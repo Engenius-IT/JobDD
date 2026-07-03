@@ -55,10 +55,13 @@ function LoginForm() {
         const currentLocale = typeof window !== 'undefined' ? window.location.pathname.split('/')[1] || 'th' : 'th';
 
         // 🟢 เปลี่ยนมาใช้ window.location.href ตัดปัญหาระบบเร้าเตอร์ Next.js นิ่งค้าง
-        if (userData.role === 'EMPLOYER' || userData.role === 'ADMIN') {
+        const redirectPath = searchParams.get('redirect');
+        if (redirectPath) {
+          const target = redirectPath.startsWith('/') ? `/${currentLocale}${redirectPath}` : redirectPath;
+          window.location.href = target;
+        } else if (userData.role === 'EMPLOYER' || userData.role === 'ADMIN') {
           window.location.href = `/${currentLocale}/employer/dashboard`;
         } else {
-          // พี่สามารถเปลี่ยนจาก '/th' เป็น '/th/profilefull' หรือหน้าไหนก็ได้ที่พี่อยากให้ผู้สมัครไปได้เลยครับ!
           window.location.href = `/${currentLocale}/profilefull`;
         }
 
@@ -127,12 +130,21 @@ function LoginForm() {
 
       login(data.accessToken, data.user);
 
-      // 🟢 ฟอร์มธรรมดาก็ให้เช็คทางเดินไปหน้าที่มีอยู่จริงเช่นกันครับ
-      if (data.user.role === 'EMPLOYER' || data.user.role === 'ADMIN') {
-        router.replace('/th/employer/dashboard');
+      // 🟢 ดึงค่า redirect จาก URL
+      const redirectPath = searchParams.get('redirect');
+      const currentLocale = typeof window !== 'undefined' ? window.location.pathname.split('/')[1] || 'th' : 'th';
+
+      if (redirectPath) {
+        // ถ้ามี redirect path ให้ไปหน้านั้น (โดยตรวจสอบว่าเป็น path ภายใน)
+        const target = redirectPath.startsWith('/') ? `/${currentLocale}${redirectPath}` : redirectPath;
+        window.location.href = target;
       } else {
-        // 🟢 [เปลี่ยนจุดนี้] เปลี่ยนให้เหมือนกันกับจุดแรกเพื่อความปลอดภัยครับ
-        router.replace('/th');
+        // ถ้าไม่มีให้ไปหน้าเริ่มต้นตาม Role
+        if (data.user.role === 'EMPLOYER' || data.user.role === 'ADMIN') {
+          window.location.href = `/${currentLocale}/employer/dashboard`;
+        } else {
+          window.location.href = `/${currentLocale}/profilefull`;
+        }
       }
     } catch {
       setError('ไม่สามารถเชื่อมต่อ API ได้');
@@ -235,7 +247,7 @@ function LoginForm() {
           <div className="space-y-4">
             {/* 🟢 แก้ไขจุดที่ 3: ปลดล็อกดึงตัวแปร `?role=${role}` ออก เพื่อให้ Google ค้นหาตัวตนและบทบาทจริงจากตารางฐานข้อมูล */}
             <a
-              href={`${OAUTH_BASE}/api/v1/auth/google`}
+              href={`${OAUTH_BASE}/api/v1/auth/google${searchParams.get('redirect') ? `?redirect=${encodeURIComponent(searchParams.get('redirect')!)}` : ''}`}
               className="w-full bg-white border border-gray-200 text-black font-medium py-3 px-4 rounded-full hover:bg-gray-50 transition-colors flex items-center justify-center gap-3 relative shadow-sm"
             >
               <svg className="w-6 h-6 absolute left-4" viewBox="0 0 24 24">

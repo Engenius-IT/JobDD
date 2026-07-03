@@ -43,9 +43,9 @@ export class AuthController {
 
     @Get('google')
     @ApiOperation({ summary: 'เริ่ม Google OAuth (ไม่ต้องส่ง Role แล้ว)' })
-    googleLogin(@Res() res: Response) {
+    googleLogin(@Res() res: Response, @Query('redirect') redirect?: string) {
         // 🟢 แก้ไข 1: ไม่ส่ง role ไปหา Google แล้ว ปล่อยให้เคลียร์สิทธิ์ด้วย Identity ก่อน
-        const googleUrl = this.authService.getGoogleRedirectUrl();
+        const googleUrl = this.authService.getGoogleRedirectUrl(redirect);
         return res.redirect(googleUrl);
     }
 
@@ -53,6 +53,7 @@ export class AuthController {
     @ApiExcludeEndpoint()
     async googleCallback(
         @Query('code') code: string,
+        @Query('state') state: string,
         @Query('error') error: string,
         @Res() res: Response
     ) {
@@ -65,6 +66,7 @@ export class AuthController {
         try {
             // 🟢 แก้ไข 2: ถอดพารามิเตอร์ targetRole ออกไปจากตัวรับ Callback
             const result = await this.authService.handleGoogleCallback(code);
+            const redirectPath = state; // We use state to pass redirect path
 
             // 🟢 เคสที่ 1: เป็นยูสเซอร์ใหม่ซิง ๆ ยังไม่มีใน Database 
             // ส่งกลับหน้า Login พร้อมแท็กสถานะ `new_user` และพ่วงโปรไฟล์ดิบจาก Google ไปให้หน้าบ้านเปิด Modal เลือกฝั่ง
@@ -73,6 +75,7 @@ export class AuthController {
                     status: 'new_user',
                     oauthData: JSON.stringify(result.user)
                 });
+                if (redirectPath) params.append('redirect', redirectPath);
                 return res.redirect(`${frontendUrl}/th/login?${params.toString()}`);
             }
 
@@ -82,6 +85,7 @@ export class AuthController {
                 token: result.token!,
                 user: JSON.stringify(result.user)
             });
+            if (redirectPath) params.append('redirect', redirectPath);
 
             return res.redirect(`${frontendUrl}/th/login?${params.toString()}`);
 

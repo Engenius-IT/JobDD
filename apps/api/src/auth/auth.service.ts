@@ -243,7 +243,7 @@ export class AuthService {
   /**
    * Get Google OAuth redirect URL (ถอดพารามิเตอร์ role ออกแล้ว)
    */
-  getGoogleRedirectUrl(): string {
+  getGoogleRedirectUrl(redirect?: string): string {
     const clientId = this.config.get<string>('GOOGLE_CLIENT_ID');
     const redirectUri = this.getApiCallbackUrl('google');
     const params = new URLSearchParams({
@@ -254,6 +254,9 @@ export class AuthService {
       access_type: 'offline',
       prompt: 'select_account',
     });
+    if (redirect) {
+      params.append('state', redirect);
+    }
     return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
   }
 

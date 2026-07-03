@@ -49,8 +49,12 @@ function RegisterContent() {
       
       login(data.accessToken, data.user);
       const currentLocale = typeof window !== 'undefined' ? window.location.pathname.split('/')[1] || 'th' : 'th';
-      
-      if (role === 'EMPLOYER') {
+      const redirectPath = searchParams.get('redirect');
+
+      if (redirectPath) {
+        const target = redirectPath.startsWith('/') ? `/${currentLocale}${redirectPath}` : redirectPath;
+        window.location.href = target;
+      } else if (role === 'EMPLOYER') {
         window.location.href = `/${currentLocale}/employer/dashboard`;
       } else {
         window.location.href = `/${currentLocale}/profilefull`;

@@ -226,7 +226,7 @@ const currentUrl =
               // Guest State
               <>
                 <Link
-                  href="/login"
+                  href={`/login?redirect=${encodeURIComponent(currentUrl)}`}
                   className="px-5 py-2.5 rounded-lg text-[#000000] font-medium hover:text-[#E00016] transition-all"
                 >
                   {t('login')}
@@ -533,7 +533,7 @@ const currentUrl =
           ) : (
             <>
               <Link
-                href="/login"
+                href={`/login?redirect=${encodeURIComponent(currentUrl)}`}
                 className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
