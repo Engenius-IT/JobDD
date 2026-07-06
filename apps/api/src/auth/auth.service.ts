@@ -34,11 +34,14 @@ export class AuthService {
     if (emailUser && emailPass) {
       this.transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
+        port: 465,
+        secure: true,
         auth: {
           user: emailUser,
           pass: emailPass,
+        },
+        tls: {
+          rejectUnauthorized: false,
         },
       } as any);
     }
@@ -553,7 +556,8 @@ export class AuthService {
       if (this.transporter) {
         try {
           console.log(`[${new Date().toISOString()}] Starting email send process...`);
-          const info = await this.transporter.sendMail({
+          
+          const sendMailPromise = this.transporter.sendMail({
             from: `"WorksDD" <${emailUser}>`,
             to: user.email!,
             subject: 'รีเซ็ตรหัสผ่าน WorksDD',
@@ -573,7 +577,13 @@ export class AuthService {
               </div>
             `,
           });
-          console.log(`[${new Date().toISOString()}] Email sent successfully! Message ID: ${info.messageId}`);
+          
+          const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Email send timeout after 15 seconds')), 15000);
+          });
+          
+          const info = await Promise.race([sendMailPromise, timeoutPromise]);
+          console.log(`[${new Date().toISOString()}] Email sent successfully! Message ID: ${(info as any).messageId}`);
         } catch (error: any) {
           console.error(`[${new Date().toISOString()}] Email send failed with error:`, error.message);
           console.error(`[${new Date().toISOString()}] Error code:`, error.code);
