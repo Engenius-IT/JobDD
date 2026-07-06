@@ -9,7 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
 import crypto from 'crypto';
-import { Resend } from 'resend';
+import * as nodemailer from 'nodemailer';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
@@ -21,16 +21,24 @@ import { VerificationStatus, NotificationType } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
-  private resend: Resend;
+  private transporter: nodemailer.Transporter;
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly config: ConfigService,
   ) {
-    const apiKey = this.config.get<string>('RESEND_API_KEY');
-    if (apiKey) {
-      this.resend = new Resend(apiKey);
+    const emailUser = this.config.get<string>('EMAIL_USER');
+    const emailPass = this.config.get<string>('EMAIL_PASS');
+
+    if (emailUser && emailPass) {
+      this.transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: emailUser,
+          pass: emailPass,
+        },
+      });
     }
   }
 
@@ -535,10 +543,10 @@ export class AuthService {
       const frontendUrl = this.config.get<string>('NEXTAUTH_URL', 'http://localhost:3000');
       const resetUrl = `${frontendUrl}/th/auth/reset-password?token=${token}`;
 
-      if (this.resend) {
+      if (this.transporter) {
         try {
-          await this.resend.emails.send({
-            from: 'WorksDD <onboarding@resend.dev>',
+          await this.transporter.sendMail({
+            from: `"WorksDD" <${this.config.get<string>('EMAIL_USER')}>`,
             to: user.email!,
             subject: 'รีเซ็ตรหัสผ่าน WorksDD',
             html: `
@@ -561,7 +569,7 @@ export class AuthService {
           console.error('Failed to send reset password email:', error);
         }
       } else {
-        console.warn('RESEND_API_KEY is not configured. Email not sent.');
+        console.warn('EMAIL_USER or EMAIL_PASS is not configured. Email not sent.');
         console.log('Reset URL:', resetUrl);
       }
 
