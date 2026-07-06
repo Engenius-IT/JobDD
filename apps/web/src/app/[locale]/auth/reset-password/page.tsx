@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { Link, useRouter } from '@/i18n/routing';
 import Navbar from '@/components/Navbar';
 
 export default function ResetPasswordPage() {
@@ -74,7 +74,7 @@ export default function ResetPasswordPage() {
 
       // Redirect to login after 3 seconds
       setTimeout(() => {
-        router.push('/th/login');
+        router.push('/login');
       }, 3000);
     } catch (err) {
       setError('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
@@ -107,7 +107,7 @@ export default function ResetPasswordPage() {
                 กรุณาเข้าสู่ระบบด้วยรหัสผ่านใหม่
               </p>
               <Link
-                href="/th/login"
+                href="/login"
                 className="inline-block bg-blue-800 text-white font-medium py-3 px-6 rounded-full hover:bg-blue-900 transition-colors"
               >
                 ไปยังหน้า Login
@@ -181,7 +181,7 @@ export default function ResetPasswordPage() {
 
               <div className="text-center pt-4">
                 <p className="text-gray-600">
-                  <Link href="/th/login" className="text-blue-800 font-medium hover:underline">
+                  <Link href="/login" className="text-blue-800 font-medium hover:underline">
                     กลับไปหน้า Login
                   </Link>
                 </p>

@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { Link, useRouter } from '@/i18n/routing';
 import Navbar from '@/components/Navbar';
 
 export default function ForgotPasswordPage() {
@@ -67,7 +66,7 @@ export default function ForgotPasswordPage() {
                 ลิงก์นี้จะหมดอายุภายใน 1 ชั่วโมง
               </p>
               <Link
-                href="/th/login"
+                href="/login"
                 className="inline-block bg-blue-800 text-white font-medium py-3 px-6 rounded-full hover:bg-blue-900 transition-colors"
               >
                 กลับไปหน้า Login
@@ -106,7 +105,7 @@ export default function ForgotPasswordPage() {
               <div className="text-center pt-4">
                 <p className="text-gray-600">
                   จำรหัสผ่านได้แล้ว?{' '}
-                  <Link href="/th/login" className="text-blue-800 font-medium hover:underline">
+                  <Link href="/login" className="text-blue-800 font-medium hover:underline">
                     เข้าสู่ระบบ
                   </Link>
                 </p>

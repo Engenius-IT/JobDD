@@ -235,8 +235,8 @@ function LoginForm() {
             </div>
             <div className="text-center pt-2">
               <Link
-                href="/th/auth/forgot-password"
-                className="text-blue-800 hover:text-blue-900 text-sm font-medium"
+                href="/auth/forgot-password"
+                className={`text-sm font-medium hover:underline ${role === 'JOBSEEKER' ? 'text-blue-800 hover:text-blue-900' : 'text-red-800 hover:text-red-900'}`}
               >
                 ลืมรหัสผ่าน?
               </Link>
