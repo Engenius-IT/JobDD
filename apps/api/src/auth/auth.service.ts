@@ -40,15 +40,7 @@ export class AuthService {
           user: emailUser,
           pass: emailPass,
         },
-        pool: {
-          maxConnections: 5,
-          maxMessages: 100,
-          rateDelta: 1000,
-          rateLimit: 5,
-        },
-        socketTimeout: 30000,
-        connectionTimeout: 10000,
-      });
+      } as any);
     }
   }
 
