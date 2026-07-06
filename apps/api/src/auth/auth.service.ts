@@ -33,11 +33,21 @@ export class AuthService {
 
     if (emailUser && emailPass) {
       this.transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
         auth: {
           user: emailUser,
           pass: emailPass,
         },
+        pool: {
+          maxConnections: 5,
+          maxMessages: 100,
+          rateDelta: 1000,
+          rateLimit: 5,
+        },
+        socketTimeout: 30000,
+        connectionTimeout: 10000,
       });
     }
   }
