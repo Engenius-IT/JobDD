@@ -32,17 +32,17 @@ import { BillingModal } from '@/components/BillingModal';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
-const getAccountStatusDisplay = (verificationStatus?: Company['verificationStatus']) => {
+const getAccountStatusDisplay = (verificationStatus: Company['verificationStatus'] | undefined, t: ReturnType<typeof useTranslations>) => {
   switch (verificationStatus) {
     case 'VERIFIED':
-      return { label: 'ยืนยันแล้ว', iconClassName: 'text-emerald-500', textClassName: 'text-gray-800' };
+      return { label: t('verified'), iconClassName: 'text-emerald-500', textClassName: 'text-gray-800' };
     case 'PENDING_REVIEW':
-      return { label: 'รอตรวจสอบ', iconClassName: 'text-blue-500', textClassName: 'text-blue-700' };
+      return { label: t('pendingReview'), iconClassName: 'text-blue-500', textClassName: 'text-blue-700' };
     case 'REJECTED':
-      return { label: 'ไม่ผ่านการยืนยัน', iconClassName: 'text-red-500', textClassName: 'text-red-700' };
+      return { label: t('rejected'), iconClassName: 'text-red-500', textClassName: 'text-red-700' };
     case 'UNVERIFIED':
     default:
-      return { label: 'ยังไม่ได้ยืนยันบัญชี', iconClassName: 'text-amber-500', textClassName: 'text-amber-700' };
+      return { label: t('unverified'), iconClassName: 'text-amber-500', textClassName: 'text-amber-700' };
   }
 };
 
@@ -67,15 +67,15 @@ const VerificationStatusBanner = ({
           </svg>
         </div>
         <div className="flex-1">
-          <h3 className="text-base font-bold text-red-800 tracking-tight">การยืนยันตัวตนบริษัทไม่ผ่าน</h3>
+          <h3 className="text-base font-bold text-red-800 tracking-tight">{t('verificationBanner.verificationRejectedTitle')}</h3>
           <p className="text-sm text-red-600 mt-1 mb-3">
-            เหตุผล: {company.rejectionReason || 'เอกสารไม่ถูกต้องหรือไม่ชัดเจน กรุณาตรวจสอบและอัปโหลดเอกสารใหม่อีกครั้ง'}
+            {t('verificationBanner.reason')}: {company.rejectionReason || t('verificationBanner.verificationRejectedDefaultReason')}
           </p>
           <button
             onClick={onVerifyClick}
             className="text-sm font-semibold bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-xl transition-colors shadow-sm"
           >
-            ยื่นเอกสารใหม่
+            {t('verificationBanner.resubmitDocuments')}
           </button>
         </div>
       </div>
@@ -91,9 +91,9 @@ const VerificationStatusBanner = ({
           </svg>
         </div>
         <div className="flex-1">
-          <h3 className="text-base font-bold text-[#020263] tracking-tight">กำลังตรวจสอบเอกสารยืนยันตัวตน</h3>
+          <h3 className="text-base font-bold text-[#020263] tracking-tight">{t('verificationBanner.verificationPendingTitle')}</h3>
           <p className="text-sm text-blue-700 mt-1">
-            บริษัทของคุณส่งเอกสารยืนยันตัวตนเรียบร้อยแล้ว แอดมินกำลังดำเนินการตรวจสอบ ซึ่งอาจใช้เวลา 1-2 วันทำการ
+            {t('verificationBanner.verificationPendingDescription')}
           </p>
         </div>
       </div>
@@ -110,10 +110,10 @@ const VerificationStatusBanner = ({
         </svg>
       </div>
       <div className="flex-1 relative z-10">
-        <h3 className="text-base font-bold text-[#805300] tracking-tight">ยังไม่ได้ยืนยันบัญชี</h3>
+        <h3 className="text-base font-bold text-[#805300] tracking-tight">{t('verificationBanner.verificationRequiredTitle')}</h3>
         <p className="text-sm text-[#996300] mt-1 mb-4 leading-relaxed max-w-2xl">
-          โปรดอัปโหลด <span className="font-semibold text-[#805300]">"หนังสือรับรองบริษัท"</span> หรือ <span className="font-semibold text-[#805300]">"ภ.พ.20"</span> เพื่อเป็นการยืนยันตัวตน <br />
-          หลังจากผ่านการตรวจสอบ คุณจะสามารถ <span className="font-semibold text-[#805300]">เผยแพร่ประกาศงาน</span> และใช้งานฟีเจอร์ต่างๆ ได้อย่างเต็มประสิทธิภาพ
+           <span className="font-semibold text-[#805300]">{t('verificationBanner.verificationRequiredDescription1')}</span> <span className="font-semibold text-[#805300]">{t('verificationBanner.verificationRequiredDocument1')}</span> {t('verificationBanner.verificationRequiredOr')} <span className="font-semibold text-[#805300]">{t('verificationBanner.verificationRequiredDocument2')}</span> {t('verificationBanner.verificationRequiredDescription2')} <br />
+          {t('verificationBanner.verificationRequiredDescription3')} <span className="font-semibold text-[#805300]">{t('verificationBanner.verificationRequiredHighlight')}</span> {t('verificationBanner.verificationRequiredDescription4')}
         </p>
         <button
           onClick={onVerifyClick}
@@ -122,28 +122,13 @@ const VerificationStatusBanner = ({
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          เริ่มยืนยันตัวตนตอนนี้
+          {t('verificationBanner.startVerification')}
         </button>
       </div>
     </div>
   );
 };
 
-const DAYS = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
-const MONTHS_TH = [
-  'มกราคม',
-  'กุมภาพันธ์',
-  'มีนาคม',
-  'เมษายน',
-  'พฤษภาคม',
-  'มิถุนายน',
-  'กรกฎาคม',
-  'สิงหาคม',
-  'กันยายน',
-  'ตุลาคม',
-  'พฤศจิกายน',
-  'ธันวาคม',
-];
 
 interface Job {
   id: string;
@@ -196,6 +181,32 @@ interface RecentApplicantItem {
 
 function MiniCalendar({ interviews = [] }: { interviews?: InterviewItem[] }) {
   const t = useTranslations('DashBoard');
+
+  const DAYS = [
+  t("days.sun"),
+  t("days.mon"),
+  t("days.tue"),
+  t("days.wed"),
+  t("days.thu"),
+  t("days.fri"),
+  t("days.sat"),
+];
+
+const MONTHS_TH = [
+  t("months.january"),
+  t("months.february"),
+  t("months.march"),
+  t("months.april"),
+  t("months.may"),
+  t("months.june"),
+  t("months.july"),
+  t("months.august"),
+  t("months.september"),
+  t("months.october"),
+  t("months.november"),
+  t("months.december"),
+];
+  
   const today = new Date();
   const [current, setCurrent] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
   const [clickedDay, setClickedDay] = useState<number | null>(null);
@@ -339,21 +350,21 @@ function MiniCalendar({ interviews = [] }: { interviews?: InterviewItem[] }) {
 
       {activeInterviews.length === 0 && clickedDay !== null && (
         <div className="mt-4 text-center">
-          <p className="text-xs text-gray-400">วันที่เลือกไม่มีนัดสัมภาษณ์</p>
+          <p className="text-xs text-gray-400">{t('verificationBanner.noInterviewSelectedDay')}</p>
         </div>
       )}
 
       {activeInterviews.length === 0 && clickedDay === null && interviews.length > 0 && (
         <div className="mt-4 text-center">
           <p className="text-xs text-gray-400">
-            วันนี้ไม่มีนัดสัมภาษณ์ · กดวันที่มีจุดสีเพื่อดูรายละเอียด
+            {t('verificationBanner.noInterviewTodayHint')}
           </p>
         </div>
       )}
 
       {interviews.length === 0 && (
         <div className="mt-4 text-center">
-          <p className="text-xs text-gray-400">{t('noInterview')}</p>
+          <p className="text-xs text-gray-400">{t('verificationBanner.noInterview')}</p>
         </div>
       )}
     </div>
@@ -369,6 +380,7 @@ function CompanyEditModal({
   onClose: () => void;
   onSaved: (c: Company) => void;
 }) {
+  const t = useTranslations('DashBoard');
   const [form, setForm] = useState<Company>({ ...company });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -408,7 +420,7 @@ function CompanyEditModal({
       onSaved(updated);
       onClose();
     } catch {
-      setError('บันทึกไม่สำเร็จ กรุณาลองใหม่');
+      setError(t('saveFailed'));
     } finally {
       setSaving(false);
     }
@@ -423,7 +435,7 @@ function CompanyEditModal({
       <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-100 px-8 py-5 flex items-center justify-between rounded-t-3xl z-10">
-          <h2 className="text-xl font-bold text-gray-800">แก้ไขข้อมูลบริษัท</h2>
+          <h2 className="text-xl font-bold text-gray-800">{t('companyEdit.title')}</h2>
           <button
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
@@ -469,7 +481,7 @@ function CompanyEditModal({
                     d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"
                   />
                 </svg>
-                <span className="text-[10px] text-white font-medium">เปลี่ยนโลโก้</span>
+                <span className="text-[10px] text-white font-medium">{t('companyEdit.logoUploadLabel')}</span>
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
@@ -490,18 +502,18 @@ function CompanyEditModal({
                       const data = await uploadRes.json();
                       set('logoUrl', data.url);
                     } catch (err) {
-                      setError('อัปโหลดรูปภาพไม่สำเร็จ');
+                      setError(t('companyEdit.uploadFailed'));
                     }
                   }}
                 />
               </label>
             </div>
             <div className="flex flex-col justify-center max-w-sm text-center sm:text-left">
-              <h3 className="text-sm font-semibold text-gray-800">โลโก้บริษัท</h3>
+              <h3 className="text-sm font-semibold text-gray-800">{t('companyEdit.logoTitle')}</h3>
               <p className="text-xs text-gray-400 mt-1 leading-relaxed">
-                อัปโหลดโลโก้บริษัทของคุณเพื่อให้น่าเชื่อถือมากยิ่งขึ้น
+                {t('companyEdit.logoDescriptionLine1')}
                 <br />
-                รองรับไฟล์ JPG, PNG, WEBP ขนาดไม่เกิน 5MB
+                {t('companyEdit.logoDescriptionLine2')}
               </p>
             </div>
           </div>
@@ -509,7 +521,7 @@ function CompanyEditModal({
           {/* Background Upload */}
           <div className="border-t border-gray-100 pt-6">
             <h3 className="text-sm font-semibold text-gray-800 mb-3">
-              รูปพื้นหลังบริษัท
+              {t('companyEdit.backgroundTitle')}
             </h3>
 
             <div className="relative rounded-2xl overflow-hidden border border-gray-200">
@@ -522,14 +534,14 @@ function CompanyEditModal({
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
-                    ยังไม่มีรูปพื้นหลัง
+                    {t('companyEdit.noBackground')}
                   </div>
                 )}
               </div>
 
               <label className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer">
                 <span className="px-4 py-2 bg-white rounded-xl text-sm font-medium">
-                  เปลี่ยนรูปพื้นหลัง
+                  {t('companyEdit.changeBackground')}
                 </span>
 
                 <input
@@ -790,7 +802,7 @@ export default function EmployerDashboard() {
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null);
   const [loadingApplicants, setLoadingApplicants] = useState(true);
   const [interviews, setInterviews] = useState<InterviewItem[]>([]);
-  const accountStatusDisplay = getAccountStatusDisplay(company?.verificationStatus);
+  const accountStatusDisplay = getAccountStatusDisplay(company?.verificationStatus, t);
   const [packageInfo, setPackageInfo] = useState<any>(null);
   const [now, setNow] = useState(new Date());
   const [selectedApplicantId, setSelectedApplicantId] = useState<string | null>(null);
@@ -1335,9 +1347,13 @@ export default function EmployerDashboard() {
                     }`} />
                   <span className={`text-xs font-semibold ${packageInfo?.name === 'VIP' || packageInfo?.name === 'Premium' ? 'text-slate-300' : packageInfo?.name === 'Pro' ? 'text-amber-700' : 'text-gray-500'}`}>
                     {packageInfo
-                      ? (packageInfo?.name === 'VIP'
-                        ? 'สิทธิพิเศษขั้นสูงสุด · Active'
-                        : (packageInfo?.name === 'Premium' ? 'สิทธิพิเศษขั้นสูง · Active' : (packageInfo?.name === 'Pro' ? 'สิทธิพิเศษขั้นพื้นฐาน · Active' : 'ฟรีทดลอง · ทดลองใช้')))
+                      ? packageInfo?.name === 'VIP'
+                        ? t('vipStatus')
+                        : packageInfo?.name === 'Premium'
+                          ? t('premiumStatus')
+                          : packageInfo?.name === 'Pro'
+                            ? t('proStatus')
+                            : t('freeTrialStatus')
                       : t('apiConnectionStatus')}
                   </span>
                 </div>
@@ -1525,7 +1541,7 @@ export default function EmployerDashboard() {
                       onClick={() => router.push('/employer/packages')}
                       className="flex-1 min-h-[44px] font-black py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-all text-sm shadow-md active:scale-[0.98]"
                     >
-                      อัปเกรดแพ็คเกจ
+                      {t('upgradePackage')}
                     </button>
                   ) : (
                     <div className="flex-1 min-h-[44px] flex items-center">
@@ -1614,7 +1630,7 @@ export default function EmployerDashboard() {
             {/* Rows */}
             <div className="divide-y divide-gray-50">
               {loadingApplicants ? (
-                <div className="py-8 text-center text-sm text-gray-400">{t('loading')}</div>
+                <div className="py-8 text-center text-sm text-gray-400">{t('recentloading')}</div>
               ) : recentApplicants.length === 0 ? (
                 <div className="py-8 text-center text-sm text-gray-400">{t('noRecent')}</div>
               ) : (
@@ -1675,7 +1691,7 @@ export default function EmployerDashboard() {
             </div>
 
             <div className="mt-4 text-center text-xs text-gray-400">
-              แสดง {recentApplicants.length} จากรายการล่าสุด (สูงสุด 5 รายการ)
+              {t('showing')} {recentApplicants.length} {t('from')} {t('recentloading')}
             </div>
           </div>
         </div>
@@ -1694,7 +1710,7 @@ export default function EmployerDashboard() {
                   {t('title')}
                 </h3>
                 <p className="text-[10px] text-gray-400 font-medium">
-                  {candidates.length} {t('total')}
+                  {candidates.length} {t('savedtotal')}
                 </p>
               </div>
             </div>
@@ -1709,9 +1725,9 @@ export default function EmployerDashboard() {
 
           {/* Table Header - แก้ไข: ซ่อนบนมือถือ */}
           <div className="hidden md:grid grid-cols-12 text-[11px] text-gray-400 font-bold pb-2 border-b border-gray-50 px-2 uppercase tracking-wider">
-            <div className="col-span-5">{t('applicant')}</div>
-            <div className="col-span-5">{t('position')}</div>
-            <div className="col-span-2 text-right">{t('action')}</div>
+            <div className="col-span-5">{t('savedapplicant')}</div>
+            <div className="col-span-5">{t('savedposition')}</div>
+            <div className="col-span-2 text-right">{t('savedaction')}</div>
           </div>
 
           {/* List Content */}
@@ -1719,7 +1735,7 @@ export default function EmployerDashboard() {
             {loadingBookmarks ? (
               <div className="py-10 text-center">
                 <div className="w-6 h-6 border-2 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-                <p className="text-xs text-gray-400">{t('loading')}</p>
+                <p className="text-xs text-gray-400">{t('savedloading')}</p>
               </div>
             ) : candidates.length === 0 ? (
               <div className="py-10 text-center">
