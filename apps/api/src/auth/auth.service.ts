@@ -3,24 +3,36 @@ import {
   ConflictException,
   UnauthorizedException,
   InternalServerErrorException,
+  BadRequestException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
+import * as crypto from 'crypto';
+import { Resend } from 'resend';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { LoginDto } from './dto/login.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import type { JwtPayload } from './types/jwt-payload.interface';
 import { VerificationStatus, NotificationType } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
+  private resend: Resend;
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly config: ConfigService,
-  ) { }
+  ) {
+    const apiKey = this.config.get<string>('RESEND_API_KEY');
+    if (apiKey) {
+      this.resend = new Resend(apiKey);
+    }
+  }
 
   /**
    * Register a new user (แบบปกติ กรอกฟอร์ม)
@@ -492,5 +504,101 @@ export class AuthService {
     });
 
     return { message: 'เปลี่ยนรหัสผ่านสำเร็จ' };
+  }
+
+  /**
+   * Forgot password - send email with reset token
+   */
+  async forgotPassword(dto: ForgotPasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
+
+    if (!user) {
+      // Return success even if user not found for security
+      return { message: 'หากอีเมลนี้มีอยู่ในระบบ เราได้ส่งลิงก์รีเซ็ตรหัสผ่านไปให้แล้ว' };
+    }
+
+    if (!user.passwordHash) {
+      throw new BadRequestException('บัญชีนี้ลงทะเบียนผ่านโซเชียลมีเดีย ไม่สามารถรีเซ็ตรหัสผ่านได้');
+    }
+
+    const token = crypto.randomBytes(32).toString('hex');
+    const expires = new Date();
+    expires.setHours(expires.getHours() + 1); // Token expires in 1 hour
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        resetPasswordToken: token,
+        resetPasswordExpires: expires,
+      },
+    });
+
+    const frontendUrl = this.config.get<string>('NEXTAUTH_URL', 'http://localhost:3000');
+    const resetUrl = `${frontendUrl}/th/auth/reset-password?token=${token}`;
+
+    if (this.resend) {
+      try {
+        await this.resend.emails.send({
+          from: 'WorksDD <onboarding@resend.dev>',
+          to: user.email!,
+          subject: 'รีเซ็ตรหัสผ่าน WorksDD',
+          html: `
+            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+              <h2 style="color: #d32f2f;">รีเซ็ตรหัสผ่าน WorksDD</h2>
+              <p>สวัสดีคุณ ${user.firstName},</p>
+              <p>คุณได้รับอีเมลนี้เนื่องจากมีการขอรีเซ็ตรหัสผ่านสำหรับบัญชีของคุณใน WorksDD</p>
+              <p>กรุณาคลิกปุ่มด้านล่างเพื่อเปลี่ยนรหัสผ่านใหม่ (ลิงก์นี้จะหมดอายุภายใน 1 ชั่วโมง):</p>
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${resetUrl}" style="background-color: #d32f2f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 50px; font-weight: bold;">เปลี่ยนรหัสผ่านใหม่</a>
+              </div>
+              <p>หากคุณไม่ได้เป็นผู้ร้องขอ โปรดเพิกเฉยต่ออีเมลนี้</p>
+              <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+              <p style="font-size: 12px; color: #777;">หากปุ่มด้านบนใช้งานไม่ได้ คุณสามารถคัดลอกลิงก์ด้านล่างไปวางในเบราว์เซอร์ได้:</p>
+              <p style="font-size: 12px; color: #777; word-break: break-all;">${resetUrl}</p>
+            </div>
+          `,
+        });
+      } catch (error) {
+        console.error('Failed to send reset password email:', error);
+      }
+    } else {
+      console.warn('RESEND_API_KEY is not configured. Email not sent.');
+      console.log('Reset URL:', resetUrl);
+    }
+
+    return { message: 'หากอีเมลนี้มีอยู่ในระบบ เราได้ส่งลิงก์รีเซ็ตรหัสผ่านไปให้แล้ว' };
+  }
+
+  /**
+   * Reset password using token
+   */
+  async resetPassword(dto: ResetPasswordDto) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        resetPasswordToken: dto.token,
+        resetPasswordExpires: {
+          gt: new Date(),
+        },
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException('Token ไม่ถูกต้องหรือหมดอายุแล้ว');
+    }
+
+    const newPasswordHash = await bcrypt.hash(dto.newPassword, 12);
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordHash: newPasswordHash,
+        resetPasswordToken: null,
+        resetPasswordExpires: null,
+      },
+    });
+
+    return { message: 'เปลี่ยนรหัสผ่านใหม่สำเร็จแล้ว' };
   }
 }

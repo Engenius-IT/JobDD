@@ -6,6 +6,8 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { JwtPayload } from './types/jwt-payload.interface';
@@ -112,5 +114,19 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     async changePassword(@CurrentUser() user: JwtPayload, @Body() dto: ChangePasswordDto) {
         return this.authService.changePassword(user.sub, dto);
+    }
+
+    @Post('forgot-password')
+    @ApiOperation({ summary: 'ขอรีเซ็ตรหัสผ่าน (ส่งอีเมล)' })
+    @HttpCode(HttpStatus.OK)
+    async forgotPassword(@Body() dto: ForgotPasswordDto) {
+        return this.authService.forgotPassword(dto);
+    }
+
+    @Post('reset-password')
+    @ApiOperation({ summary: 'รีเซ็ตรหัสผ่านใหม่ด้วย Token' })
+    @HttpCode(HttpStatus.OK)
+    async resetPassword(@Body() dto: ResetPasswordDto) {
+        return this.authService.resetPassword(dto);
     }
 }

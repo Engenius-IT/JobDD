@@ -233,6 +233,14 @@ function LoginForm() {
                 สมัครสมาชิก
               </Link>
             </div>
+            <div className="text-center pt-2">
+              <Link
+                href="/th/auth/forgot-password"
+                className="text-blue-800 hover:text-blue-900 text-sm font-medium"
+              >
+                ลืมรหัสผ่าน?
+              </Link>
+            </div>
           </form>
 
           <div className="relative my-8">
