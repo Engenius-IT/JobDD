@@ -543,10 +543,16 @@ export class AuthService {
       const frontendUrl = this.config.get<string>('NEXTAUTH_URL', 'http://localhost:3000');
       const resetUrl = `${frontendUrl}/th/auth/reset-password?token=${token}`;
 
+      const emailUser = this.config.get<string>('EMAIL_USER');
+      console.log(`[${new Date().toISOString()}] Attempting to send reset password email to: ${user.email}`);
+      console.log(`[${new Date().toISOString()}] Email User configured: ${!!emailUser}`);
+      console.log(`[${new Date().toISOString()}] Transporter available: ${!!this.transporter}`);
+
       if (this.transporter) {
         try {
-          await this.transporter.sendMail({
-            from: `"WorksDD" <${this.config.get<string>('EMAIL_USER')}>`,
+          console.log(`[${new Date().toISOString()}] Starting email send process...`);
+          const info = await this.transporter.sendMail({
+            from: `"WorksDD" <${emailUser}>`,
             to: user.email!,
             subject: 'รีเซ็ตรหัสผ่าน WorksDD',
             html: `
@@ -565,12 +571,15 @@ export class AuthService {
               </div>
             `,
           });
-        } catch (error) {
-          console.error('Failed to send reset password email:', error);
+          console.log(`[${new Date().toISOString()}] Email sent successfully! Message ID: ${info.messageId}`);
+        } catch (error: any) {
+          console.error(`[${new Date().toISOString()}] Email send failed with error:`, error.message);
+          console.error(`[${new Date().toISOString()}] Error code:`, error.code);
+          console.error(`[${new Date().toISOString()}] Full error:`, error);
         }
       } else {
-        console.warn('EMAIL_USER or EMAIL_PASS is not configured. Email not sent.');
-        console.log('Reset URL:', resetUrl);
+        console.warn(`[${new Date().toISOString()}] EMAIL_USER or EMAIL_PASS is not configured. Email not sent.`);
+        console.log(`[${new Date().toISOString()}] Reset URL for manual testing: ${resetUrl}`);
       }
 
       return { message: 'หากอีเมลนี้มีอยู่ในระบบ เราได้ส่งลิงก์รีเซ็ตรหัสผ่านไปให้แล้ว' };
