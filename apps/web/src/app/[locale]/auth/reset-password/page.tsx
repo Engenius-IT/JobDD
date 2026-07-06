@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Link, useRouter } from '@/i18n/routing';
-import Navbar from '@/components/Navbar';
+import { Navbar } from '@/components/Navbar';
+import { Suspense } from 'react';
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
@@ -191,5 +192,13 @@ export default function ResetPasswordPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">กำลังโหลด...</div>}>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }

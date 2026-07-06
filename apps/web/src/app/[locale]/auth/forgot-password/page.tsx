@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { Link, useRouter } from '@/i18n/routing';
-import Navbar from '@/components/Navbar';
+import { Navbar } from '@/components/Navbar';
+import { Suspense } from 'react';
 
-export default function ForgotPasswordPage() {
+function ForgotPasswordContent() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
@@ -115,5 +116,13 @@ export default function ForgotPasswordPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ForgotPasswordPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">กำลังโหลด...</div>}>
+      <ForgotPasswordContent />
+    </Suspense>
   );
 }
