@@ -520,10 +520,6 @@ export class AuthService {
         return { message: 'หากอีเมลนี้มีอยู่ในระบบ เราได้ส่งลิงก์รีเซ็ตรหัสผ่านไปให้แล้ว' };
       }
 
-      if (!user.passwordHash) {
-        throw new BadRequestException('บัญชีนี้ลงทะเบียนผ่านโซเชียลมีเดีย ไม่สามารถรีเซ็ตรหัสผ่านได้');
-      }
-
       const token = crypto.randomBytes(32).toString('hex');
       const expires = new Date();
       expires.setHours(expires.getHours() + 1); // Token expires in 1 hour
