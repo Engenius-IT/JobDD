@@ -200,24 +200,31 @@ export class AuthService {
   }
 
   /**
-   * Google OAuth Redirect URL
+   * Get Google OAuth redirect URL
    */
-  getGoogleRedirectUrl(redirect?: string) {
-    const googleClientId = this.config.get<string>('GOOGLE_CLIENT_ID');
-    const apiBaseUrl = this.config.get<string>('API_URL');
-    const redirectUri = `${apiBaseUrl}/auth/google/callback`;
-    
+  getGoogleRedirectUrl(redirect?: string): string {
+    const clientId = this.config.get<string>('GOOGLE_CLIENT_ID');
+    const redirectUri = this.getApiCallbackUrl('google');
     const params = new URLSearchParams({
-      client_id: googleClientId!,
+      client_id: clientId!,
       redirect_uri: redirectUri,
       response_type: 'code',
       scope: 'openid email profile',
       access_type: 'offline',
       prompt: 'select_account',
-      state: redirect || '/',
     });
-
+    if (redirect) {
+      params.append('state', redirect);
+    }
     return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+  }
+
+  /**
+   * Get API callback URL for OAuth providers
+   */
+  private getApiCallbackUrl(provider: string): string {
+    const apiUrl = this.config.get<string>('API_URL', 'http://localhost:3001');
+    return `${apiUrl}/api/v1/auth/${provider}/callback`;
   }
 
   /**
@@ -227,8 +234,7 @@ export class AuthService {
     try {
       const googleClientId = this.config.get<string>('GOOGLE_CLIENT_ID');
       const googleClientSecret = this.config.get<string>('GOOGLE_CLIENT_SECRET');
-      const apiBaseUrl = this.config.get<string>('API_URL');
-      const redirectUri = `${apiBaseUrl}/auth/google/callback`;
+      const redirectUri = this.getApiCallbackUrl('google');
 
       // 1. Exchange code for tokens
       const tokenResponse = await axios.post('https://oauth2.googleapis.com/token', {
@@ -237,6 +243,8 @@ export class AuthService {
         client_secret: googleClientSecret,
         redirect_uri: redirectUri,
         grant_type: 'authorization_code',
+      }, {
+        timeout: 10000,
       });
 
       const { access_token } = tokenResponse.data;
@@ -244,6 +252,7 @@ export class AuthService {
       // 2. Get user info from Google
       const userResponse = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
         headers: { Authorization: `Bearer ${access_token}` },
+        timeout: 10000,
       });
 
       const googleUser = userResponse.data;
@@ -302,7 +311,11 @@ export class AuthService {
         },
       };
     } catch (error: any) {
-      console.error('Google Auth Error:', error.response?.data || error.message);
+      console.error('Google Auth Error:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message,
+      });
       throw new InternalServerErrorException('Google Authentication Failed');
     }
   }
