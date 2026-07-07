@@ -39,13 +39,12 @@
     "class-validator": "^0.14.0",
     "express": "^5.0.1",
     "multer": "^2.0.2",
-    "resend": "^4.1.2",
+    "axios": "^1.6.2",
     "mysql2": "^3.11.3",
     "omise": "^1.1.0",
     "pdf-parse": "^1.1.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.0",
-    "nodemailer": "^6.9.13",
     "zod": "^3.24.0"
   },
   "devDependencies": {
@@ -55,7 +54,6 @@
     "@types/express": "^5.0.6",
     "@types/multer": "^2.0.0",
     "@types/node": "^25.6.0",
-    "@types/nodemailer": "^6.4.14",
     "@types/pdf-parse": "^1.1.4",
     "eslint": "^9.0.0",
     "prisma": "5.22.0",
