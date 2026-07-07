@@ -354,11 +354,14 @@ export class AuthService {
    */
   async forgotPassword(dto: ForgotPasswordDto) {
     try {
+      console.log(`[Forgot Password] Request for email: ${dto.email}`);
+      
       const user = await this.prisma.user.findUnique({
         where: { email: dto.email },
       });
 
       if (!user) {
+        console.log(`[Forgot Password] User not found for email: ${dto.email}`);
         return { message: 'หากอีเมลนี้มีอยู่ในระบบ เราได้ส่งลิงก์รีเซ็ตรหัสผ่านไปให้แล้ว' };
       }
 
@@ -376,13 +379,19 @@ export class AuthService {
 
       const frontendUrl = this.config.get<string>('NEXTAUTH_URL', 'http://localhost:3000');
       const resetUrl = `${frontendUrl}/th/auth/reset-password?token=${token}`;
+      const senderEmail = this.config.get<string>('BREVO_SENDER_EMAIL', 'noreply@worksdd.com');
+
+      console.log(`[Forgot Password] Brevo API Key configured: ${!!this.brevoApiKey}`);
+      console.log(`[Forgot Password] Sender email: ${senderEmail}`);
 
       if (this.brevoApiKey) {
         try {
-          await axios.post(
+          console.log(`[Forgot Password] Sending email to: ${user.email}`);
+          
+          const response = await axios.post(
             `${this.brevoApiUrl}/smtp/email`,
             {
-              sender: { name: 'WorksDD', email: 'noreply@worksdd.com' },
+              sender: { name: 'WorksDD', email: senderEmail },
               to: [{ email: user.email, name: user.firstName }],
               subject: 'รีเซ็ตรหัสผ่าน WorksDD',
               htmlContent: `
@@ -406,9 +415,17 @@ export class AuthService {
               timeout: 10000,
             },
           );
+          
+          console.log(`[Forgot Password] Email sent successfully. Response ID: ${response.data?.messageId}`);
         } catch (error: any) {
-          console.error('Brevo Email Error:', error.response?.data || error.message);
+          console.error(`[Forgot Password] Brevo API Error:`, {
+            status: error.response?.status,
+            data: error.response?.data,
+            message: error.message,
+          });
         }
+      } else {
+        console.warn('[Forgot Password] BREVO_API_KEY is not configured');
       }
 
       return { message: 'หากอีเมลนี้มีอยู่ในระบบ เราได้ส่งลิงก์รีเซ็ตรหัสผ่านไปให้แล้ว' };
@@ -430,8 +447,11 @@ export class AuthService {
       });
 
       if (!user) {
+        console.warn(`[Reset Password] Invalid or expired token`);
         throw new BadRequestException('ลิงก์รีเซ็ตรหัสผ่านไม่ถูกต้องหรือหมดอายุแล้ว');
       }
+
+      console.log(`[Reset Password] Resetting password for user: ${user.email}`);
 
       const passwordHash = await bcrypt.hash(dto.newPassword, 12);
 
@@ -444,6 +464,7 @@ export class AuthService {
         },
       });
 
+      console.log(`[Reset Password] Password reset successfully for user: ${user.email}`);
       return { message: 'รีเซ็ตรหัสผ่านสำเร็จ คุณสามารถเข้าสู่ระบบได้แล้ว' };
     } catch (error: any) {
       if (error instanceof BadRequestException) throw error;
