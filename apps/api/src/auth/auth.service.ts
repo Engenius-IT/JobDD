@@ -17,7 +17,7 @@ import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import type { JwtPayload } from './types/jwt-payload.interface';
-import { VerificationStatus, NotificationType } from '@prisma/client';
+import { UserRole } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -33,7 +33,7 @@ export class AuthService {
   }
 
   /**
-   * Register a new user (แบบปกติ กรอกฟอร์ม)
+   * Register a new user
    */
   async register(dto: RegisterDto) {
     try {
@@ -53,13 +53,13 @@ export class AuthService {
           firstName: dto.firstName,
           lastName: dto.lastName,
           passwordHash,
-          verificationStatus: VerificationStatus.UNVERIFIED,
+          role: dto.role || UserRole.JOBSEEKER,
         },
       });
 
       const payload: JwtPayload = {
         sub: user.id,
-        email: user.email,
+        email: user.email!,
         role: user.role,
       };
 
@@ -73,6 +73,7 @@ export class AuthService {
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
+          role: user.role,
         },
         token,
       };
@@ -107,7 +108,7 @@ export class AuthService {
 
       const payload: JwtPayload = {
         sub: user.id,
-        email: user.email,
+        email: user.email!,
         role: user.role,
       };
 
@@ -121,12 +122,41 @@ export class AuthService {
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
+          role: user.role,
         },
         token,
       };
     } catch (error: any) {
       if (error instanceof UnauthorizedException) throw error;
       throw new InternalServerErrorException(`Login Failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Get user profile
+   */
+  async getProfile(userPayload: JwtPayload) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: userPayload.sub },
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          role: true,
+          avatarUrl: true,
+        },
+      });
+
+      if (!user) {
+        throw new UnauthorizedException('ไม่พบข้อมูลผู้ใช้');
+      }
+
+      return user;
+    } catch (error: any) {
+      if (error instanceof UnauthorizedException) throw error;
+      throw new InternalServerErrorException(`Get Profile Failed: ${error.message}`);
     }
   }
 
@@ -140,21 +170,17 @@ export class AuthService {
       });
 
       if (!user) {
-        throw new UnauthorizedException('ผู้ใช้ไม่พบ');
+        throw new UnauthorizedException('ไม่พบผู้ใช้');
       }
 
       if (!user.passwordHash) {
         throw new BadRequestException('บัญชีนี้ลงทะเบียนผ่านโซเชียลมีเดีย ไม่สามารถเปลี่ยนรหัสผ่านได้');
       }
 
-      const isPasswordValid = await bcrypt.compare(dto.currentPassword, user.passwordHash);
+      const isPasswordValid = await bcrypt.compare(dto.oldPassword, user.passwordHash);
 
       if (!isPasswordValid) {
         throw new BadRequestException('รหัสผ่านปัจจุบันไม่ถูกต้อง');
-      }
-
-      if (dto.newPassword !== dto.confirmPassword) {
-        throw new BadRequestException('รหัสผ่านใหม่ไม่ตรงกัน');
       }
 
       const newPasswordHash = await bcrypt.hash(dto.newPassword, 12);
@@ -174,7 +200,157 @@ export class AuthService {
   }
 
   /**
-   * Forgot password - send reset link via email
+   * Google OAuth Redirect URL
+   */
+  getGoogleRedirectUrl(redirect?: string) {
+    const googleClientId = this.config.get<string>('GOOGLE_CLIENT_ID');
+    const apiBaseUrl = this.config.get<string>('API_URL');
+    const redirectUri = `${apiBaseUrl}/auth/google/callback`;
+    
+    const params = new URLSearchParams({
+      client_id: googleClientId!,
+      redirect_uri: redirectUri,
+      response_type: 'code',
+      scope: 'openid email profile',
+      access_type: 'offline',
+      prompt: 'select_account',
+      state: redirect || '/',
+    });
+
+    return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+  }
+
+  /**
+   * Handle Google OAuth Callback
+   */
+  async handleGoogleCallback(code: string) {
+    try {
+      const googleClientId = this.config.get<string>('GOOGLE_CLIENT_ID');
+      const googleClientSecret = this.config.get<string>('GOOGLE_CLIENT_SECRET');
+      const apiBaseUrl = this.config.get<string>('API_URL');
+      const redirectUri = `${apiBaseUrl}/auth/google/callback`;
+
+      // 1. Exchange code for tokens
+      const tokenResponse = await axios.post('https://oauth2.googleapis.com/token', {
+        code,
+        client_id: googleClientId,
+        client_secret: googleClientSecret,
+        redirect_uri: redirectUri,
+        grant_type: 'authorization_code',
+      });
+
+      const { access_token } = tokenResponse.data;
+
+      // 2. Get user info from Google
+      const userResponse = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: `Bearer ${access_token}` },
+      });
+
+      const googleUser = userResponse.data;
+
+      // 3. Check if user exists in database
+      let user = await this.prisma.user.findFirst({
+        where: {
+          OR: [
+            { googleId: googleUser.sub },
+            { email: googleUser.email },
+          ],
+        },
+      });
+
+      if (!user) {
+        // New user - need to register with role selection
+        return {
+          isNewUser: true,
+          user: {
+            googleId: googleUser.sub,
+            email: googleUser.email,
+            firstName: googleUser.given_name || '',
+            lastName: googleUser.family_name || '',
+            avatarUrl: googleUser.picture,
+          },
+        };
+      }
+
+      // Existing user - update googleId if missing
+      if (!user.googleId) {
+        user = await this.prisma.user.update({
+          where: { id: user.id },
+          data: { googleId: googleUser.sub },
+        });
+      }
+
+      // Generate JWT
+      const payload: JwtPayload = {
+        sub: user.id,
+        email: user.email!,
+        role: user.role,
+      };
+
+      const token = this.jwtService.sign(payload, { expiresIn: '7d' });
+
+      return {
+        isNewUser: false,
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+          avatarUrl: user.avatarUrl,
+        },
+      };
+    } catch (error: any) {
+      console.error('Google Auth Error:', error.response?.data || error.message);
+      throw new InternalServerErrorException('Google Authentication Failed');
+    }
+  }
+
+  /**
+   * Register user from Google OAuth (after role selection)
+   */
+  async registerGoogleUser(body: { role: UserRole; oauthData: any; companyName?: string }) {
+    try {
+      const { role, oauthData } = body;
+
+      const user = await this.prisma.user.create({
+        data: {
+          email: oauthData.email,
+          googleId: oauthData.googleId,
+          firstName: oauthData.firstName,
+          lastName: oauthData.lastName,
+          avatarUrl: oauthData.avatarUrl,
+          role: role,
+        },
+      });
+
+      const payload: JwtPayload = {
+        sub: user.id,
+        email: user.email!,
+        role: user.role,
+      };
+
+      const token = this.jwtService.sign(payload, { expiresIn: '7d' });
+
+      return {
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+          avatarUrl: user.avatarUrl,
+        },
+        token,
+      };
+    } catch (error: any) {
+      throw new InternalServerErrorException(`Google Registration Failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Forgot password - send reset link via email using Brevo
    */
   async forgotPassword(dto: ForgotPasswordDto) {
     try {
@@ -183,13 +359,12 @@ export class AuthService {
       });
 
       if (!user) {
-        // Return success even if user not found for security
         return { message: 'หากอีเมลนี้มีอยู่ในระบบ เราได้ส่งลิงก์รีเซ็ตรหัสผ่านไปให้แล้ว' };
       }
 
       const token = crypto.randomBytes(32).toString('hex');
       const expires = new Date();
-      expires.setHours(expires.getHours() + 1); // Token expires in 1 hour
+      expires.setHours(expires.getHours() + 1);
 
       await this.prisma.user.update({
         where: { id: user.id },
@@ -202,26 +377,13 @@ export class AuthService {
       const frontendUrl = this.config.get<string>('NEXTAUTH_URL', 'http://localhost:3000');
       const resetUrl = `${frontendUrl}/th/auth/reset-password?token=${token}`;
 
-      console.log(`[${new Date().toISOString()}] Attempting to send reset password email to: ${user.email}`);
-      console.log(`[${new Date().toISOString()}] Brevo API Key configured: ${!!this.brevoApiKey}`);
-
       if (this.brevoApiKey) {
         try {
-          console.log(`[${new Date().toISOString()}] Starting Brevo email send process...`);
-
-          const response = await axios.post(
+          await axios.post(
             `${this.brevoApiUrl}/smtp/email`,
             {
-              sender: {
-                name: 'WorksDD',
-                email: 'noreply@worksdd.com',
-              },
-              to: [
-                {
-                  email: user.email,
-                  name: user.firstName,
-                },
-              ],
+              sender: { name: 'WorksDD', email: 'noreply@worksdd.com' },
+              to: [{ email: user.email, name: user.firstName }],
               subject: 'รีเซ็ตรหัสผ่าน WorksDD',
               htmlContent: `
                 <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
@@ -240,28 +402,17 @@ export class AuthService {
               `,
             },
             {
-              headers: {
-                'api-key': this.brevoApiKey,
-                'Content-Type': 'application/json',
-              },
+              headers: { 'api-key': this.brevoApiKey, 'Content-Type': 'application/json' },
               timeout: 10000,
             },
           );
-          console.log(`[${new Date().toISOString()}] Email sent successfully! Message ID: ${response.data.messageId}`);
         } catch (error: any) {
-          console.error(`[${new Date().toISOString()}] Email send failed with error:`, error.message);
-          console.error(`[${new Date().toISOString()}] Error response:`, error.response?.data);
-          console.error(`[${new Date().toISOString()}] Full error:`, error);
+          console.error('Brevo Email Error:', error.response?.data || error.message);
         }
-      } else {
-        console.warn(`[${new Date().toISOString()}] BREVO_API_KEY is not configured. Email not sent.`);
-        console.log(`[${new Date().toISOString()}] Reset URL for manual testing: ${resetUrl}`);
       }
 
       return { message: 'หากอีเมลนี้มีอยู่ในระบบ เราได้ส่งลิงก์รีเซ็ตรหัสผ่านไปให้แล้ว' };
     } catch (error: any) {
-      console.error(`[${new Date().toISOString()}] Forgot Password Error:`, error);
-      if (error instanceof BadRequestException) throw error;
       throw new InternalServerErrorException(`Forgot Password Failed: ${error.message}`);
     }
   }
@@ -274,9 +425,7 @@ export class AuthService {
       const user = await this.prisma.user.findFirst({
         where: {
           resetPasswordToken: dto.token,
-          resetPasswordExpires: {
-            gt: new Date(),
-          },
+          resetPasswordExpires: { gt: new Date() },
         },
       });
 
@@ -284,15 +433,7 @@ export class AuthService {
         throw new BadRequestException('ลิงก์รีเซ็ตรหัสผ่านไม่ถูกต้องหรือหมดอายุแล้ว');
       }
 
-      if (dto.password !== dto.confirmPassword) {
-        throw new BadRequestException('รหัสผ่านใหม่ไม่ตรงกัน');
-      }
-
-      if (dto.password.length < 6) {
-        throw new BadRequestException('รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร');
-      }
-
-      const passwordHash = await bcrypt.hash(dto.password, 12);
+      const passwordHash = await bcrypt.hash(dto.newPassword, 12);
 
       await this.prisma.user.update({
         where: { id: user.id },
