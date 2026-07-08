@@ -97,7 +97,7 @@ export class AuthService {
         : null;
 
       return {
-        accessToken: token,
+        accessToken: token, token: token,
         user: {
           id: user.id,
           email: user.email,
@@ -151,7 +151,7 @@ export class AuthService {
       const token = await this.signToken(user.id, user.email ?? '', user.role);
 
       return {
-        accessToken: token,
+        accessToken: token, token: token,
         user: {
           id: user.id,
           email: user.email,
@@ -340,7 +340,7 @@ export class AuthService {
 
       return {
         isNewUser: false,
-        token,
+        token, accessToken: token,
         user: {
           id: user.id,
           email: user.email,
@@ -423,7 +423,7 @@ export class AuthService {
 
       const token = await this.signToken(user.id, user.email ?? '', user.role);
       return {
-        accessToken: token,
+        accessToken: token, token: token,
         user: {
           id: user.id,
           email: user.email,
@@ -466,7 +466,7 @@ export class AuthService {
       await this.prisma.user.update({
         where: { id: user.id },
         data: {
-          resetPasswordToken: token,
+          resetPasswordToken: token, accessToken: token,
           resetPasswordExpires: expires,
         },
       });
@@ -523,7 +523,7 @@ export class AuthService {
     try {
       const user = await this.prisma.user.findFirst({
         where: {
-          resetPasswordToken: dto.token,
+          resetPasswordToken: dto.token, accessToken: token,
           resetPasswordExpires: { gt: new Date() },
         },
       });

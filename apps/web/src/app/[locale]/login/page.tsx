@@ -49,7 +49,7 @@ function LoginForm() {
         const userData = JSON.parse(decodeURIComponent(userParam));
 
         // อัปเดตสถานะล็อกอินเข้าสู่ Context ตัวแอปพลิเคชัน
-        login(token, userData);
+        const userToken = token; login(userToken, userData);
 
         // ดึงค่า locale จาก url ปัจจุบัน (ถ้ามี) หรือใช้เริ่มต้นเป็น th
         const currentLocale = typeof window !== 'undefined' ? window.location.pathname.split('/')[1] || 'th' : 'th';
@@ -128,7 +128,7 @@ function LoginForm() {
         return;
       }
 
-      login(data.accessToken, data.user);
+      const userToken = data.token || data.accessToken; login(userToken, data.user);
 
       // 🟢 ดึงค่า redirect จาก URL
       const redirectPath = searchParams.get('redirect');
