@@ -17,7 +17,7 @@ import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import type { JwtPayload } from './types/jwt-payload.interface';
-import { UserRole } from '@prisma/client';
+import { VerificationStatus, NotificationType, UserRole } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -54,28 +54,55 @@ export class AuthService {
           lastName: dto.lastName,
           passwordHash,
           role: dto.role || UserRole.JOBSEEKER,
+          phone: dto.phone,
         },
       });
 
-      const payload: JwtPayload = {
-        sub: user.id,
-        email: user.email!,
-        role: user.role,
-      };
+      let companyName: string | undefined = dto.companyName;
+      let companySlug: string | undefined;
 
-      const token = this.jwtService.sign(payload, {
-        expiresIn: '7d',
+      if (dto.role === 'EMPLOYER' && dto.companyName) {
+        try {
+          const company = await this.prisma.company.create({
+            data: {
+              ownerId: user.id,
+              name: dto.companyName,
+              industry: dto.industry || undefined,
+              slug: this.generateSlug(dto.companyName),
+              isVerified: false,
+              verificationStatus: VerificationStatus.UNVERIFIED,
+            },
+          });
+
+          companyName = company.name;
+          companySlug = company.slug;
+        } catch (error: any) {
+          await this.prisma.user.delete({ where: { id: user.id } });
+          throw error;
+        }
+      }
+
+      await this.createRegisterNotification({
+        userId: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        companyName,
       });
 
+      const token = await this.signToken(user.id, user.email ?? '', user.role);
+
       return {
+        accessToken: token,
         user: {
           id: user.id,
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
           role: user.role,
+          companyName,
+          companySlug,
         },
-        token,
       };
     } catch (error: any) {
       if (error instanceof ConflictException) throw error;
@@ -90,6 +117,15 @@ export class AuthService {
     try {
       const user = await this.prisma.user.findUnique({
         where: { email: dto.email },
+        include: {
+          companies: {
+            select: {
+              name: true,
+              slug: true,
+              logoUrl: true,
+            },
+          },
+        },
       });
 
       if (!user) {
@@ -106,25 +142,21 @@ export class AuthService {
         throw new UnauthorizedException('อีเมลหรือรหัสผ่านไม่ถูกต้อง');
       }
 
-      const payload: JwtPayload = {
-        sub: user.id,
-        email: user.email!,
-        role: user.role,
-      };
-
-      const token = this.jwtService.sign(payload, {
-        expiresIn: '7d',
-      });
+      const token = await this.signToken(user.id, user.email ?? '', user.role);
 
       return {
+        accessToken: token,
         user: {
           id: user.id,
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
           role: user.role,
+          avatarUrl: user.avatarUrl,
+          companyName: user.companies?.[0]?.name || null,
+          companyLogo: user.companies?.[0]?.logoUrl || null,
+          companySlug: user.companies?.[0]?.slug || null,
         },
-        token,
       };
     } catch (error: any) {
       if (error instanceof UnauthorizedException) throw error;
@@ -139,13 +171,17 @@ export class AuthService {
     try {
       const user = await this.prisma.user.findUnique({
         where: { id: userPayload.sub },
-        select: {
-          id: true,
-          email: true,
-          firstName: true,
-          lastName: true,
-          role: true,
-          avatarUrl: true,
+        include: {
+          companies: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              logoUrl: true,
+              isVerified: true,
+              verificationStatus: true,
+            },
+          },
         },
       });
 
@@ -153,7 +189,16 @@ export class AuthService {
         throw new UnauthorizedException('ไม่พบข้อมูลผู้ใช้');
       }
 
-      return user;
+      return {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        avatarUrl: user.avatarUrl,
+        phone: user.phone,
+        company: user.companies?.[0] || null,
+      };
     } catch (error: any) {
       if (error instanceof UnauthorizedException) throw error;
       throw new InternalServerErrorException(`Get Profile Failed: ${error.message}`);
@@ -165,33 +210,21 @@ export class AuthService {
    */
   async changePassword(userId: string, dto: ChangePasswordDto) {
     try {
-      const user = await this.prisma.user.findUnique({
-        where: { id: userId },
-      });
-
-      if (!user) {
-        throw new UnauthorizedException('ไม่พบผู้ใช้');
+      const user = await this.prisma.user.findUnique({ where: { id: userId } });
+      if (!user || !user.passwordHash) {
+        throw new UnauthorizedException(
+          'ไม่พบผู้ใช้หรือบัญชีนี้ไม่ได้ลงทะเบียนด้วยรหัสผ่าน (อาจลงทะเบียนผ่าน Google/Line)',
+        );
       }
-
-      if (!user.passwordHash) {
-        throw new BadRequestException('บัญชีนี้ลงทะเบียนผ่านโซเชียลมีเดีย ไม่สามารถเปลี่ยนรหัสผ่านได้');
-      }
-
       const isPasswordValid = await bcrypt.compare(dto.oldPassword, user.passwordHash);
-
       if (!isPasswordValid) {
-        throw new BadRequestException('รหัสผ่านปัจจุบันไม่ถูกต้อง');
+        throw new UnauthorizedException('รหัสผ่านเดิมไม่ถูกต้อง');
       }
-
       const newPasswordHash = await bcrypt.hash(dto.newPassword, 12);
-
       await this.prisma.user.update({
         where: { id: userId },
-        data: {
-          passwordHash: newPasswordHash,
-        },
+        data: { passwordHash: newPasswordHash },
       });
-
       return { message: 'เปลี่ยนรหัสผ่านสำเร็จ' };
     } catch (error: any) {
       if (error instanceof BadRequestException || error instanceof UnauthorizedException) throw error;
@@ -265,6 +298,7 @@ export class AuthService {
             { email: googleUser.email },
           ],
         },
+        include: { companies: true },
       });
 
       if (!user) {
@@ -286,17 +320,12 @@ export class AuthService {
         user = await this.prisma.user.update({
           where: { id: user.id },
           data: { googleId: googleUser.sub },
+          include: { companies: true },
         });
       }
 
       // Generate JWT
-      const payload: JwtPayload = {
-        sub: user.id,
-        email: user.email!,
-        role: user.role,
-      };
-
-      const token = this.jwtService.sign(payload, { expiresIn: '7d' });
+      const token = await this.signToken(user.id, user.email ?? '', user.role);
 
       return {
         isNewUser: false,
@@ -308,6 +337,9 @@ export class AuthService {
           lastName: user.lastName,
           role: user.role,
           avatarUrl: user.avatarUrl,
+          companyName: user.companies?.[0]?.name || null,
+          companyLogo: user.companies?.[0]?.logoUrl || null,
+          companySlug: user.companies?.[0]?.slug || null,
         },
       };
     } catch (error: any) {
@@ -324,29 +356,62 @@ export class AuthService {
    * Register user from Google OAuth (after role selection)
    */
   async registerGoogleUser(body: { role: UserRole; oauthData: any; companyName?: string }) {
+    const { role, oauthData, companyName } = body;
+    const { email, googleId, firstName, lastName, avatarUrl } = oauthData;
     try {
-      const { role, oauthData } = body;
-
-      const user = await this.prisma.user.create({
-        data: {
-          email: oauthData.email,
-          googleId: oauthData.googleId,
-          firstName: oauthData.firstName,
-          lastName: oauthData.lastName,
-          avatarUrl: oauthData.avatarUrl,
-          role: role,
+      const existing = await this.prisma.user.findFirst({
+        where: {
+          OR: [
+            ...(googleId ? [{ googleId }] : []),
+            ...(email ? [{ email }] : []),
+          ],
         },
       });
+      if (existing) {
+        throw new ConflictException('บัญชีอีเมลหรือสิทธิ์การใช้งานนี้ลงทะเบียนไว้แล้ว');
+      }
 
-      const payload: JwtPayload = {
-        sub: user.id,
-        email: user.email!,
+      let user = await this.prisma.user.create({
+        data: {
+          email: email || null,
+          googleId: googleId || null,
+          firstName,
+          lastName,
+          avatarUrl: avatarUrl || null,
+          role: role,
+        },
+        include: { companies: true },
+      });
+
+      let finalCompanyName: string | null = null;
+      if (role === 'EMPLOYER') {
+        finalCompanyName = companyName || `${firstName} Company`;
+        await this.prisma.company.create({
+          data: {
+            ownerId: user.id,
+            name: finalCompanyName,
+            slug: this.generateSlug(finalCompanyName),
+            isVerified: false,
+            verificationStatus: VerificationStatus.UNVERIFIED,
+          },
+        });
+        user = await this.prisma.user.findUnique({
+          where: { id: user.id },
+          include: { companies: true },
+        }) as any;
+      }
+
+      await this.createRegisterNotification({
+        userId: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
         role: user.role,
-      };
+        companyName: user.companies?.[0]?.name || finalCompanyName,
+      });
 
-      const token = this.jwtService.sign(payload, { expiresIn: '7d' });
-
+      const token = await this.signToken(user.id, user.email ?? '', user.role);
       return {
+        accessToken: token,
         user: {
           id: user.id,
           email: user.email,
@@ -354,10 +419,13 @@ export class AuthService {
           lastName: user.lastName,
           role: user.role,
           avatarUrl: user.avatarUrl,
+          companyName: user.companies?.[0]?.name || null,
+          companyLogo: user.companies?.[0]?.logoUrl || null,
+          companySlug: user.companies?.[0]?.slug || null,
         },
-        token,
       };
     } catch (error: any) {
+      if (error?.status) throw error;
       throw new InternalServerErrorException(`Google Registration Failed: ${error.message}`);
     }
   }
@@ -394,13 +462,8 @@ export class AuthService {
       const resetUrl = `${frontendUrl}/th/auth/reset-password?token=${token}`;
       const senderEmail = this.config.get<string>('BREVO_SENDER_EMAIL', 'noreply@worksdd.com');
 
-      console.log(`[Forgot Password] Brevo API Key configured: ${!!this.brevoApiKey}`);
-      console.log(`[Forgot Password] Sender email: ${senderEmail}`);
-
       if (this.brevoApiKey) {
         try {
-          console.log(`[Forgot Password] Sending email to: ${user.email}`);
-          
           const response = await axios.post(
             `${this.brevoApiUrl}/smtp/email`,
             {
@@ -428,17 +491,10 @@ export class AuthService {
               timeout: 10000,
             },
           );
-          
           console.log(`[Forgot Password] Email sent successfully. Response ID: ${response.data?.messageId}`);
         } catch (error: any) {
-          console.error(`[Forgot Password] Brevo API Error:`, {
-            status: error.response?.status,
-            data: error.response?.data,
-            message: error.message,
-          });
+          console.error(`[Forgot Password] Brevo API Error:`, error.response?.data || error.message);
         }
-      } else {
-        console.warn('[Forgot Password] BREVO_API_KEY is not configured');
       }
 
       return { message: 'หากอีเมลนี้มีอยู่ในระบบ เราได้ส่งลิงก์รีเซ็ตรหัสผ่านไปให้แล้ว' };
@@ -460,11 +516,8 @@ export class AuthService {
       });
 
       if (!user) {
-        console.warn(`[Reset Password] Invalid or expired token`);
-        throw new BadRequestException('ลิงก์รีเซ็ตรหัสผ่านไม่ถูกต้องหรือหมดอายุแล้ว');
+        throw new BadRequestException('Token ไม่ถูกต้องหรือหมดอายุแล้ว');
       }
-
-      console.log(`[Reset Password] Resetting password for user: ${user.email}`);
 
       const passwordHash = await bcrypt.hash(dto.newPassword, 12);
 
@@ -477,11 +530,48 @@ export class AuthService {
         },
       });
 
-      console.log(`[Reset Password] Password reset successfully for user: ${user.email}`);
-      return { message: 'รีเซ็ตรหัสผ่านสำเร็จ คุณสามารถเข้าสู่ระบบได้แล้ว' };
+      return { message: 'รีเซ็ตรหัสผ่านใหม่สำเร็จ' };
     } catch (error: any) {
       if (error instanceof BadRequestException) throw error;
       throw new InternalServerErrorException(`Reset Password Failed: ${error.message}`);
+    }
+  }
+
+  private async signToken(userId: string, email: string, role: string): Promise<string> {
+    const payload: JwtPayload = {
+      sub: userId,
+      email,
+      role,
+    };
+    return this.jwtService.signAsync(payload);
+  }
+
+  private generateSlug(text: string): string {
+    return text
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '') + '-' + Math.random().toString(36).substring(2, 7);
+  }
+
+  private async createRegisterNotification(data: {
+    userId: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+    companyName?: string;
+  }) {
+    try {
+      await this.prisma.notification.create({
+        data: {
+          userId: data.userId,
+          type: NotificationType.SYSTEM,
+          title: 'ยินดีต้อนรับสู่ WorksDD',
+          content: `สวัสดีคุณ ${data.firstName} ${data.lastName} ยินดีต้อนรับสู่แพลตฟอร์มของเรา!`,
+        },
+      });
+    } catch (error) {
+      console.error('Failed to create register notification:', error);
     }
   }
 }
