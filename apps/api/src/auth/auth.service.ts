@@ -17,7 +17,7 @@ import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import type { JwtPayload } from './types/jwt-payload.interface';
-import { VerificationStatus, NotificationType, UserRole } from '@prisma/client';
+import { VerificationStatus, UserRole } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -565,9 +565,9 @@ export class AuthService {
       await this.prisma.notification.create({
         data: {
           userId: data.userId,
-          type: NotificationType.SYSTEM,
+          type: 'GENERAL' as any,
           title: 'ยินดีต้อนรับสู่ WorksDD',
-          content: `สวัสดีคุณ ${data.firstName} ${data.lastName} ยินดีต้อนรับสู่แพลตฟอร์มของเรา!`,
+          message: `สวัสดีคุณ ${data.firstName} ${data.lastName} ยินดีต้อนรับสู่แพลตฟอร์มของเรา!`,
         },
       });
     } catch (error) {
