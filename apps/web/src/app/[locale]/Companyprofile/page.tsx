@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { CompanyLogo } from "@/components/CompanyLogo";
@@ -28,6 +29,7 @@ interface Company {
 interface CompanyJob {
   id: string;
   title: string;
+  slug?: string;
   jobType?: string;
   locationProvince?: string | null;
   locationDistrict?: string | null;
@@ -143,6 +145,8 @@ function locationText(job: CompanyJob) {
 export default function CompanyProfile() {
   const searchParams = useSearchParams();
   const slug = searchParams.get("slug") || "hondy";
+  const router = useRouter();
+  const locale = useLocale();
 
   const [appliedJobs, setAppliedJobs] = useState<string[]>([]);
   const [company, setCompany] = useState<Company | null>(null);
@@ -201,14 +205,14 @@ export default function CompanyProfile() {
       {/* Hero Banner */}
       <div style={{ maxWidth: 1060, margin: "12px auto 0", padding: "0 20px" }}>
         <div className="hero-banner" style={{
-  borderRadius: 16,
-  overflow: "hidden",
-  position: "relative",
-  minHeight: 200,
-  background: company?.bgUrl
-    ? `linear-gradient(rgba(26,42,58,0.45), rgba(26,42,58,0.45)), url(${company.bgUrl}) center/cover no-repeat`
-    : "linear-gradient(135deg, #1a2a3a 0%, #2c4a5c 40%, #1e3a4a 100%)"
-}}>
+          borderRadius: 16,
+          overflow: "hidden",
+          position: "relative",
+          minHeight: 200,
+          background: company?.bgUrl
+            ? `linear-gradient(rgba(26,42,58,0.45), rgba(26,42,58,0.45)), url(${company.bgUrl}) center/cover no-repeat`
+            : "linear-gradient(135deg, #1a2a3a 0%, #2c4a5c 40%, #1e3a4a 100%)"
+        }}>
           {/* Car silhouette decoration */}
           <div style={{
             position: "absolute",
@@ -241,26 +245,26 @@ export default function CompanyProfile() {
             gap: 14
           }}>
             <div style={{
-  background: "#fff",
-  borderRadius: 10,
-  width: 56,
-  height: 56,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  fontWeight: 900,
-  fontSize: 15,
-  color: "#1a1a2e",
-  letterSpacing: "-0.5px",
-  boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
-  overflow: "hidden"
-}}>
-  {company ? (
-    <CompanyLogo company={company} size="lg" className="w-full h-full border-none rounded-none" />
-  ) : (
-    "-"
-  )}
-</div>
+              background: "#fff",
+              borderRadius: 10,
+              width: 56,
+              height: 56,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontWeight: 900,
+              fontSize: 15,
+              color: "#1a1a2e",
+              letterSpacing: "-0.5px",
+              boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
+              overflow: "hidden"
+            }}>
+              {company ? (
+                <CompanyLogo company={company} size="lg" className="w-full h-full border-none rounded-none" />
+              ) : (
+                "-"
+              )}
+            </div>
             <div>
               <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "#fff", letterSpacing: "-0.5px" }}>
                 {loading ? "กำลังโหลด..." : company?.name || "ไม่พบข้อมูลบริษัท"}
@@ -314,16 +318,19 @@ export default function CompanyProfile() {
 
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {companyJobs.map((job, i) => (
-                <div key={job.id} style={{
-                  border: "1px solid #e8eaed",
-                  borderRadius: 12,
-                  padding: "18px 22px",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  transition: "box-shadow 0.2s, border-color 0.2s",
-                  animation: `fadeInUp 0.3s ease ${i * 0.05}s both`
-                }}
+                <div
+                  key={job.id}
+                  className="job-card"
+                  style={{
+                    border: "1px solid #e8eaed",
+                    borderRadius: 12,
+                    padding: "18px 22px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    transition: "box-shadow 0.2s, border-color 0.2s",
+                    animation: `fadeInUp 0.3s ease ${i * 0.05}s both`
+                  }}
                   onMouseOver={e => {
                     (e.currentTarget as HTMLDivElement).style.boxShadow = "0 4px 16px rgba(230,57,70,0.1)";
                     (e.currentTarget as HTMLDivElement).style.borderColor = "#f9c0c4";
@@ -333,11 +340,48 @@ export default function CompanyProfile() {
                     (e.currentTarget as HTMLDivElement).style.borderColor = "#e8eaed";
                   }}
                 >
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: 15, color: "#1a1a2e", marginBottom: 8 }}>{job.title}</div>
+                  <div
+                    style={{
+                      flex: 1,
+                      minWidth: 0,
+                      marginRight: 16,
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontWeight: 700,
+                        fontSize: 15,
+                        color: "#1a1a2e",
+                        marginBottom: 8,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {job.title}
+                    </div>
                     <div style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
-                      <span style={{ display: "flex", alignItems: "center", gap: 4, color: "#666", fontSize: 13 }}>
-                        <LocationIcon />{locationText(job)}
+                      <span
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 4,
+                          color: "#666",
+                          fontSize: 13,
+                          minWidth: 0,
+                          overflow: "hidden",
+                        }}
+                      >
+                        <LocationIcon />
+                        <span
+                          style={{
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {locationText(job)}
+                        </span>
                       </span>
                       <span style={{ display: "flex", alignItems: "center", gap: 4, color: "#666", fontSize: 13 }}>
                         <ClockIcon />{job.jobType || "-"}
@@ -354,9 +398,9 @@ export default function CompanyProfile() {
                   </div>
                   <button
                     className="apply-btn"
-                    onClick={() => handleApply(job.id)}
+                    onClick={() => router.push(`/${locale}/jobs/${job.slug || job.id}`)}
                     style={{
-                      background: appliedJobs.includes(job.id) ? "#22c55e" : "#1a1a2e",
+                      background: "#1a1a2e",
                       color: "#fff",
                       border: "none",
                       borderRadius: 9,
@@ -364,19 +408,9 @@ export default function CompanyProfile() {
                       fontSize: 13,
                       fontWeight: 700,
                       cursor: "pointer",
-                      whiteSpace: "nowrap",
-                      flexShrink: 0,
-                      transition: "background 0.2s, transform 0.1s",
-                      marginLeft: 20,
-                    }}
-                    onMouseOver={e => {
-                      if (!appliedJobs.includes(job.id)) (e.currentTarget as HTMLButtonElement).style.background = "#e63946";
-                    }}
-                    onMouseOut={e => {
-                      if (!appliedJobs.includes(job.id)) (e.currentTarget as HTMLButtonElement).style.background = "#1a1a2e";
                     }}
                   >
-                    {appliedJobs.includes(job.id) ? "✓ Applied" : "Apply Now"}
+                    ดูรายละเอียดงาน
                   </button>
                 </div>
               ))}
@@ -506,11 +540,21 @@ export default function CompanyProfile() {
           to { opacity: 1; transform: translateY(0); }
         }
         * { box-sizing: border-box; }
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
   .main-grid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 16px auto !important;
     padding: 0 14px !important;
     gap: 16px !important;
+    overflow-x: hidden !important;
+  }
+
+  .main-grid > div {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
   }
 
   .similar-grid {
@@ -519,6 +563,22 @@ export default function CompanyProfile() {
 
   nav {
     padding: 0 16px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .job-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    overflow: hidden !important;
+  }
+
+  .apply-btn {
+    flex-shrink: 0 !important;
   }
 }
       `}</style>

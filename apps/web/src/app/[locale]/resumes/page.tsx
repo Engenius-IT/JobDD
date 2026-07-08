@@ -527,6 +527,60 @@ function GenderAvatar({
   );
 }
 
+
+function summarizeList(items: string[], unit: string, emptyText: string) {
+  const cleanedItems = items.map((item) => item?.trim()).filter(Boolean);
+
+  if (cleanedItems.length === 0) return emptyText;
+  if (cleanedItems.length === 1) return cleanedItems[0];
+
+  return `${cleanedItems[0]} และอีก ${cleanedItems.length - 1} ${unit}`;
+}
+
+function getPositionItems(candidate: CandidateCard) {
+  if (candidate.jobPreferences && candidate.jobPreferences.length > 0) {
+    return candidate.jobPreferences
+      .map((pref) => pref.position)
+      .filter(Boolean);
+  }
+
+  return candidate.desiredPosition
+    ? candidate.desiredPosition.split(",").map((pos) => pos.trim()).filter(Boolean)
+    : [];
+}
+
+function getDesiredProvinceItems(candidate: CandidateCard) {
+  return (candidate.desiredProvinces || [])
+    .map((province: any) =>
+      typeof province === "string" ? province : province?.provinceName,
+    )
+    .filter(Boolean);
+}
+
+function getLanguageItems(candidate: CandidateCard) {
+  if (candidate.languages && candidate.languages.length > 0) {
+    return candidate.languages
+      .map((lang) =>
+        lang.level ? `${lang.language} (${lang.level})` : lang.language,
+      )
+      .filter(Boolean);
+  }
+
+  return candidate.englishLevelLabel
+    ? [`ภาษาอังกฤษ (${candidate.englishLevelLabel})`]
+    : [];
+}
+
+function getDrivingSkillItems(candidate: CandidateCard, locale: string) {
+  return (candidate.drivingSkills || [])
+    .map((skillId) => {
+      const skillData = drivingSkillMap[skillId as keyof typeof drivingSkillMap];
+      if (!skillData) return skillId;
+      return locale === "en" ? skillData.en : skillData.th;
+    })
+    .filter(Boolean);
+}
+
 interface Resumesearch {
   onSearch?: (params: SearchParams) => void;
   initialValues?: Partial<SearchParams>;
@@ -2750,13 +2804,35 @@ export default function ResumeDirectoryPage({}: Resumesearch = {}) {
                   candidate,
                   searchParams.get("query"),
                 );
+                const positionItems = getPositionItems(candidate);
+                const visiblePositions = positionItems.slice(0, 2);
+                const remainingPositions = Math.max(positionItems.length - 2, 0);
+                const desiredProvinceText = summarizeList(
+                  getDesiredProvinceItems(candidate),
+                  "จังหวัด",
+                  t("list.noProvince") || "ไม่ระบุ",
+                );
+                const languageText = summarizeList(
+                  getLanguageItems(candidate),
+                  "ภาษา",
+                  t("list.english")
+                    ? `${t("list.english")}: ${candidate.englishLevelLabel || "ไม่ระบุ"}`
+                    : "ไม่ระบุ",
+                );
+                const drivingSkillText = summarizeList(
+                  getDrivingSkillItems(candidate, locale),
+                  "รายการ",
+                  t("list.noDrivingSkill") || "ไม่มีข้อมูล",
+                );
+                const visibleSkills = candidate.skills.slice(0, 3);
+                const remainingSkills = Math.max(candidate.skills.length - 3, 0);
 
                 return (
                   <div key={candidate.id} className="h-full">
                     <button
                       type="button"
                       onClick={() => setSelectedCandidateId(candidate.id)}
-                      className="text-left w-full rounded-[2rem] bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all p-6 h-full min-h-[700px] flex flex-col relative overflow-hidden"
+                      className="text-left w-full rounded-[2rem] bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all p-6 h-full min-h-[580px] flex flex-col relative overflow-hidden"
                     >
                       {highlight && (
                         <div className="mb-4 px-3 py-2 bg-indigo-50 border border-indigo-100 rounded-2xl flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
@@ -2857,45 +2933,24 @@ export default function ResumeDirectoryPage({}: Resumesearch = {}) {
                             <span>{t("list.lookingFor")}</span>
                           </div>
 
-                          <div className="flex flex-col gap-y-2.5">
-                            {candidate.jobPreferences &&
-                            candidate.jobPreferences.length > 0 ? (
-                              candidate.jobPreferences.map((pref, idx) => (
-                                <div
-                                  key={idx}
-                                  className="flex items-center gap-2 group"
-                                >
-                                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" />
-                                  <span className="text-sm font-bold text-slate-800">
-                                    {pref.position}
-                                  </span>
-                                  {pref.job_type && (
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full border border-indigo-100 text-[10px] font-bold text-indigo-500 bg-indigo-50/50 whitespace-nowrap">
-                                      {pref.job_type}
+                          <div className="flex flex-col gap-y-2">
+                            {visiblePositions.length > 0 ? (
+                              <>
+                                {visiblePositions.map((position, idx) => (
+                                  <div key={idx} className="flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" />
+                                    <span className="text-sm font-bold text-slate-800 truncate">
+                                      {position}
                                     </span>
-                                  )}
-                                </div>
-                              ))
-                            ) : candidate.desiredPosition ? (
-                              candidate.desiredPosition
-                                .split(",")
-                                .map((pos, idx) => (
-                                  <div
-                                    key={idx}
-                                    className="flex items-center gap-2"
-                                  >
-                                    <span className="w-1.5 h-1.5 rounded-full bg-black shrink-0" />
-
-                                    <span className="text-sm font-bold text-slate-800">
-                                      {pos.trim()}
-                                    </span>
-                                    {(candidate as any).jobTypes?.[idx] && (
-                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full border border-slate-200 text-[10px] font-bold text-slate-500 bg-slate-50 whitespace-nowrap">
-                                        {(candidate as any).jobTypes[idx]}
-                                      </span>
-                                    )}
                                   </div>
-                                ))
+                                ))}
+
+                                {remainingPositions > 0 && (
+                                  <div className="pl-3.5 text-xs font-semibold text-slate-500">
+                                    และอีก {remainingPositions} ตำแหน่ง
+                                  </div>
+                                )}
+                              </>
                             ) : (
                               <div className="flex items-center gap-2 text-sm font-bold text-slate-400">
                                 <span className="w-1.5 h-1.5 rounded-full bg-slate-200 shrink-0" />
@@ -2959,31 +3014,11 @@ export default function ResumeDirectoryPage({}: Resumesearch = {}) {
                               {t("list.province") || "จังหวัดที่สนใจ"}
                             </span>
 
-                            <div className="flex flex-col gap-y-1.5">
-                              {candidate.desiredProvinces &&
-                              candidate.desiredProvinces.length > 0 ? (
-                                candidate.desiredProvinces.map(
-                                  (provinceName: any, idx) => (
-                                    <div
-                                      key={idx}
-                                      className="flex items-center text-xs group"
-                                    >
-                                      <span className="w-1 h-1 rounded-full bg-yellow-500 mr-2 shrink-0" />
-                                      <span className="text-xs text-slate-500 leading-relaxed">
-                                        {provinceName}
-                                      </span>
-                                    </div>
-                                  ),
-                                )
-                              ) : (
-                                /* Fallback กรณีไม่มีข้อมูล - แสดงจังหวัดปัจจุบัน */
-                                <div className="flex items-center text-xs">
-                                  <span className="w-1 h-1 rounded-full bg-slate-300 mr-2 shrink-0" />
-                                  <span className="text-xs text-slate-400 italic leading-relaxed">
-                                    {t("list.noProvince") || "ไม่ระบุ"}
-                                  </span>
-                                </div>
-                              )}
+                            <div className="flex items-center text-xs">
+                              <span className="w-1 h-1 rounded-full bg-yellow-500 mr-2 shrink-0" />
+                              <span className="text-xs text-slate-500 leading-relaxed">
+                                {desiredProvinceText}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -2995,37 +3030,11 @@ export default function ResumeDirectoryPage({}: Resumesearch = {}) {
                               {t("list.languageSkills") || "ทักษะทางภาษา"}
                             </span>
 
-                            <div className="flex flex-col gap-y-1.5">
-                              {candidate.languages &&
-                              candidate.languages.length > 0 ? (
-                                candidate.languages.map((lang, idx) => (
-                                  <div
-                                    key={idx}
-                                    className="flex items-center text-xs group"
-                                  >
-                                    {/* จุดนำหน้า (Bullet Point) */}
-                                    <span className="w-1 h-1 rounded-full bg-amber-500 mr-2 shrink-0" />
-
-                                    <div className="flex justify-between items-center w-full">
-                                      <span className="text-xs text-slate-500 leading-relaxed">
-                                        {lang.language}
-                                      </span>
-                                      {lang.level && (
-                                        <span className="text-[10px] text-slate-400 font-normal">
-                                          {lang.level}
-                                        </span>
-                                      )}
-                                    </div>
-                                  </div>
-                                ))
-                              ) : (
-                                /* Fallback กรณีไม่มี Array */
-                                <div className="flex items-center text-xs italic text-slate-400">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-slate-300 mr-2" />
-                                  {t("list.english")}:{" "}
-                                  {candidate.englishLevelLabel || "ไม่ระบุ"}
-                                </div>
-                              )}
+                            <div className="flex items-center text-xs">
+                              <span className="w-1 h-1 rounded-full bg-amber-500 mr-2 shrink-0" />
+                              <span className="text-xs text-slate-500 leading-relaxed">
+                                {languageText}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -3037,42 +3046,11 @@ export default function ResumeDirectoryPage({}: Resumesearch = {}) {
                               {t("list.drivingSkillsTitle") || "ทักษะการขับขี่"}
                             </span>
 
-                            <div className="flex flex-col gap-y-1.5">
-                              {candidate.drivingSkills &&
-                              candidate.drivingSkills.length > 0 ? (
-                                candidate.drivingSkills.map(
-                                  (skillId: string) => {
-                                    const skillData =
-                                      drivingSkillMap[
-                                        skillId as keyof typeof drivingSkillMap
-                                      ];
-                                    const label = skillData
-                                      ? locale === "en"
-                                        ? skillData.en
-                                        : skillData.th
-                                      : skillId;
-
-                                    return (
-                                      <div
-                                        key={skillId}
-                                        className="flex items-center text-xs"
-                                      >
-                                        {/* จุดนำหน้าสีเดียวกับไอคอนรถ (Blue-500) */}
-                                        <span className="w-1 h-1 rounded-full bg-blue-500 mr-2 shrink-0" />
-                                        <span className="text-xs text-slate-500 leading-relaxed">
-                                          {label}
-                                        </span>
-                                      </div>
-                                    );
-                                  },
-                                )
-                              ) : (
-                                /* กรณีไม่มีข้อมูล */
-                                <div className="flex items-center text-xs italic text-slate-400">
-                                  <span className="w-1 h-1 rounded-full bg-slate-300 mr-2 shrink-0" />
-                                  {t("list.noDrivingSkill") || "ไม่มีข้อมูล"}
-                                </div>
-                              )}
+                            <div className="flex items-center text-xs">
+                              <span className="w-1 h-1 rounded-full bg-blue-500 mr-2 shrink-0" />
+                              <span className="text-xs text-slate-500 leading-relaxed">
+                                {drivingSkillText}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -3080,7 +3058,8 @@ export default function ResumeDirectoryPage({}: Resumesearch = {}) {
 
                       <div className="mt-5 pt-4 border-t border-slate-100 flex flex-wrap gap-2">
                         {candidate.skills.length > 0 ? (
-                          candidate.skills.slice(0, 4).map((skill) => {
+                          <>
+                            {visibleSkills.map((skill) => {
                             const isMatch =
                               searchParams.get("query") &&
                               skill
@@ -3100,7 +3079,13 @@ export default function ResumeDirectoryPage({}: Resumesearch = {}) {
                                 {skill}
                               </span>
                             );
-                          })
+                          })}
+                            {remainingSkills > 0 && (
+                              <span className="px-3 py-1.5 rounded-full border text-xs font-medium bg-slate-50 text-slate-500 border-slate-200">
+                                และอีก {remainingSkills} ทักษะ
+                              </span>
+                            )}
+                          </>
                         ) : (
                           <span className="text-xs text-slate-400">
                             {t("list.noSkills")}
