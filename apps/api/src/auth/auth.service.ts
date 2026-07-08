@@ -92,6 +92,10 @@ export class AuthService {
 
       const token = await this.signToken(user.id, user.email ?? '', user.role);
 
+      const company = user.role === 'EMPLOYER' 
+        ? await this.prisma.company.findFirst({ where: { ownerId: user.id } })
+        : null;
+
       return {
         accessToken: token,
         user: {
@@ -100,8 +104,9 @@ export class AuthService {
           firstName: user.firstName,
           lastName: user.lastName,
           role: user.role,
-          companyName,
-          companySlug,
+          companyId: company?.id,
+          companyName: company?.name || companyName,
+          companySlug: company?.slug || companySlug,
         },
       };
     } catch (error: any) {
@@ -120,6 +125,7 @@ export class AuthService {
         include: {
           companies: {
             select: {
+              id: true,
               name: true,
               slug: true,
               logoUrl: true,
@@ -153,6 +159,7 @@ export class AuthService {
           lastName: user.lastName,
           role: user.role,
           avatarUrl: user.avatarUrl,
+          companyId: user.companies?.[0]?.id || null,
           companyName: user.companies?.[0]?.name || null,
           companyLogo: user.companies?.[0]?.logoUrl || null,
           companySlug: user.companies?.[0]?.slug || null,
@@ -197,6 +204,10 @@ export class AuthService {
         role: user.role,
         avatarUrl: user.avatarUrl,
         phone: user.phone,
+        companyId: user.companies?.[0]?.id || null,
+        companyName: user.companies?.[0]?.name || null,
+        companyLogo: user.companies?.[0]?.logoUrl || null,
+        companySlug: user.companies?.[0]?.slug || null,
         company: user.companies?.[0] || null,
       };
     } catch (error: any) {
@@ -337,6 +348,7 @@ export class AuthService {
           lastName: user.lastName,
           role: user.role,
           avatarUrl: user.avatarUrl,
+          companyId: user.companies?.[0]?.id || null,
           companyName: user.companies?.[0]?.name || null,
           companyLogo: user.companies?.[0]?.logoUrl || null,
           companySlug: user.companies?.[0]?.slug || null,
@@ -419,6 +431,7 @@ export class AuthService {
           lastName: user.lastName,
           role: user.role,
           avatarUrl: user.avatarUrl,
+          companyId: user.companies?.[0]?.id || null,
           companyName: user.companies?.[0]?.name || null,
           companyLogo: user.companies?.[0]?.logoUrl || null,
           companySlug: user.companies?.[0]?.slug || null,
