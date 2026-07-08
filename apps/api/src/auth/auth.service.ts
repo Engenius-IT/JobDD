@@ -466,7 +466,7 @@ export class AuthService {
       await this.prisma.user.update({
         where: { id: user.id },
         data: {
-          resetPasswordToken: token, accessToken: token,
+          resetPasswordToken: token,
           resetPasswordExpires: expires,
         },
       });
@@ -523,7 +523,7 @@ export class AuthService {
     try {
       const user = await this.prisma.user.findFirst({
         where: {
-          resetPasswordToken: dto.token, accessToken: token,
+          resetPasswordToken: dto.token,
           resetPasswordExpires: { gt: new Date() },
         },
       });
