@@ -859,7 +859,7 @@ export default function EmployerDashboard() {
       });
       setPackageInfo(res.data.data || res.data);
     } catch (err: any) {
-      console.error("❌ Package API Error:", err.message);
+      console.error("❌ Package API Error:", err.message, "Response:", err.response?.data);
       setPackageInfo(false);
     }
   }, [company?.id]);
@@ -920,9 +920,9 @@ export default function EmployerDashboard() {
     if (!token) return;
 
     // 2. ดึงข้อมูลบริษัท (ทำทีเดียว ได้ทั้งข้อมูลบริษัทและเอา ID ไปดึง Package ต่อ)
-    fetch(`${API_URL}/companies/mine`, { headers: { Authorization: `Bearer ${token}` } })
+    console.log("🔍 Fetching company info from:", `${API_URL}/companies/mine`); fetch(`${API_URL}/companies/mine`, { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
+      .then((data) => { console.log("📦 Company Data Received:", data);
         if (data && (data.id || data.data?.id)) {
           setCompany(data.data || data);
         } else {
@@ -934,7 +934,7 @@ export default function EmployerDashboard() {
     // 3. ดึงรายการงาน (Jobs)
     fetch(`${API_URL}/companies/mine/jobs`, { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.json())
-      .then((data) => {
+      .then((data) => { console.log("📦 Company Data Received:", data);
         const list = Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : [];
         setJobs(list);
         setLoadingJobs(false);
@@ -945,7 +945,7 @@ export default function EmployerDashboard() {
     setLoadingApplicants(true);
     fetch(`${API_URL}/applications/employer/recent`, { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => (r.ok ? r.json() : []))
-      .then((data) => {
+      .then((data) => { console.log("📦 Company Data Received:", data);
         setRecentApplicants(Array.isArray(data) ? data : []);
         setLoadingApplicants(false);
       })
@@ -1818,7 +1818,7 @@ export default function EmployerDashboard() {
           onSuccess={() => {
             setShowVerifyModal(false);
             const token = localStorage.getItem('accessToken');
-            fetch(`${API_URL}/companies/mine`, { headers: { Authorization: `Bearer ${token}` } })
+            console.log("🔍 Fetching company info from:", `${API_URL}/companies/mine`); fetch(`${API_URL}/companies/mine`, { headers: { Authorization: `Bearer ${token}` } })
               .then(r => r.json())
               .then(data => { if (data) setCompany(data.data || data); });
           }}
