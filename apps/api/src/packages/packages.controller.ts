@@ -17,6 +17,7 @@ export class PackagesController {
         return await this.packagesService.MultipleUpgrade(companyId, planName);
     }
 
+    @Public()
     @Get('status/:companyId') // เพิ่มส่วนนี้เพื่อให้ Frontend ยิงมา Get ได้
     @ApiOperation({ summary: 'Get company package status' })
     async getStatus(@Param('companyId') companyId: string) {

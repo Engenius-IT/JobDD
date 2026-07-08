@@ -923,8 +923,8 @@ export default function EmployerDashboard() {
     fetch(`${API_URL}/companies/mine`, { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        if (data && data.id) {
-          setCompany(data);
+        if (data && (data.id || data.data?.id)) {
+          setCompany(data.data || data);
         } else {
           setPackageInfo(false);
         }
@@ -1820,7 +1820,7 @@ export default function EmployerDashboard() {
             const token = localStorage.getItem('accessToken');
             fetch(`${API_URL}/companies/mine`, { headers: { Authorization: `Bearer ${token}` } })
               .then(r => r.json())
-              .then(data => { if (data) setCompany(data); });
+              .then(data => { if (data) setCompany(data.data || data); });
           }}
         />
       )}
