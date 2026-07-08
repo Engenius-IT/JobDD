@@ -378,7 +378,7 @@ export function HeroSearch({ onSearch, initialValues }: HeroSearchProps = {}) {
         {/* Search Form Container */}
         <div className="bg-white/[0.03] border border-white/[0.05] rounded-[28px] p-4 md:p-5 backdrop-blur-2xl backdrop-saturate-150 mx-auto max-w-4xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] relative z-40">
           {/* Top Search Bar (White Box) */}
-          <div className="flex flex-col md:flex-row bg-white rounded-2xl md:rounded-xl p-1.5 md:p-2 gap-2 md:gap-0 relative z-50">
+          <div className="flex flex-col md:flex-row bg-white rounded-2xl md:rounded-xl p-1.5 md:p-2 gap-2 md:gap-0 relative z-[100]">
             {/* Keyword Input */}
             <div className="flex-1 flex items-center px-4 md:px-5 h-12 md:h-14 bg-white rounded-lg md:rounded-none">
               <svg
@@ -454,7 +454,7 @@ export function HeroSearch({ onSearch, initialValues }: HeroSearchProps = {}) {
 
               {/* Location Options */}
               {isLocationOpen && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 z-9999 text-left">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 z-[9999] text-left">
                   {/* Search Input */}
                   <div className="p-2 border-b border-gray-100">
                     <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
@@ -537,7 +537,7 @@ export function HeroSearch({ onSearch, initialValues }: HeroSearchProps = {}) {
           </div>
 
           {/* Bottom Row Filters (Pills) */}
-          <div className="relative z-50 flex flex-wrap gap-2 md:gap-3 mt-4 items-center justify-center md:px-4">
+          <div className="relative z-40 flex flex-wrap gap-2 md:gap-3 mt-4 items-center justify-center md:px-4">
             {/* Position Type Pill */}
             <div className="relative" ref={jobTypeDropdownRef}>
               <button
@@ -566,7 +566,7 @@ export function HeroSearch({ onSearch, initialValues }: HeroSearchProps = {}) {
               </button>
 
               {isJobTypeOpen && (
-                <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 z-9999 p-2 text-left">
+                <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 z-[9999] p-2 text-left">
                   <p className="px-2 py-1 text-xs text-gray-400 font-medium">{t('jobType')}</p>
                   {[
                     { value: 'FULL_TIME', label: t('jobTypes.FULL_TIME') },
@@ -638,7 +638,7 @@ export function HeroSearch({ onSearch, initialValues }: HeroSearchProps = {}) {
               </button>
 
               {isSalaryOpen && (
-                <div className="absolute top-full left-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-gray-100 p-4 z-9999 text-left">
+                <div className="absolute top-full left-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-gray-100 p-4 z-[9999] text-left">
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <p className="text-xs text-gray-400 font-medium">
@@ -715,7 +715,7 @@ export function HeroSearch({ onSearch, initialValues }: HeroSearchProps = {}) {
               </button>
 
               {isEducationOpen && (
-                <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 z-9999 p-2 text-left">
+                <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 z-[9999] p-2 text-left">
                   <p className="px-2 py-1 text-xs text-gray-400 font-medium">{t('education')}</p>
                   {[
                     { value: 'ต่ำกว่ามัธยมศึกษา', label: t('educationLevels.lower_secondary') },
@@ -788,7 +788,7 @@ export function HeroSearch({ onSearch, initialValues }: HeroSearchProps = {}) {
               </button>
 
               {isCategoryOpen && (
-                <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 max-h-60 overflow-y-auto z-9999 p-2 text-left">
+                <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 max-h-60 overflow-y-auto z-[9999] p-2 text-left">
                   <div className="space-y-1">
                     <p className="px-2 py-1 text-xs text-gray-400 font-medium">{t('category')}</p>
                     {JOB_CATEGORIES.map((category) => (
