@@ -853,7 +853,7 @@ export default function EmployerDashboard() {
     if (!token) return;
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const baseUrl = API_URL;
       const res = await axios.get(`${baseUrl}/packages/status/${company.id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
