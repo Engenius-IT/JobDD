@@ -342,33 +342,33 @@
   },
 "FAQ": {
     "title": "Frequently Asked Questions",
-    "subtitle": "A collection of questions and answers you might have about using WorksDD so you can start searching for jobs with confidence.",
+    "subtitle": "We've gathered the questions and answers you might have about using WorksDD here,\nso you can find the right candidates with confidence.",
     "employerTitle": "For Employers",
     "candidateTitle": "For Candidates",
     "employer": [
       {
-        "q": "Is there a fee to post a job vacancy?",
-        "a": "WorksDD offers flexible job posting options, including both free posts and premium packages that enhance your company's visibility."
+        "q": "Is there a fee to post a job?",
+        "a": "WorksDD offers flexible job posting options. You can post jobs for free or purchase a premium package that boosts visibility for your job listing and company."
       },
       {
-        "q": "When can I delete or edit a job post?",
-        "a": "You can manage your job postings at any time through the Employer Dashboard. Changes will be reflected on the website in real-time."
+        "q": "When can employers edit or delete a job posting?",
+        "a": "You can manage your job postings anytime through the Employer Dashboard. Changes will be reflected on the website in real-time."
       },
       {
-        "q": "Does the system have features to help screen candidates?",
-        "a": "We feature an AI Matching system and application management tools that help you accurately find and sort candidates matching your required skills."
+        "q": "Does WorksDD have a feature to help screen candidates?",
+        "a": "We have an AI Matching system and application management tools that can help you accurately find and sort candidates whose skills match your requirements."
       },
       {
-        "q": "How can I view a candidate's resume?",
-        "a": "When a candidate applies for a job, you can view their details and download their resume directly through the application management system in your employer account."
+        "q": "How can employers view the resumes of applicants who applied?",
+        "a": "When a candidate applies to a job you've posted, you'll receive a notification via the email linked to your account, as well as an in-app notification. You can view the application details and the candidate's resume through the application page or the application management system in your employer account."
       },
       {
-        "q": "What types of jobs does this website support?",
-        "a": "WorksDD supports all forms of job postings, ranging from full-time, part-time, and freelance work to student internship recruitment."
+        "q": "What types of jobs does WorksDD support?",
+        "a": "WorksDD supports all types of job postings, including full-time, part-time, contract, freelance, and internships for students."
       },
       {
-        "q": "If I encounter technical issues while using the platform, how do I get in touch?",
-        "a": "You can immediately submit a request through the Support system on your Dashboard or reach out to our team via the channels specified on our Contact Us page."
+        "q": "If I encounter an issue while using the platform, how can employers contact the support center?",
+        "a": "You can submit a request through the Support center on your Dashboard, or contact our team via the channels listed on our Contact Us page."
       }
     ],
     "candidate": [
@@ -397,7 +397,7 @@
         "a": "If you wish to update your information, you can upload a new resume on your profile page, which will be saved for your next job applications."
       }
     ],
-    "stillHaveQuestions": "Still have questions?",
+    "stillHaveQuestions": "If you have any further questions",
     "contactUs": "Contact Us"
   },
   "CookieConsent": {
@@ -1328,15 +1328,15 @@
     "description": "Understand the process of setting up your company profile, posting job vacancies, and managing applicants to start recruiting with confidence.",
     "overview": {
       "setupTitle": "Easy Company Setup",
-      "setupDesc": "Fill in information once, use it for all job postings.",
+      "setupDesc": "Fill in your information once and use it for every job posting.",
       "postTitle": "Unlimited Job Posts",
-      "postDesc": "Save as draft or publish instantly anytime.",
+      "postDesc": "You can save it as a draft first or publish it immediately.",
       "manageTitle": "Instant Applicant Access",
-      "manageDesc": "Resumes and contact details are ready for your review."
+      "manageDesc": "Resumes and applicant contact details are ready for your review."
     },
     "interactiveTitle": "Employer Dashboard Simulation (Interactive UI)",
     "interactiveHint": "💡 Click on the simulated boxes or numbers to view details for each step.",
-    "sectionTitle": "Step-by-Step Instructions for Employers",
+    "sectionTitle": "Usage Steps for Employers",
     "steps": {
       "step1": {
         "title": "1. Company Setup",
@@ -1345,8 +1345,8 @@
         "tips": "Complete company verification first. If not yet approved, your job posts can only be saved as drafts and cannot be published immediately."
       },
       "step2": {
-        "title": "2. Post a Job",
-        "desc": "Fill in job descriptions, salary ranges, qualifications, and benefits, then choose to save as a draft or publish immediately.",
+        "title": "2. Create and Publish a Job",
+        "desc": "Fill in the job details, salary, qualifications, and benefits. You can choose to save it as a draft or publish it immediately.",
         "badge": "Core Feature",
         "tips": "Include required skills as keywords. The AI system will use this data to automatically pre-screen applicants who match your criteria."
       },
@@ -1357,10 +1357,10 @@
         "tips": "Open and view candidate resumes and contact details instantly once they apply—no need to wait for them to send additional files."
       },
       "step4": {
-        "title": "4. Update Status & Close Job (Hiring)",
-        "desc": "Change application statuses (e.g., Interview, Passed, or Rejected) and close the job posting once you have hired the right person.",
+        "title": "4. Update Application Status & Close Job Posting",
+        "desc": "Change the application status for each candidate, such as passed, not passed, or interview scheduled, and so on.",
         "badge": "Hired",
-        "tips": "Once closed, the job post will no longer appear in candidate searches, but past applicant data can still be reviewed anytime."
+        "tips": "You should close a job posting once you've hired enough people, to prevent new applicants from applying. Once closed, the job will no longer appear in job seekers' search results, but existing applicants can still view the posting."
       }
     },
     "ui": {
@@ -1375,10 +1375,10 @@
       "title": "System Guidelines & Tips",
       "tip1": "Double-check your company information and job details before publishing, and keep them up to date.",
       "tip2": "Regularly monitor applicant statuses using the Employer Dashboard.",
-      "tip3": "Respond to applicants quickly to improve your hiring conversion rate.",
-      "tip4": "Close job postings once positions are filled to reduce redundant data."
+      "tip3": "Respond to applicants quickly to speed up and improve your chances in the selection process.",
+      "tip4": "Close job postings once you've hired the candidates you need, to reduce redundant data."
     },
-    "backToHome": "Understood, Back to Home"
+    "backToHome": "Back to Home"
   },
   "DashBoard": {
     "greeting": "Hello",
