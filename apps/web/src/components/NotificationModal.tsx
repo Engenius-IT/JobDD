@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { createPortal } from 'react-dom';
 import { Bell, MailOpen, AtSign, Settings, ArrowLeft, Calendar, Tag, MapPin, Users, Building, Map, Phone, Mail, MessageSquare, Search, X, ChevronRight, CheckCircle } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { getLocalizedNotification } from './NotificationBell';
 
 interface Notification {
@@ -86,6 +86,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
 }) => {
   const router = useRouter();
   const tNoti = useTranslations('Notifications');
+  const locale = useLocale() as 'th' | 'en';
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -257,7 +258,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
       }
     }
 
-    const locNoti = getLocalizedNotification(notification, tNoti);
+    const locNoti = getLocalizedNotification(notification, tNoti, locale);
 
     if (notification.metadata || notification.title.includes('สัมภาษณ์') || locNoti.title.includes('สัมภาษณ์') || notification.type === 'GENERAL') {
       setSelectedNotification(notification);
@@ -307,7 +308,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
     }
 
     // 2. Search Query Filter
-    const locNoti = getLocalizedNotification(n, tNoti);
+    const locNoti = getLocalizedNotification(n, tNoti, locale);
     return (
       locNoti.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       locNoti.message.toLowerCase().includes(searchQuery.toLowerCase())
@@ -378,7 +379,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
   const displayCompanyPhone = selectedCompany?.phone || selectedNotification?.metadata?.companyPhone || '02-123-4567';
   const displayCompanyEmail = selectedCompany?.owner?.email || selectedNotification?.metadata?.companyEmail || 'contact@novatech.com';
 
-  const locDetail = selectedNotification ? getLocalizedNotification(selectedNotification, tNoti) : null;
+  const locDetail = selectedNotification ? getLocalizedNotification(selectedNotification, tNoti, locale) : null;
 
   const getNotificationParams = (value?: string) => {
     if (!value) return {};
@@ -687,9 +688,9 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
                     <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm space-y-4">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-xl bg-[#1a1c3d] text-white flex items-center justify-center font-bold overflow-hidden">
-                          {selectedLogo && !logoError ? (
+                          {displayCompanyLogo && !logoError ? (
                             <img
-                              src={selectedLogo}
+                              src={displayCompanyLogo}
                               alt={displayCompanyName}
                               className="w-full h-full object-cover"
                               onError={() => setLogoError(true)}
@@ -700,7 +701,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
                         </div>
                         <div className="min-w-0">
                           <p className="font-bold text-slate-900 truncate">{displayCompanyName}</p>
-                          <p className="text-xs text-slate-500 truncate">{displayJobTitle}</p>
+                          <p className="text-xs text-slate-500 truncate">{displayPosition}</p>
                         </div>
                       </div>
 
@@ -739,7 +740,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
             <div className="flex-1 overflow-y-auto bg-white">
               <section className="p-4 space-y-3">
                 {filteredNotifications.map((noti) => {
-                  const locNoti = getLocalizedNotification(noti, tNoti);
+                  const locNoti = getLocalizedNotification(noti, tNoti, locale);
                   return (
                     <button
                       key={noti.id}
@@ -1441,7 +1442,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
                       <h3 className="text-[11px] font-bold text-[#45464e] uppercase tracking-[0.2em] mb-4 ml-1">Today</h3>
                       <div className="space-y-3">
                         {filteredNotifications.map((noti) => {
-                          const locNoti = getLocalizedNotification(noti, tNoti);
+                          const locNoti = getLocalizedNotification(noti, tNoti, locale);
                           return (
                             <div
                               key={noti.id}
