@@ -18,9 +18,13 @@ interface UserDropdownProps {
     companySlug?: string;
   };
   logout: () => void;
+  customDropdownClass?: string;
+  badgeText?: string;
+  badgeClass?: string;
+  avatarRingClass?: string;
 }
 
-export function UserDropdown({ user, logout }: UserDropdownProps) {
+export function UserDropdown({ user, logout, customDropdownClass, badgeText, badgeClass, avatarRingClass }: UserDropdownProps) {
   const t = useTranslations('Navbar');
   const [isOpen, setIsOpen] = useState(false);
   const [companySlug, setCompanySlug] = useState(user.companySlug || '');
@@ -62,26 +66,36 @@ export function UserDropdown({ user, logout }: UserDropdownProps) {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-3 hover:bg-gray-50 p-2 rounded-lg transition-colors focus:outline-none"
+        className={`flex items-center gap-3 transition-colors focus:outline-none ${customDropdownClass || "hover:bg-gray-50 p-2 rounded-lg"}`}
       >
-        <span className="text-gray-700 font-medium hidden md:block">
-          {t('hello')}{' '}
-          <span className="text-(--color-primary)">
-            {isEmployer && user.companyName ? user.companyName : user.firstName}
-          </span>
-        </span>
+        <div className={customDropdownClass ? `p-[2px] rounded-full ${avatarRingClass || 'bg-gradient-to-tr from-[#C99700] via-[#F8E5B0] to-[#FFF7E6]'} shadow-sm shrink-0` : "shrink-0"}>
+          {displayImageUrl ? (
+            <img
+              src={displayImageUrl}
+              alt="Profile"
+              className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-blue-100 text-(--color-primary) flex items-center justify-center font-bold border-2 border-white shadow-sm">
+              {initialChar}
+            </div>
+          )}
+        </div>
 
-        {displayImageUrl ? (
-          <img
-            src={displayImageUrl}
-            alt="Profile"
-            className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm ring-2 ring-transparent hover:ring-blue-100 transition-all"
-          />
-        ) : (
-          <div className="w-10 h-10 rounded-full bg-blue-100 text-(--color-primary) flex items-center justify-center font-bold border-2 border-white shadow-sm ring-2 ring-transparent hover:ring-blue-100 transition-all">
-            {initialChar}
+        <span className="text-inherit hidden md:flex flex-col text-left justify-center">
+          <div className="flex items-center gap-1.5 leading-none text-xs">
+            <span className="font-semibold">{t('hello')}</span>
+            <span className="font-bold">
+              {isEmployer && user.companyName ? user.companyName : user.firstName}
+            </span>
           </div>
-        )}
+          {badgeText && (
+            <div className={`text-[8.5px] font-bold tracking-[0.8px] ${badgeClass || 'text-[#C99700]'} flex items-center gap-0.5 mt-1 leading-none uppercase`}>
+              <span>👑</span>
+              <span>{badgeText}</span>
+            </div>
+          )}
+        </span>
       </button>
 
       {isOpen && (

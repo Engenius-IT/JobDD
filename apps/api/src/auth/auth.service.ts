@@ -148,6 +148,17 @@ export class AuthService {
 
       const token = await this.signToken(user.id, user.email ?? '', user.role);
 
+      let companyPackagePlanName = 'DEFAULT';
+      if (user.role === 'EMPLOYER' && user.companies?.[0]?.id) {
+        const companyPackage = await this.prisma.companyPackage.findUnique({
+          where: { companyId: user.companies[0].id },
+          select: { name: true },
+        });
+        if (companyPackage && companyPackage.name) {
+          companyPackagePlanName = companyPackage.name.toUpperCase();
+        }
+      }
+
       return {
         accessToken: token, token: token,
         user: {
@@ -161,6 +172,7 @@ export class AuthService {
           companyName: user.companies?.[0]?.name || null,
           companyLogo: user.companies?.[0]?.logoUrl || null,
           companySlug: user.companies?.[0]?.slug || null,
+          companyPackagePlanName,
         },
       };
     } catch (error: any) {
@@ -194,6 +206,17 @@ export class AuthService {
         throw new UnauthorizedException('ไม่พบข้อมูลผู้ใช้');
       }
 
+      let companyPackagePlanName = 'DEFAULT';
+      if (user.role === 'EMPLOYER' && user.companies?.[0]?.id) {
+        const companyPackage = await this.prisma.companyPackage.findUnique({
+          where: { companyId: user.companies[0].id },
+          select: { name: true },
+        });
+        if (companyPackage && companyPackage.name) {
+          companyPackagePlanName = companyPackage.name.toUpperCase();
+        }
+      }
+
       return {
         id: user.id,
         email: user.email,
@@ -207,6 +230,7 @@ export class AuthService {
         companyLogo: user.companies?.[0]?.logoUrl || null,
         companySlug: user.companies?.[0]?.slug || null,
         company: user.companies?.[0] || null,
+        companyPackagePlanName,
       };
     } catch (error: any) {
       if (error instanceof UnauthorizedException) throw error;
@@ -336,6 +360,17 @@ export class AuthService {
       // Generate JWT
       const token = await this.signToken(user.id, user.email ?? '', user.role);
 
+      let companyPackagePlanName = 'DEFAULT';
+      if (user.role === 'EMPLOYER' && user.companies?.[0]?.id) {
+        const companyPackage = await this.prisma.companyPackage.findUnique({
+          where: { companyId: user.companies[0].id },
+          select: { name: true },
+        });
+        if (companyPackage && companyPackage.name) {
+          companyPackagePlanName = companyPackage.name.toUpperCase();
+        }
+      }
+
       return {
         isNewUser: false,
         token, accessToken: token,
@@ -350,6 +385,7 @@ export class AuthService {
           companyName: user.companies?.[0]?.name || null,
           companyLogo: user.companies?.[0]?.logoUrl || null,
           companySlug: user.companies?.[0]?.slug || null,
+          companyPackagePlanName,
         },
       };
     } catch (error: any) {
@@ -420,6 +456,17 @@ export class AuthService {
       });
 
       const token = await this.signToken(user.id, user.email ?? '', user.role);
+      let companyPackagePlanName = 'DEFAULT';
+      if (user.role === 'EMPLOYER' && user.companies?.[0]?.id) {
+        const companyPackage = await this.prisma.companyPackage.findUnique({
+          where: { companyId: user.companies[0].id },
+          select: { name: true },
+        });
+        if (companyPackage && companyPackage.name) {
+          companyPackagePlanName = companyPackage.name.toUpperCase();
+        }
+      }
+
       return {
         accessToken: token, token: token,
         user: {
@@ -433,6 +480,7 @@ export class AuthService {
           companyName: user.companies?.[0]?.name || null,
           companyLogo: user.companies?.[0]?.logoUrl || null,
           companySlug: user.companies?.[0]?.slug || null,
+          companyPackagePlanName,
         },
       };
     } catch (error: any) {

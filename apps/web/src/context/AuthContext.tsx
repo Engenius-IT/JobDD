@@ -14,6 +14,7 @@ interface User {
   companyName?: string;
   companyLogo?: string;
   companyId?: string;
+  companyPackagePlanName?: 'PRO' | 'PREMIUM' | 'VIP' | 'DEFAULT'; // เพิ่ม property นี้
 }
 
 interface AuthContextType {
@@ -36,9 +37,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('accessToken');
 
+    // เมื่อโหลด user จาก localStorage ให้พยายาม parse companyPackagePlanName ด้วย
     if (storedUser && storedToken) {
       try {
         setUserState(JSON.parse(storedUser));
+        
+        // ดึงข้อมูลโปรไฟล์ล่าสุดเพื่ออัปเดตสิทธิ์แพ็กเกจ
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+        fetch(`${API_URL}/auth/me`, {
+          headers: { Authorization: `Bearer ${storedToken}` }
+        })
+        .then((res) => {
+          if (res.ok) return res.json();
+          throw new Error('Refresh failed');
+        })
+        .then((userData) => {
+          localStorage.setItem('user', JSON.stringify(userData));
+          setUserState(userData);
+        })
+        .catch(() => {});
       } catch (error) {
         console.error('Failed to parse user data:', error);
         localStorage.removeItem('user');
@@ -49,6 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = (token: string, userData: User) => {
+    // เมื่อ login ให้เก็บ companyPackagePlanName ลง localStorage ด้วย
     localStorage.setItem('accessToken', token);
     localStorage.setItem('user', JSON.stringify(userData));
     setUserState(userData);
@@ -74,6 +92,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 };
 
   const setUser = (userData: User | null) => {
+    // เมื่อ set user ให้เก็บ companyPackagePlanName ลง localStorage ด้วย
     if (userData) {
       localStorage.setItem('user', JSON.stringify(userData));
     } else {
