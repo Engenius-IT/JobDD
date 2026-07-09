@@ -128,34 +128,6 @@ export function SubNavbar({ userRole, packagePlanName }: SubNavbarProps) {
               {renderActiveIndicator('/jobs')}
             </Link>
 
-            {/* Find Jobs Dropdown */}
-            <div className="group relative">
-              <Link
-                href="/jobs"
-                className={navLinkClass('/jobs', true)}
-              >
-                {t('findJobs')}
-                <svg className="w-4 h-4 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-                {renderActiveIndicator('/jobs', true)}
-              </Link>
-              <div className={`absolute top-full left-0 hidden group-hover:block ${currentTheme.subNavbarDropdownBg} text-gray-800 shadow-xl rounded-b-lg min-w-56 py-2 z-50 border border-t-0 border-gray-100`}>
-                <Link href="/jobs?keyword=โรงแรม" className={`block px-4 py-2 ${currentTheme.subNavbarDropdownHoverBg} ${currentTheme.subNavbarDropdownHoverText} text-sm`}>
-                  {t('findJobsSub.hotel')}
-                </Link>
-                <Link href="/jobs?jobType=INTERNSHIP" className={`block px-4 py-2 ${currentTheme.subNavbarDropdownHoverBg} ${currentTheme.subNavbarDropdownHoverText} text-sm`}>
-                  {t('findJobsSub.internship')}
-                </Link>
-                <Link href="/jobs?keyword=สหกิจศึกษา" className={`block px-4 py-2 ${currentTheme.subNavbarDropdownHoverBg} ${currentTheme.subNavbarDropdownHoverText} text-sm`}>
-                  {t('findJobsSub.coop')}
-                </Link>
-                <Link href="/jobs?category=งานไอที งานเทคโนโลยีสื่อสาร" className={`block px-4 py-2 ${currentTheme.subNavbarDropdownHoverBg} ${currentTheme.subNavbarDropdownHoverText} text-sm`}>
-                  {t('findJobsSub.disabled')}
-                </Link>
-              </div>
-            </div>
-
             {/* Regional Jobs Dropdown */}
             <div className="group relative">
               <Link

@@ -83,7 +83,7 @@ export function UserDropdown({ user, logout, customDropdownClass, badgeText, bad
         </div>
 
         <span className="text-inherit hidden md:flex flex-col text-left justify-center">
-          <div className="flex items-center gap-1.5 leading-none text-xs">
+          <div className={`flex items-center gap-1.5 leading-none ${badgeText ? 'text-xs' : 'text-base'}`}>
             <span className="font-semibold">{t('hello')}</span>
             <span className="font-bold">
               {isEmployer && user.companyName ? user.companyName : user.firstName}
