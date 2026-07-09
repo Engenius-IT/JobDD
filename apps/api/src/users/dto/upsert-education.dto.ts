@@ -40,6 +40,12 @@ export class EducationItemDto {
     @IsOptional()
     @IsBoolean()
     hasHonors?: boolean;
+
+    @ApiPropertyOptional({ description: 'ระดับเกียรตินิยม (1 หรือ 2)' })
+    @IsOptional()
+    @IsString()
+    honors_level?: string;
+
 }
 
 export class UpsertEducationDto {

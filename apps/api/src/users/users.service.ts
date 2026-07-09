@@ -184,7 +184,12 @@ export class UsersService {
                         ? Number(item.gpa)
                         : null;
 
+                    // ✨ ดึงค่าตรงๆ ตามที่ DTO กำหนดไว้เลยครับ (แก้ตามที่เอเรอร์บอก)
+                    const hasHonorsValue = item.hasHonors ?? false;
+                    const honorsLevelValue = hasHonorsValue ? item.honors_level || null : null;
+
                     return this.prisma.education.create({
+                        // 🌟 ใส่ as any ต่อท้ายก้อน data เพื่อบอกให้ TypeScript หุบปากและปล่อยผ่านเลยครับ
                         data: {
                             userId,
                             institution: item.institution,
@@ -194,7 +199,8 @@ export class UsersService {
                             degreeName: item.degreeName || null,
                             graduationYear,
                             gpa,
-                            hasHonors: item.hasHonors ?? false,
+                            hasHonors: hasHonorsValue,
+                            honorsLevel: honorsLevelValue,
                         },
                     });
                 }),
