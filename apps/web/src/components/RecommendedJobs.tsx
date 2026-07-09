@@ -217,7 +217,7 @@ export function RecommendedJobs() {
               <div key={job.id} className="relative group">
                 <Link
                   href={`/jobs/${job.slug}`}
-                  className="border border-gray-300 rounded-3xl p-6 relative hover:shadow-lg transition-shadow bg-white flex flex-col cursor-pointer z-10 group-hover:z-20"
+                  className="border border-gray-300 rounded-3xl p-6 relative z-0 hover:shadow-lg transition-shadow bg-white flex flex-col cursor-pointer z-10 group-hover:z-20"
                 >
                   {/* Urgent Badge - Corner Ribbon Style */}
                   {job.isQuickApply && (
@@ -335,12 +335,13 @@ export function RecommendedJobs() {
 
                 {/* Save button — positioned absolute top-right of card */}
                 <button
+                  type="button"
                   onClick={(e) => toggleSave(e, job.slug)}
                   title={isSaved ? 'ยกเลิกบันทึก' : 'บันทึกงาน'}
-                  className={`absolute top-5 right-5 z-10 flex flex-col items-center gap-0.5 p-2 rounded-xl transition-all  ${
+                  className={`absolute top-5 right-5 z-20 pointer-events-auto flex flex-col items-center gap-0.5 p-2 rounded-xl transition-all ${
                     isSaved
-                      ? 'text-[#E00016] bg-red-50 hover:bg-red-100'
-                      : 'text-gray-300 hover:text-[#E00016] hover:bg-red-50'
+                      ? 'text-[#E00016] bg-transparent'
+                      : 'text-gray-300 hover:text-[#E00016]'
                   }`}
                 >
                   <Bookmark
