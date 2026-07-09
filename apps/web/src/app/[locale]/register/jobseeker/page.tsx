@@ -27,6 +27,7 @@ export default function JobSeekerRegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [termsChecked, setTermsChecked] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const isFormValid =
     form.firstName.trim() !== '' &&
@@ -175,6 +176,11 @@ export default function JobSeekerRegisterPage() {
         if (globalErrors.length > 0) {
           setError(globalErrors.join(', '));
         }
+        return;
+      }
+
+      if (data.requiresVerification) {
+        setIsSuccess(true);
         return;
       }
 
