@@ -291,8 +291,37 @@
     "or": "หรือ",
     "login": "เข้าสู่ระบบ",
     "noAccount": "ยังไม่มีบัญชีใช่ไหม?",
-    "register": "สมัครสมาชิก"
+    "register": "สมัครสมาชิก",
+    "forgotPassword": "ลืมรหัสผ่าน?"
   },
+  "Login": {
+  "heading": "เข้าสู่ระบบ",
+  "roleJobseeker": "ผู้สมัครงาน",
+  "roleEmployer": "ผู้ประกอบการ",
+  "placeholderEmail": "อีเมลผู้ใช้งาน",
+  "placeholderPassword": "รหัสผ่าน",
+  "btnSubmit": "เข้าสู่ระบบ",
+  "btnRegister": "สมัครสมาชิก",
+  "dividerOr": "หรือ",
+  "btnGoogle": "ดำเนินการต่อด้วยบัญชี Google",
+  "errDefault": "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง",
+  "errOAuthGoogle": "เกิดข้อผิดพลาดในการประมวลผลข้อมูลของ Google",
+  "errNetwork": "ไม่สามารถเชื่อมต่อ API ได้ กรุณาตรวจสอบอินเทอร์เน็ตหรือเซิร์ฟเวอร์",
+  "oauthCancelled": "ยกเลิกการเข้าสู่ระบบด้วย Google",
+  "oauthFailed": "เข้าสู่ระบบด้วย Google ล้มเหลว กรุณาลองใหม่",
+  "btnChangePassword": "เปลี่ยนรหัสผ่าน?",
+  "forgotPassword": "ลืมรหัสผ่าน?"
+},
+"ChangePassword": {
+  "heading": "เปลี่ยนรหัสผ่านใหม่",
+  "placeholderEmail": "อีเมลผู้ใช้งาน",
+  "placeholderOldPassword": "รหัสผ่านปัจจุบัน",
+  "placeholderNewPassword": "รหัสผ่านใหม่ (6-20 ตัวอักษร)",
+  "btnSubmit": "บันทึกรหัสผ่านใหม่",
+  "btnBack": "ย้อนกลับ",
+  "errLength": "รหัสผ่านต้องมีความยาวระหว่าง 6 ถึง 20 ตัวอักษร",
+  "success": "เปลี่ยนรหัสผ่านสำเร็จแล้ว!"
+},
   "AIjobmatch": {
     "aimatch": "JOBDD AI MATCHING",
     "aimatcher": "ให้ระบบ AI ของเราจับคู่คุณกับงานที่สมบูรณ์แบบตามทักษะ ประสบการณ์ และเรซูเม่ของคุณ เพื่อค้นหาโอกาสที่เหมาะสมได้เร็วขึ้น",

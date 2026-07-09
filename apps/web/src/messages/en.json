@@ -291,7 +291,37 @@
     "or": "or",
     "login": "Login",
     "noAccount": "Don't have an account?",
-    "register": "Register"
+    "register": "Register",
+    "forgotPassword": "Forgot Password?"
+
+  },
+  "Login": {
+    "heading": "Sign In",
+    "roleJobseeker": "Job Seeker",
+    "roleEmployer": "Employer",
+    "placeholderEmail": "Email Address",
+    "placeholderPassword": "Password",
+    "btnSubmit": "Sign In",
+    "btnRegister": "Register",
+    "dividerOr": "OR",
+    "btnGoogle": "Continue with Google",
+    "errDefault": "Invalid username or password",
+    "errOAuthGoogle": "Failed to process Google authentication data",
+    "errNetwork": "Cannot connect to API. Please check your internet or server",
+    "oauthCancelled": "Google sign-in cancelled",
+    "oauthFailed": "Google sign-in failed. Please try again",
+    "btnChangePassword": "Change Password",
+    "forgotPassword": "Forgot Password?"
+  },
+ "ChangePassword": {
+    "heading": "Change Password",
+    "placeholderEmail": "User Email",
+    "placeholderOldPassword": "Current Password",
+    "placeholderNewPassword": "New Password (6-20 characters)",
+    "btnSubmit": "Save New Password",
+    "btnBack": "Back",
+    "errLength": "Password must be between 6 and 20 characters long.",
+    "success": "Password changed successfully!"
   },
   "JobCategories": {
     "storefront": "Storefront Jobs",

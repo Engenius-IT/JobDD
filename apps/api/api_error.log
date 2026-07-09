@@ -791,3 +791,228 @@ Stack: UnauthorizedException: อีเมลหรือรหัสผ่า�
     at AuthService.login (D:\JobDD10_3\JobDD\apps\api\src\auth\auth.service.ts:131:15)
     at async D:\JobDD10_3\JobDD\node_modules\.bun\@nestjs+core@11.1.19+0bf89da9cc8b8299\node_modules\@nestjs\core\router\router-execution-context.js:46:28
     at async D:\JobDD10_3\JobDD\node_modules\.bun\@nestjs+core@11.1.19+0bf89da9cc8b8299\node_modules\@nestjs\core\router\router-proxy.js:9:17
+[2026-07-02T04:21:29.929Z] Login Error: {
+  "response": {
+    "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    "error": "Unauthorized",
+    "statusCode": 401
+  },
+  "status": 401,
+  "options": {},
+  "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+  "name": "UnauthorizedException"
+}
+Stack: UnauthorizedException: อีเมลหรือรหัสผ่านไม่ถูกต้อง
+    at AuthService.login (D:\JobDD10_4\JobDD\apps\api\src\auth\auth.service.ts:177:15)
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-execution-context.js:47:62
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-proxy.js:9:17
+[2026-07-02T04:28:15.934Z] Login Error: {
+  "response": {
+    "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    "error": "Unauthorized",
+    "statusCode": 401
+  },
+  "status": 401,
+  "options": {},
+  "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+  "name": "UnauthorizedException"
+}
+Stack: UnauthorizedException: อีเมลหรือรหัสผ่านไม่ถูกต้อง
+    at AuthService.login (D:\JobDD10_4\JobDD\apps\api\src\auth\auth.service.ts:177:15)
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-execution-context.js:47:62
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-proxy.js:9:17
+[2026-07-02T04:56:54.381Z] Login Error: {
+  "response": {
+    "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    "error": "Unauthorized",
+    "statusCode": 401
+  },
+  "status": 401,
+  "options": {},
+  "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+  "name": "UnauthorizedException"
+}
+Stack: UnauthorizedException: อีเมลหรือรหัสผ่านไม่ถูกต้อง
+    at AuthService.login (D:\JobDD10_4\JobDD\apps\api\src\auth\auth.service.ts:177:15)
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-execution-context.js:47:62
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-proxy.js:9:17
+[2026-07-02T06:10:16.110Z] Login Error: {
+  "response": {
+    "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    "error": "Unauthorized",
+    "statusCode": 401
+  },
+  "status": 401,
+  "options": {},
+  "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+  "name": "UnauthorizedException"
+}
+Stack: UnauthorizedException: อีเมลหรือรหัสผ่านไม่ถูกต้อง
+    at AuthService.login (D:\JobDD10_4\JobDD\apps\api\src\auth\auth.service.ts:177:15)
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-execution-context.js:47:62
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-proxy.js:9:17
+[2026-07-02T06:29:17.773Z] Login Error: {
+  "response": {
+    "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    "error": "Unauthorized",
+    "statusCode": 401
+  },
+  "status": 401,
+  "options": {},
+  "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+  "name": "UnauthorizedException"
+}
+Stack: UnauthorizedException: อีเมลหรือรหัสผ่านไม่ถูกต้อง
+    at AuthService.login (D:\JobDD10_4\JobDD\apps\api\src\auth\auth.service.ts:177:15)
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-execution-context.js:47:62
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-proxy.js:9:17
+[2026-07-02T07:40:01.729Z] Login Error: {
+  "response": {
+    "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    "error": "Unauthorized",
+    "statusCode": 401
+  },
+  "status": 401,
+  "options": {},
+  "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+  "name": "UnauthorizedException"
+}
+Stack: UnauthorizedException: อีเมลหรือรหัสผ่านไม่ถูกต้อง
+    at AuthService.login (D:\JobDD10_4\JobDD\apps\api\src\auth\auth.service.ts:177:15)
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-execution-context.js:47:62
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-proxy.js:9:17
+[2026-07-02T07:40:05.507Z] Login Error: {
+  "response": {
+    "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    "error": "Unauthorized",
+    "statusCode": 401
+  },
+  "status": 401,
+  "options": {},
+  "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+  "name": "UnauthorizedException"
+}
+Stack: UnauthorizedException: อีเมลหรือรหัสผ่านไม่ถูกต้อง
+    at AuthService.login (D:\JobDD10_4\JobDD\apps\api\src\auth\auth.service.ts:177:15)
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-execution-context.js:47:62
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-proxy.js:9:17
+[2026-07-02T07:52:29.831Z] Login Error: {
+  "response": {
+    "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    "error": "Unauthorized",
+    "statusCode": 401
+  },
+  "status": 401,
+  "options": {},
+  "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+  "name": "UnauthorizedException"
+}
+Stack: UnauthorizedException: อีเมลหรือรหัสผ่านไม่ถูกต้อง
+    at AuthService.login (D:\JobDD10_4\JobDD\apps\api\src\auth\auth.service.ts:177:15)
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-execution-context.js:47:62
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-proxy.js:9:17
+[2026-07-03T02:33:22.297Z] Login Error: {
+  "response": {
+    "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    "error": "Unauthorized",
+    "statusCode": 401
+  },
+  "status": 401,
+  "options": {},
+  "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+  "name": "UnauthorizedException"
+}
+Stack: UnauthorizedException: อีเมลหรือรหัสผ่านไม่ถูกต้อง
+    at AuthService.login (D:\JobDD10_4\JobDD\apps\api\src\auth\auth.service.ts:177:15)
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-execution-context.js:47:62
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-proxy.js:9:17
+[2026-07-03T02:33:25.208Z] Login Error: {
+  "response": {
+    "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    "error": "Unauthorized",
+    "statusCode": 401
+  },
+  "status": 401,
+  "options": {},
+  "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+  "name": "UnauthorizedException"
+}
+Stack: UnauthorizedException: อีเมลหรือรหัสผ่านไม่ถูกต้อง
+    at AuthService.login (D:\JobDD10_4\JobDD\apps\api\src\auth\auth.service.ts:177:15)
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-execution-context.js:47:62
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-proxy.js:9:17
+[2026-07-03T04:26:08.911Z] Login Error: {
+  "response": {
+    "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    "error": "Unauthorized",
+    "statusCode": 401
+  },
+  "status": 401,
+  "options": {},
+  "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+  "name": "UnauthorizedException"
+}
+Stack: UnauthorizedException: อีเมลหรือรหัสผ่านไม่ถูกต้อง
+    at AuthService.login (D:\JobDD10_4\JobDD\apps\api\src\auth\auth.service.ts:177:15)
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-execution-context.js:47:62
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-proxy.js:9:17
+[2026-07-03T04:26:16.235Z] Login Error: {
+  "response": {
+    "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    "error": "Unauthorized",
+    "statusCode": 401
+  },
+  "status": 401,
+  "options": {},
+  "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+  "name": "UnauthorizedException"
+}
+Stack: UnauthorizedException: อีเมลหรือรหัสผ่านไม่ถูกต้อง
+    at AuthService.login (D:\JobDD10_4\JobDD\apps\api\src\auth\auth.service.ts:177:15)
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-execution-context.js:47:62
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-proxy.js:9:17
+[2026-07-03T04:26:27.658Z] Login Error: {
+  "response": {
+    "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    "error": "Unauthorized",
+    "statusCode": 401
+  },
+  "status": 401,
+  "options": {},
+  "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+  "name": "UnauthorizedException"
+}
+Stack: UnauthorizedException: อีเมลหรือรหัสผ่านไม่ถูกต้อง
+    at AuthService.login (D:\JobDD10_4\JobDD\apps\api\src\auth\auth.service.ts:177:15)
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-execution-context.js:47:62
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-proxy.js:9:17
+[2026-07-06T03:09:16.875Z] Login Error: {
+  "response": {
+    "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    "error": "Unauthorized",
+    "statusCode": 401
+  },
+  "status": 401,
+  "options": {},
+  "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+  "name": "UnauthorizedException"
+}
+Stack: UnauthorizedException: อีเมลหรือรหัสผ่านไม่ถูกต้อง
+    at AuthService.login (D:\JobDD10_4\JobDD\apps\api\src\auth\auth.service.ts:177:15)
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-execution-context.js:47:62
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-proxy.js:9:17
+[2026-07-06T03:09:20.266Z] Login Error: {
+  "response": {
+    "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    "error": "Unauthorized",
+    "statusCode": 401
+  },
+  "status": 401,
+  "options": {},
+  "message": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+  "name": "UnauthorizedException"
+}
+Stack: UnauthorizedException: อีเมลหรือรหัสผ่านไม่ถูกต้อง
+    at AuthService.login (D:\JobDD10_4\JobDD\apps\api\src\auth\auth.service.ts:177:15)
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-execution-context.js:47:62
+    at async D:\JobDD10_4\JobDD\node_modules\.bun\@nestjs+core@11.1.27+fc73dd6cef4877d7\node_modules\@nestjs\core\router\router-proxy.js:9:17
