@@ -79,7 +79,7 @@ const translations = {
         complete: 'สมบูรณ์',
         licensePrefix: 'ใบขับขี่',
         machineryPrefix: 'ขับ',
-        machinerySuffix: 'ได้'
+        
     },
     en: {
         completeness: 'Profile Completeness',
@@ -445,7 +445,7 @@ export default function EditDrivingPage() {
                                 {HEAVY_MACHINERY.map(v => (
                                     <SelectionCard
                                         key={v.id}
-                                        title={`${t.machineryPrefix}${v.label}${t.machinerySuffix}`}
+                                        title={`${t.machineryPrefix}${v.label}`}
                                         active={machinerySkills.includes(v.id)}
                                         icon={v.icon}
                                         onClick={() => toggle(v.id, setMachinerySkills, 'backup_machinery_skills')}
