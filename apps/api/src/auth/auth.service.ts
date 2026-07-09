@@ -59,7 +59,6 @@ export class AuthService {
       });
 
       let companyName: string | undefined = dto.companyName;
-      let companySlug: string | undefined;
 
       if (dto.role === 'EMPLOYER' && dto.companyName) {
         try {
@@ -75,7 +74,6 @@ export class AuthService {
           });
 
           companyName = company.name;
-          companySlug = company.slug;
         } catch (error: any) {
           await this.prisma.user.delete({ where: { id: user.id } });
           throw error;
