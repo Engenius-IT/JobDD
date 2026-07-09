@@ -25,10 +25,12 @@ import {
   Mail,
   Sparkles,
   Car,
-  AlertCircle
+  AlertCircle,
+  Award
 } from 'lucide-react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+
 
 interface ProfileData {
   gender?: string;
@@ -252,6 +254,9 @@ const getProfileValueLabel = (key: string, value: string | undefined, isEn: bool
 const getEducationLabel = (key: string, value: string | undefined, isEn: boolean) => {
   if (!value) return '-';
 
+
+
+
   const translations: Record<string, Record<string, string>> = {
     educationLevel: {
       'มัธยมศึกษาตอนต้น': 'Lower Secondary School',
@@ -332,7 +337,7 @@ export default function ProfileFullPage() {
 
   const [refreshKey, setRefreshKey] = useState(0);
   const { user, loading: authLoading, setUser } = useAuth();
-
+  const [certificates, setCertificates] = useState<any[]>([]);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [educations, setEducations] = useState<EducationItem[]>([]);
   const [works, setWorks] = useState<WorkItem[]>([]);
@@ -402,6 +407,23 @@ export default function ProfileFullPage() {
     uploadPdf: isEn ? 'Upload PDF' : 'อัปโหลด PDF',
     loadingProfile: isEn ? 'Loading profile data...' : 'กำลังโหลดข้อมูลโปรไฟล์...',
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return;
+
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+    fetch(`${API_URL}/users/me/certificates`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setCertificates(data);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (authLoading) return;
@@ -563,34 +585,53 @@ export default function ProfileFullPage() {
     }
   };
 
-  const handleTogglePublic = async () => {
-    const currentIsPublic = profile?.isPublic ?? true;
-    const newStatus = !currentIsPublic;
+ const handleTogglePublic = async () => {
+  const currentIsPublic = profile?.isPublic ?? true;
+  const newStatus = !currentIsPublic;
 
-    const previousProfile = profile;
-    const newProfile = profile
-      ? { ...profile, isPublic: newStatus }
-      : ({ isPublic: newStatus } as ProfileData);
-    setProfile(newProfile);
+  const previousProfile = profile;
+  const newProfile = profile
+    ? { ...profile, isPublic: newStatus }
+    : ({ isPublic: newStatus } as ProfileData);
+  setProfile(newProfile);
 
-    try {
-      const token = localStorage.getItem('accessToken');
-      const res = await fetch(`${API_URL}/users/me/profile`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ isPublic: newStatus }),
-      });
-
-      if (!res.ok) throw new Error('Failed to update');
-    } catch (error) {
-      console.error('Failed to update visibility', error);
-      setProfile(previousProfile);
-      alert(isEn ? 'Error updating status' : 'เกิดข้อผิดพลาดในการอัปเดตสถานะ');
+  try {
+    const token = localStorage.getItem('accessToken');
+    
+    // 1. เช็คก่อนว่ามี Token ไหม ถ้าไม่มีให้เตือนเลย
+    if (!token) {
+      throw new Error(isEn ? 'No access token found' : 'ไม่พบ Access Token กรุณาเข้าสู่ระบบใหม่');
     }
-  };
+
+    const res = await fetch(`${API_URL}/users/me/profile`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ isPublic: newStatus }),
+    });
+
+    // 2. ถ้า API ส่ง Error กลับมา ให้ดึง response message จากหลังบ้านมาดู
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      const serverMessage = errorData.message || errorData.error || `Status ${res.status}`;
+      throw new Error(serverMessage);
+    }
+
+  } catch (error: any) {
+    // ย้อนสถานะกลับถ้าอัปเดตไม่สำเร็จ
+    console.error('Failed to update visibility:', error);
+    setProfile(previousProfile);
+    
+    // แสดงข้อความ Error จริงๆ ให้เราเห็น
+    alert(
+      isEn 
+        ? `Error updating status: ${error.message}` 
+        : `เกิดข้อผิดพลาดในการอัปเดตสถานะ: ${error.message}`
+    );
+  }
+};
 
   if (authLoading || loading) {
     return (
@@ -1381,9 +1422,71 @@ export default function ProfileFullPage() {
               </div>
             </div>
           </div>
-        </div>
-      </div>
+
+           {/* ==================== 🏆 ✨ Card 7: Certificates (การ์ดแถวยาวเต็มความกว้าง) ==================== */}
+          <div className="col-span-1 lg:col-span-3 w-full bg-white rounded-4xl p-6 shadow-sm border border-slate-100/50 drop-shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-6">
+            
+            {/* ฝั่งซ้าย: ไอคอน และ ข้อมูลรายชื่อใบเซอร์ */}
+            <div className="flex items-start gap-4 flex-1">
+              <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                <Award className="w-5 h-5" />
+              </div>
+              
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-slate-800 text-[17px] mb-1">
+                  {locale === 'th' ? 'ใบประกาศนียบัตร / เกียรติบัตร' : 'Certificates & Awards'}
+                </h3>
+                <p className="text-[13px] text-slate-500 leading-relaxed mb-4 md:mb-2">
+                  {locale === 'th' ? 'แสดงความสำเร็จและทักษะที่ได้รับการรับรองของคุณ' : 'Showcase your certified achievements and expertise.'}
+                </p>
+
+                {/* เปลี่ยนมาตรวจสอบและวนลูปผ่านตัวแปร certificates ที่เราดึงมาจาก API ตรงๆ */}
+                {certificates && certificates.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                    {certificates.map((cert: any, idx: number) => (
+                      <div key={cert.id || idx} className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[13px] font-semibold text-slate-800 truncate">{cert.name}</p>
+                          <p className="text-[11px] text-slate-400 truncate">
+                            {cert.issuedBy || ''} {cert.issueYear ? `(${cert.issueYear})` : ''}
+                          </p>
+                        </div>
+                        {(cert.imageUrl || cert.imagePreview) && (
+                          <a
+                            href={cert.imageUrl || cert.imagePreview}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ml-2 text-slate-400 hover:text-blue-600 p-1.5 bg-white rounded-md shadow-xs border border-slate-100 transition-colors shrink-0"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-[12px] text-slate-400 italic mt-2">
+                    {locale === 'th' ? 'ยังไม่ได้เพิ่มใบประกาศนียบัตร' : 'No certificates uploaded yet.'}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* ฝั่งขวา: ปุ่มลิงก์ย้ายหน้า */}
+            <div className="shrink-0 flex justify-end items-center border-t md:border-t-0 pt-4 md:pt-0 border-slate-100 w-full md:w-auto">
+              <Link
+                href="/profile/certificates"
+                className="w-full md:w-auto text-center text-xs text-blue-600 bg-blue-50 hover:bg-blue-100 font-bold px-5 py-2.5 rounded-full flex items-center justify-center gap-1.5 transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                <span>{locale === 'th' ? 'จัดการใบประกาศนียบัตร' : 'Manage Certificates'}</span>
+              </Link>
+            </div>
+          </div>
+
+        </div> {/* ปิด Container หลักของกลุ่ม Card */}
+      </div> {/* ปิด Layout Wrapper ชั้นนอก */}
       <Footer />
-    </div>
+    </div> 
   );
-}
+}         
