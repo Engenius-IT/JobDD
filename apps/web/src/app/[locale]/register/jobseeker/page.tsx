@@ -27,6 +27,7 @@ export default function JobSeekerRegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [termsChecked, setTermsChecked] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const isFormValid =
     form.firstName.trim() !== '' &&
@@ -178,6 +179,11 @@ export default function JobSeekerRegisterPage() {
         return;
       }
 
+      if (data.requiresVerification) {
+        setIsSuccess(true);
+        return;
+      }
+
       // Auto-login using AuthContext
       login(data.accessToken, data.user);
     } catch {
@@ -207,7 +213,35 @@ export default function JobSeekerRegisterPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {isSuccess ? (
+            <div className="text-center py-8">
+              <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">สมัครสมาชิกสำเร็จ!</h2>
+              <p className="text-gray-600 mb-8">
+                เราได้ส่งอีเมลยืนยันไปที่ <span className="font-semibold text-[#202063]">{form.email}</span> แล้ว <br />
+                กรุณาตรวจสอบกล่องจดหมายและคลิกลิงก์เพื่อยืนยันตัวตน
+              </p>
+              <div className="space-y-3">
+                <Link
+                  href="/login"
+                  className="block w-full py-3 bg-[#202063] text-white font-bold rounded-xl shadow-lg hover:opacity-90 transition-all"
+                >
+                  ไปหน้าเข้าสู่ระบบ
+                </Link>
+                <button
+                  onClick={() => setIsSuccess(false)}
+                  className="text-sm text-gray-500 hover:text-[#202063] transition-colors"
+                >
+                  กลับไปแก้ไขข้อมูล
+                </button>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">ชื่อ</label>
@@ -405,6 +439,7 @@ export default function JobSeekerRegisterPage() {
               </Link>
             </div>
           </form>
+          )}
         </div>
       </main>
     </div>

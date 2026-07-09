@@ -201,7 +201,11 @@ export function getLocalizedNotification(
   };
 }
 
-export function NotificationBell() {
+interface NotificationBellProps {
+  customBellClass?: string;
+}
+
+export function NotificationBell({ customBellClass }: NotificationBellProps) {
   const { user } = useAuth();
   
   const locale = useLocale() as 'th' | 'en'; // 🌐 ดึง Locale ปัจจุบันของระบบ
@@ -386,7 +390,7 @@ export function NotificationBell() {
         {/* Bell Button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+          className={customBellClass || "relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"}
           aria-label={t.bellLabel}
         >
           <svg

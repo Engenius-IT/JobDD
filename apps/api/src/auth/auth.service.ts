@@ -59,7 +59,6 @@ export class AuthService {
       });
 
       let companyName: string | undefined = dto.companyName;
-      let companySlug: string | undefined;
 
       if (dto.role === 'EMPLOYER' && dto.companyName) {
         try {
@@ -75,7 +74,6 @@ export class AuthService {
           });
 
           companyName = company.name;
-          companySlug = company.slug;
         } catch (error: any) {
           await this.prisma.user.delete({ where: { id: user.id } });
           throw error;
@@ -90,24 +88,20 @@ export class AuthService {
         companyName,
       });
 
-      const token = await this.signToken(user.id, user.email ?? '', user.role);
+      // สร้าง Token สำหรับยืนยันอีเมล
+      const verificationToken = crypto.randomBytes(32).toString('hex');
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { emailVerificationToken: verificationToken },
+      });
 
-      const company = user.role === 'EMPLOYER' 
-        ? await this.prisma.company.findFirst({ where: { ownerId: user.id } })
-        : null;
+      // ส่งอีเมลยืนยัน
+      await this.sendVerificationEmail(user.email!, user.firstName, verificationToken);
 
       return {
-        accessToken: token, token: token,
-        user: {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          role: user.role,
-          companyId: company?.id,
-          companyName: company?.name || companyName,
-          companySlug: company?.slug || companySlug,
-        },
+        message: 'สมัครสมาชิกสำเร็จ โปรดตรวจสอบอีเมลของคุณเพื่อยืนยันบัญชี',
+        requiresVerification: true,
+        email: user.email,
       };
     } catch (error: any) {
       if (error instanceof ConflictException) throw error;
@@ -148,7 +142,22 @@ export class AuthService {
         throw new UnauthorizedException('อีเมลหรือรหัสผ่านไม่ถูกต้อง');
       }
 
+      if (!user.emailVerified) {
+        throw new UnauthorizedException('กรุณายืนยันอีเมลของคุณก่อนเข้าสู่ระบบ');
+      }
+
       const token = await this.signToken(user.id, user.email ?? '', user.role);
+
+      let companyPackagePlanName = 'DEFAULT';
+      if (user.role === 'EMPLOYER' && user.companies?.[0]?.id) {
+        const companyPackage = await this.prisma.companyPackage.findUnique({
+          where: { companyId: user.companies[0].id },
+          select: { name: true },
+        });
+        if (companyPackage && companyPackage.name) {
+          companyPackagePlanName = companyPackage.name.toUpperCase();
+        }
+      }
 
       return {
         accessToken: token, token: token,
@@ -163,6 +172,7 @@ export class AuthService {
           companyName: user.companies?.[0]?.name || null,
           companyLogo: user.companies?.[0]?.logoUrl || null,
           companySlug: user.companies?.[0]?.slug || null,
+          companyPackagePlanName,
         },
       };
     } catch (error: any) {
@@ -196,6 +206,17 @@ export class AuthService {
         throw new UnauthorizedException('ไม่พบข้อมูลผู้ใช้');
       }
 
+      let companyPackagePlanName = 'DEFAULT';
+      if (user.role === 'EMPLOYER' && user.companies?.[0]?.id) {
+        const companyPackage = await this.prisma.companyPackage.findUnique({
+          where: { companyId: user.companies[0].id },
+          select: { name: true },
+        });
+        if (companyPackage && companyPackage.name) {
+          companyPackagePlanName = companyPackage.name.toUpperCase();
+        }
+      }
+
       return {
         id: user.id,
         email: user.email,
@@ -209,6 +230,7 @@ export class AuthService {
         companyLogo: user.companies?.[0]?.logoUrl || null,
         companySlug: user.companies?.[0]?.slug || null,
         company: user.companies?.[0] || null,
+        companyPackagePlanName,
       };
     } catch (error: any) {
       if (error instanceof UnauthorizedException) throw error;
@@ -326,17 +348,31 @@ export class AuthService {
         };
       }
 
-      // Existing user - update googleId if missing
-      if (!user.googleId) {
+      // Existing user - update googleId and emailVerified if missing
+      if (!user.googleId || !user.emailVerified) {
         user = await this.prisma.user.update({
           where: { id: user.id },
-          data: { googleId: googleUser.sub },
+          data: { 
+            googleId: googleUser.sub,
+            emailVerified: true, // Google users are verified
+          },
           include: { companies: true },
         });
       }
 
       // Generate JWT
       const token = await this.signToken(user.id, user.email ?? '', user.role);
+
+      let companyPackagePlanName = 'DEFAULT';
+      if (user.role === 'EMPLOYER' && user.companies?.[0]?.id) {
+        const companyPackage = await this.prisma.companyPackage.findUnique({
+          where: { companyId: user.companies[0].id },
+          select: { name: true },
+        });
+        if (companyPackage && companyPackage.name) {
+          companyPackagePlanName = companyPackage.name.toUpperCase();
+        }
+      }
 
       return {
         isNewUser: false,
@@ -352,6 +388,7 @@ export class AuthService {
           companyName: user.companies?.[0]?.name || null,
           companyLogo: user.companies?.[0]?.logoUrl || null,
           companySlug: user.companies?.[0]?.slug || null,
+          companyPackagePlanName,
         },
       };
     } catch (error: any) {
@@ -391,6 +428,7 @@ export class AuthService {
           lastName,
           avatarUrl: avatarUrl || null,
           role: role,
+          emailVerified: true, // Google users are verified automatically
         },
         include: { companies: true },
       });
@@ -422,6 +460,17 @@ export class AuthService {
       });
 
       const token = await this.signToken(user.id, user.email ?? '', user.role);
+      let companyPackagePlanName = 'DEFAULT';
+      if (user.role === 'EMPLOYER' && user.companies?.[0]?.id) {
+        const companyPackage = await this.prisma.companyPackage.findUnique({
+          where: { companyId: user.companies[0].id },
+          select: { name: true },
+        });
+        if (companyPackage && companyPackage.name) {
+          companyPackagePlanName = companyPackage.name.toUpperCase();
+        }
+      }
+
       return {
         accessToken: token, token: token,
         user: {
@@ -435,6 +484,7 @@ export class AuthService {
           companyName: user.companies?.[0]?.name || null,
           companyLogo: user.companies?.[0]?.logoUrl || null,
           companySlug: user.companies?.[0]?.slug || null,
+          companyPackagePlanName,
         },
       };
     } catch (error: any) {
@@ -456,7 +506,7 @@ export class AuthService {
 
       if (!user) {
         console.log(`[Forgot Password] User not found for email: ${dto.email}`);
-        return { message: 'หากอีเมลนี้มีอยู่ในระบบ เราได้ส่งลิงก์รีเซ็ตรหัสผ่านไปให้แล้ว' };
+        throw new BadRequestException('ไม่พบอีเมลนี้ในระบบการลงทะเบียน');
       }
 
       const token = crypto.randomBytes(32).toString('hex');
@@ -585,6 +635,76 @@ export class AuthService {
       });
     } catch (error) {
       console.error('Failed to create register notification:', error);
+    }
+  }
+
+  /**
+   * Send verification email
+   */
+  private async sendVerificationEmail(email: string, firstName: string, token: string) {
+    const frontendUrl = this.config.get<string>('NEXTAUTH_URL', 'http://localhost:3000');
+    const verifyUrl = `${frontendUrl}/th/auth/verify-email?token=${token}`;
+    const senderEmail = this.config.get<string>('BREVO_SENDER_EMAIL', 'noreply@worksdd.com');
+
+    if (this.brevoApiKey) {
+      try {
+        await axios.post(
+          `${this.brevoApiUrl}/smtp/email`,
+          {
+            sender: { name: 'WorksDD', email: senderEmail },
+            to: [{ email, name: firstName }],
+            subject: 'ยืนยันอีเมลของคุณ - WorksDD',
+            htmlContent: `
+              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                <h2 style="color: #202063;">ยืนยันอีเมลของคุณ</h2>
+                <p>สวัสดีคุณ ${firstName},</p>
+                <p>ขอบคุณที่สมัครสมาชิกกับ WorksDD กรุณาคลิกปุ่มด้านล่างเพื่อยืนยันอีเมลของคุณและเริ่มต้นใช้งาน:</p>
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${verifyUrl}" style="background-color: #202063; color: white; padding: 12px 24px; text-decoration: none; border-radius: 50px; font-weight: bold;">ยืนยันอีเมล</a>
+                </div>
+                <p>หากคุณไม่ได้สมัครสมาชิก โปรดเพิกเฉยต่ออีเมลนี้</p>
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+                <p style="font-size: 12px; color: #777;">หากปุ่มด้านบนใช้งานไม่ได้ คุณสามารถคัดลอกลิงก์ด้านล่างไปวางในเบราว์เซอร์ได้:</p>
+                <p style="font-size: 12px; color: #777; word-break: break-all;">${verifyUrl}</p>
+              </div>
+            `,
+          },
+          {
+            headers: { 'api-key': this.brevoApiKey, 'Content-Type': 'application/json' },
+            timeout: 10000,
+          },
+        );
+      } catch (error: any) {
+        console.error(`[Verification Email] Brevo API Error:`, error.response?.data || error.message);
+      }
+    }
+  }
+
+  /**
+   * Verify email using token
+   */
+  async verifyEmail(token: string) {
+    try {
+      const user = await this.prisma.user.findFirst({
+        where: { emailVerificationToken: token },
+      });
+
+      if (!user) {
+        throw new BadRequestException('Token ไม่ถูกต้องหรือหมดอายุแล้ว');
+      }
+
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          emailVerified: true,
+          emailVerificationToken: null,
+        },
+      });
+
+      return { message: 'ยืนยันอีเมลสำเร็จ คุณสามารถเข้าสู่ระบบได้แล้ว' };
+    } catch (error: any) {
+      if (error instanceof BadRequestException) throw error;
+      throw new InternalServerErrorException(`Verify Email Failed: ${error.message}`);
     }
   }
 }

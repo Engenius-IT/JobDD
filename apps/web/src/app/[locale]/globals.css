@@ -196,3 +196,30 @@ html {
 @utility text-glow-blue {
   text-shadow: 0 0 8px rgba(147, 197, 253, 0.4);
 }
+
+/* Galaxy Stars Background Utility */
+@utility bg-galaxy-stars {
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.9) 0.8px, transparent 1.5px),
+    radial-gradient(circle at 20% 60%, rgba(255, 255, 255, 0.75) 0.6px, transparent 1.2px),
+    radial-gradient(circle at 35% 15%, rgba(255, 255, 255, 0.9) 1px, transparent 1.8px),
+    radial-gradient(circle at 52% 48%, rgba(255, 255, 255, 1) 1.5px, transparent 2.5px), /* Bright star */
+    radial-gradient(circle at 52% 48%, rgba(255, 255, 255, 0.25) 8px, transparent 14px), /* Bright star glow */
+    radial-gradient(circle at 65% 70%, rgba(255, 255, 255, 0.75) 0.6px, transparent 1.3px),
+    radial-gradient(circle at 80% 30%, rgba(255, 255, 255, 0.85) 0.9px, transparent 1.6px),
+    radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.65) 0.5px, transparent 1.2px),
+    /* Repeated dense starfield grids */
+    radial-gradient(1px 1px at 20px 30px, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1px 1px at 60px 70px, rgba(255,255,255,0.8), transparent),
+    radial-gradient(1.2px 1.2px at 100px 15px, rgba(255,255,255,0.9), transparent),
+    radial-gradient(1px 1px at 140px 90px, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1px 1px at 190px 45px, rgba(255,255,255,0.75), transparent),
+    radial-gradient(1.5px 1.5px at 240px 65px, rgba(255,255,255,0.9), transparent),
+    radial-gradient(1px 1px at 270px 25px, rgba(255,255,255,0.5), transparent),
+    /* Nebulae space glows */
+    radial-gradient(circle at 15% 40%, rgba(147, 197, 253, 0.25) 0%, transparent 45%),
+    radial-gradient(circle at 75% 60%, rgba(167, 139, 250, 0.2) 0%, transparent 40%),
+    linear-gradient(to right, #080E2E 0%, #1B3EA6 45%, #0F2470 80%, #05081E 100%);
+  background-repeat: repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, no-repeat, no-repeat, no-repeat;
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 280px 130px, 280px 130px, 280px 130px, 280px 130px, 280px 130px, 280px 130px, 280px 130px, 100% 100%, 100% 100%, 100% 100%;
+}

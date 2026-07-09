@@ -8,6 +8,7 @@ import { UserDropdown } from './UserDropdown';
 import { NotificationBell } from './NotificationBell';
 import { SubNavbar } from './SubNavbar';
 import { useSearchParams } from 'next/navigation';
+import { packageThemes, PackageTheme } from '@/config/themeConfig'; // Import theme config
 
 export function Navbar() {
   const { user, logout } = useAuth();
@@ -126,18 +127,33 @@ const currentUrl =
     };
   }, [pathname]);
 
+  // Determine the current theme based on user's package, fallback to DEFAULT
+  const currentTheme: PackageTheme = packageThemes[user?.companyPackagePlanName || 'DEFAULT'] || packageThemes.DEFAULT;
+
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => setIsMounted(true), []);
+  if (!isMounted) return <div className="h-[56px] w-full bg-[#202063] animate-pulse" />; // Default skeleton
+
   return (
-    <header className=" bg-[#ffffff] sticky top-0 z-50 drop-shadow-xl">
-      <div className="max-w-(--container-max) mx-auto px-4 py-0 flex items-center justify-between">
+    <header className={`w-full ${currentTheme.navbarBg} sticky top-0 z-50 ${currentTheme.navbarBorderAndShadow || 'drop-shadow-xl'} ${currentTheme.navbarText} relative`}>
+      {/* Metallic Highlight for PRO */}
+      {currentTheme.name === 'PRO' && (
+        <div className="absolute top-0 left-0 w-full h-[10%] bg-gradient-to-b from-white/60 to-transparent pointer-events-none opacity-80" />
+      )}
+      {/* Sleek Top Glowing Border for VIP */}
+      {currentTheme.name === 'VIP' && (
+        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-red-500/35 to-transparent pointer-events-none" />
+      )}
+      <div className="max-w-(--container-max) mx-auto px-4 py-3 flex items-center justify-between relative z-20">
         {/* Left Side: Logo & Main Nav */}
         <div className="flex items-center gap-8">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
+          <Link href="/" className={`flex items-center gap-2 group transition-all duration-300 ${currentTheme.logoContainerClass || ''}`}>
             {!logoError ? (
               <img
-                src="/images/logo_jobdd_main.png"
+                src="/images/logo_jobdd_main - แก้ไขแล้ว.png"
                 alt="JobDD Logo"
-                className="h-14 w-auto object-contain"
+                className={`${currentTheme.name === 'DEFAULT' ? 'h-14' : 'h-10'} w-auto object-contain transition-all duration-300 ${currentTheme.logoClass || ''}`}
                 onError={() => setLogoError(true)}
               />
             ) : (
@@ -154,8 +170,8 @@ const currentUrl =
         </div>
 
         {/* Right Side: Auth & Language */}
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center gap-3">
+        <div className="flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-6">
             {user?.role !== 'EMPLOYER' && user?.role !== 'ADMIN' && (
               <Link
                 href="/ai-job-matcher"
@@ -185,8 +201,8 @@ const currentUrl =
                     {user.role === 'ADMIN' && (
                       <Link
                         href="/admin"
-                        className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold text-sm px-4 py-2 rounded-xl shadow shadow-red-500/40 transition-all hover:scale-105 active:scale-95"
-                      >
+                        className={`flex items-center gap-2 ${currentTheme.adminBackendButtonBg} ${currentTheme.adminBackendButtonHoverBg} ${currentTheme.adminBackendButtonText} font-bold text-sm px-4 py-2 rounded-xl transition-all hover:scale-105 active:scale-95`}
+                    >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path
                             strokeLinecap="round"
@@ -206,7 +222,7 @@ const currentUrl =
                     )}
                     <Link
                       href="/employer/dashboard"
-                      className="flex items-center gap-2 bg-amber-400 hover:bg-amber-300 text-gray-900 font-bold text-sm px-4 py-2 rounded-xl shadow shadow-amber-300/40 transition-all hover:scale-105 active:scale-95"
+                      className={`flex items-center gap-2 ${currentTheme.employerBackendButtonBg} ${currentTheme.employerBackendButtonHoverBg} ${currentTheme.employerBackendButtonText} font-bold text-sm px-4 py-2 transition-all hover:scale-105 active:scale-95`}
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path
@@ -220,20 +236,20 @@ const currentUrl =
                     </Link>
                   </div>
                 )}
-                <UserDropdown user={{ ...user, role: user.role }} logout={logout} />
+                <UserDropdown user={{ ...user, role: user.role }} logout={logout} customDropdownClass={currentTheme.userDropdownClass} badgeText={currentTheme.badgeText} badgeClass={currentTheme.badgeClass} avatarRingClass={currentTheme.avatarRingClass} />
               </>
             ) : (
               // Guest State
               <>
                 <Link
-                  href={`/login?redirect=${encodeURIComponent(currentUrl)}`}
-                  className="px-5 py-2.5 rounded-lg text-[#000000] font-medium hover:text-[#E00016] transition-all"
+                  href={`/login?redirect=${encodeURIComponent(currentUrl)}`} // Use currentUrl for redirect
+                  className={`px-5 py-2.5 rounded-lg ${currentTheme.navbarText} font-medium hover:text-[#E00016] transition-all`}
                 >
                   {t('login')}
                 </Link>
                 <Link
                   href="/register"
-                  className="px-5 py-2.5 rounded-lg bg-[#A80010] text-white font-medium shadow-lg hover:-translate-y-0.5 transition-all"
+                  className={`px-5 py-2.5 rounded-lg ${currentTheme.buttonBg} ${currentTheme.buttonText} font-medium shadow-lg hover:-translate-y-0.5 transition-all ${currentTheme.buttonHoverBg}`}
                 >
                   {t('register')}
                 </Link>
@@ -246,23 +262,23 @@ const currentUrl =
             {/* Notification Bell */}
             {user && (
               <div className="flex items-center">
-                <NotificationBell />
+                <NotificationBell customBellClass={currentTheme.bellBtnClass} />
               </div>
             )}
 
             {/* Desktop Language Switcher */}
-            <div className="hidden md:flex items-center gap-1 bg-gray-50 p-1 rounded-lg border border-gray-200">
+            <div className={currentTheme.langSwitcherClass}>
               <button
                 onClick={() => switchLanguage('th')}
                 disabled={isPending}
-                className={`px-2.5 py-1 text-xs font-bold rounded-md transition-all ${locale === 'th' ? 'bg-white text-(--color-primary) shadow-sm ring-1 ring-gray-200/50' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'} ${isPending ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`px-2.5 py-1 text-xs font-bold rounded-md transition-all ${locale === 'th' ? currentTheme.langBtnActive : currentTheme.langBtnInactive} ${isPending ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 TH
               </button>
               <button
                 onClick={() => switchLanguage('en')}
                 disabled={isPending}
-                className={`px-2.5 py-1 text-xs font-bold rounded-md transition-all ${locale === 'en' ? 'bg-white text-(--color-primary) shadow-sm ring-1 ring-gray-200/50' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'} ${isPending ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`px-2.5 py-1 text-xs font-bold rounded-md transition-all ${locale === 'en' ? currentTheme.langBtnActive : currentTheme.langBtnInactive} ${isPending ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 EN
               </button>
@@ -415,8 +431,8 @@ const currentUrl =
                 <div className="flex flex-col gap-2 mx-2">
                   {user.role === 'ADMIN' && (
                     <Link
-                      href="/admin"
-                      className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white font-bold text-sm rounded-xl"
+                      href="/admin" 
+                      className={`flex items-center gap-2 px-4 py-2 ${currentTheme.adminBackendButtonBg} ${currentTheme.adminBackendButtonText} font-bold text-sm rounded-xl`}
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -438,7 +454,7 @@ const currentUrl =
                   )}
                   <Link
                     href="/employer/dashboard"
-                    className="flex items-center gap-2 px-4 py-2 bg-amber-400 text-gray-900 font-bold text-sm rounded-xl"
+                    className={`flex items-center gap-2 px-4 py-2 ${currentTheme.employerBackendButtonBg} ${currentTheme.employerBackendButtonText} font-bold text-sm`}
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -541,7 +557,7 @@ const currentUrl =
               </Link>
               <Link
                 href="/register"
-                className="block px-4 py-2 text-(--color-primary) font-medium"
+                className={`block px-4 py-2 ${currentTheme.navbarText} font-medium`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('register')}
@@ -552,7 +568,7 @@ const currentUrl =
       )}
 
       {/* Sub Navigation Bar */}
-      <SubNavbar userRole={user?.role} />
+      <SubNavbar userRole={user?.role} packagePlanName={user?.companyPackagePlanName} />
     </header>
   );
 }

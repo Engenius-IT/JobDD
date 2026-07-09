@@ -191,28 +191,13 @@ export default function EmployerRegisterPage() {
         return;
       }
 
-      setSuccess(true);
-
-      // Attempt to auto-login
-      try {
-        const loginRes = await fetch(`${API_URL}/auth/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: form.email, password: form.password }),
-        });
-        const loginData = await loginRes.json();
-
-        if (loginRes.ok && loginData.accessToken && loginData.user) {
-          // login function from AuthContext already redirects to /employer/dashboard
-          login(loginData.accessToken, loginData.user);
-          return;
-        }
-      } catch (err) {
-        console.error('Auto-login failed', err);
+      if (data.requiresVerification) {
+        setSuccess(true);
+        return;
       }
 
-      // Fallback
-      setTimeout(() => router.push('/employer/login'), 2500);
+      // Auto-login using AuthContext
+      login(data.accessToken, data.user);
     } catch {
       setError('ไม่สามารถเชื่อมต่อ API ได้');
     } finally {
@@ -231,10 +216,31 @@ export default function EmployerRegisterPage() {
           </div>
 
           {success && (
-            <div className="mb-6 p-5 rounded-xl bg-green-50 border border-green-200 text-center">
-              <div className="text-3xl mb-2">✅</div>
-              <div className="font-bold text-green-700 text-base">ลงทะเบียนสำเร็จ!</div>
-              <div className="text-green-600 text-sm mt-1">กำลังพาไปหน้าแดชบอร์ด...</div>
+            <div className="text-center py-8">
+              <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">สมัครสมาชิกสำเร็จ!</h2>
+              <p className="text-gray-600 mb-8">
+                เราได้ส่งอีเมลยืนยันไปที่ <span className="font-semibold text-[#202063]">{form.email}</span> แล้ว <br />
+                กรุณาตรวจสอบกล่องจดหมายและคลิกลิงก์เพื่อยืนยันตัวตน
+              </p>
+              <div className="space-y-3">
+                <Link
+                  href="/login"
+                  className="block w-full py-3 bg-[#202063] text-white font-bold rounded-xl shadow-lg hover:opacity-90 transition-all"
+                >
+                  ไปหน้าเข้าสู่ระบบ
+                </Link>
+                <button
+                  onClick={() => setSuccess(false)}
+                  className="text-sm text-gray-500 hover:text-[#202063] transition-colors"
+                >
+                  กลับไปแก้ไขข้อมูล
+                </button>
+              </div>
             </div>
           )}
 
