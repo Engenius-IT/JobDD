@@ -463,7 +463,13 @@ export function CandidateDetailModal({ candidateId, onClose, isBookmarked, onBoo
             <div className="space-y-3 text-sm">
               <div className="rounded-2xl bg-white/5 border border-white/10 px-4 py-3">
                 <div className="text-slate-300 mb-1"> {t('filters.genderAll')} </div>
-                <div className="font-semibold">{data.gender ? t(`filters.gender.${data.gender}`) : t('list.noGender')}</div>
+                <div className="font-semibold">
+                  {data.gender === 'male'
+                    ? t('filters.gender.male')
+                    : data.gender === 'female'
+                      ? t('filters.gender.female')
+                      : t('list.noGender')}
+                </div>
               </div>
               <div className="rounded-2xl bg-white/5 border border-white/10 px-4 py-3">
                 <div className="text-slate-300 mb-1">{t('list.age')}</div>

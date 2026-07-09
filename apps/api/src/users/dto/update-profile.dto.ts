@@ -2,6 +2,16 @@ import { IsOptional, IsString, IsDateString, IsNumber, Min, Max } from 'class-va
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateProfileDto {
+    @ApiPropertyOptional({ description: 'ชื่อจริง' })
+    @IsOptional()
+    @IsString()
+    first_name?: string;
+
+    @ApiPropertyOptional({ description: 'นามสกุล' })
+    @IsOptional()
+    @IsString()
+    last_name?: string;
+
     @ApiPropertyOptional({ description: 'วันเกิด (ISO 8601)', example: '1995-06-15' })
     @IsOptional()
     @IsDateString()

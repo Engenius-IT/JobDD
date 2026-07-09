@@ -87,15 +87,6 @@ const NATIONALITY_EN_MAP: Record<string, string> = {
   'โรมาเนีย': 'Romanian'
 };
 
-const stepRoutes = [
-  '/profile',
-  '/profile/education',
-  '/profile/work-history',
-  '/profile/languages',
-  '/profile/driving-skills',
-  '/profile/certifications'
-];
-
 function getErrorMessage(error: unknown, fallback: string) {
   if (error instanceof Error && error.message) {
     return error.message;
@@ -320,9 +311,7 @@ export default function ProfilePage() {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  const months = locale === 'en'
-    ? ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-    : ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+
 
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
   const years = Array.from({ length: 100 }, (_, i) => 2567 - i);
@@ -598,7 +587,7 @@ export default function ProfilePage() {
 
 
 
-  
+
   return (
     <div className="min-h-screen bg-gray-50 font-sans flex flex-col">
       <Navbar />
@@ -692,13 +681,13 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
-          </div>
         </div>
+      </div>
 
       {/* Main Content Form */}
       <div className="max-w-4xl mx-auto px-4 -mt-8 relative z-20 pb-20 w-full">
         {/* Avatar & Name Section */}
-        
+
         <div className="flex flex-col md:flex-row gap-6 mb-8 items-center md:items-start">
           <div
             className="relative mx-auto md:mx-0 group cursor-pointer"
@@ -783,7 +772,7 @@ export default function ProfilePage() {
                   {user?.firstName || user?.lastName ? `${firstName} ${lastName}` : 'เพิ่มชื่อของคุณ'}
                 </span>
                 {/* ปุ่มดินสอ: เพิ่ม onClick ตรงนี้เพื่อให้กดเปิดโหมดแก้ไขได้จริง */}
-                <button 
+                <button
                   onClick={() => setIsEditingName(true)}
                   className="text-gray-400 hover:text-gray-600 p-1 rounded-sm hover:bg-gray-100 cursor-pointer"
                   title="แก้ไขชื่อ"
@@ -792,8 +781,8 @@ export default function ProfilePage() {
                 </button>
               </div>
             )}
-          </div>  
-       </div>    
+          </div>
+        </div>
         {/* Card: Personal Info */}
         <div className="bg-white rounded-xl shadow-2xl border border-gray-300 p-6 md:p-8">
           <h2 className="text-lg font-bold text-gray-800 mb-6">{t('ข้อมูลส่วนบุคคล')}</h2>
@@ -805,7 +794,7 @@ export default function ProfilePage() {
               <label className="block text-sm font-bold text-gray-700 mb-2">
                 {t('วัน/เดือน/ปีที่เกิด')}
               </label>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <SearchableSelect
                   placeholder={t('วัน')}
@@ -832,7 +821,7 @@ export default function ProfilePage() {
             </div>
 
             {/* ฝั่ง ส่วนสูง / น้ำหนัก / ประสบการณ์ */}
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-start md:items-end">
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-2">Height (cm.)</label>
@@ -863,8 +852,15 @@ export default function ProfilePage() {
                 <input
                   type="number"
                   name="experience"
+                  min="0" // 1. บล็อกไม่ให้ลูกศรเลื่อนลงต่ำกว่า 0
                   value={form.experience}
                   onChange={handleChange}
+                  onKeyDown={(e) => {
+                    // 2. บล็อกไม่ให้พิมพ์เครื่องหมายลบ (-) และตัว e (Exponential ในเลขฐาน)
+                    if (e.key === '-' || e.key === 'e' || e.key === 'E') {
+                      e.preventDefault();
+                    }
+                  }}
                   placeholder={t('โปรดระบุ')}
                   className="w-full bg-gray-100 border border-gray-300 text-gray-700 py-2.5 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 placeholder-gray-400"
                 />
