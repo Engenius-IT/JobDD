@@ -506,7 +506,7 @@ export class AuthService {
 
       if (!user) {
         console.log(`[Forgot Password] User not found for email: ${dto.email}`);
-        return { message: 'หากอีเมลนี้มีอยู่ในระบบ เราได้ส่งลิงก์รีเซ็ตรหัสผ่านไปให้แล้ว' };
+        throw new BadRequestException('ไม่พบอีเมลนี้ในระบบการลงทะเบียน');
       }
 
       const token = crypto.randomBytes(32).toString('hex');
