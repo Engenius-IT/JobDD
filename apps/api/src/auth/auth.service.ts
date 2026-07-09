@@ -348,11 +348,14 @@ export class AuthService {
         };
       }
 
-      // Existing user - update googleId if missing
-      if (!user.googleId) {
+      // Existing user - update googleId and emailVerified if missing
+      if (!user.googleId || !user.emailVerified) {
         user = await this.prisma.user.update({
           where: { id: user.id },
-          data: { googleId: googleUser.sub },
+          data: { 
+            googleId: googleUser.sub,
+            emailVerified: true, // Google users are verified
+          },
           include: { companies: true },
         });
       }
@@ -425,6 +428,7 @@ export class AuthService {
           lastName,
           avatarUrl: avatarUrl || null,
           role: role,
+          emailVerified: true, // Google users are verified automatically
         },
         include: { companies: true },
       });
