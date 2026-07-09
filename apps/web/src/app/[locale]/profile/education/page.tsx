@@ -45,16 +45,16 @@ const EDUCATION_LEVELS_EN = [
 
 
 const FACULTIES_TH = [
-  "คณะเกษตรศาสตร์", "คณะครุศาสตร์", "คณะครุศาสตร์อุตสาหกรรม", "คณะดุริยางคศิลป์", "คณะทันตแพทยศาสตร์", 
-  "คณะเทคนิคการแพทย์", "คณะเทคโนโลยี", "คณะเทคโนโลยีทางทะเล", "คณะเทคโนโลยีสารสนเทศ", "คณะนิติศาสตร์", 
-  "คณะนิเทศศาสตร์", "คณะบริหารธุรกิจ", "คณะโบราณคดี", "คณะประมง", "คณะพยาบาลศาสตร์", 
-  "คณะพาณิชยศาสตร์และการบัญชี", "คณะแพทยศาสตร์", "คณะเภสัชศาสตร์", "คณะโภชนศาสตร์", "คณะมนุษยศาสตร์", 
-  "คณะมัณฑนศิลป์", "คณะวนศาสตร์", "คณะวารสารศาสตร์และสื่อสารมวลชน", "คณะวิจิตรศิลป์", "คณะวิทยาการจัดการ", 
-  "คณะวิทยาการสารสนเทศ", "คณะวิทยาศาสตร์", "คณะวิทยาศาสตร์การกีฬา", "คณะวิศวกรรมศาสตร์", "คณะศิลปกรรมศาสตร์", 
-  "คณะศิลปศาสตร์", "คณะศิลปะและการออกแบบ", "คณะเศรษฐศาสตร์", "คณะสถาปัตยกรรมศาสตร์", "คณะสหเวชศาสตร์", 
-  "คณะสัตวแพทยศาสตร์", "คณะสังคมสงเคราะห์ศาสตร์", "คณะสังคมศาสตร์", "คณะสาธารณสุขศาสตร์", "คณะศึกษาศาสตร์", 
-  "คณะสิ่งแวดล้อมและทรัพยากรศาสตร์", "คณะอุตสาหกรรมเกษตร", "คณะอุตสาหกรรมสร้างสรรค์", "คณะอักษรศาสตร์", 
-  "วิทยาลัยการคอมพิวเตอร์", "วิทยาลัยการภาพยนตร์ ศิลปะการแสดงและสื่อใหม่", "วิทยาลัยนานาชาติ", "วิทยาลัยนวัตกรรม", 
+  "คณะเกษตรศาสตร์", "คณะครุศาสตร์", "คณะครุศาสตร์อุตสาหกรรม", "คณะดุริยางคศิลป์", "คณะทันตแพทยศาสตร์",
+  "คณะเทคนิคการแพทย์", "คณะเทคโนโลยี", "คณะเทคโนโลยีทางทะเล", "คณะเทคโนโลยีสารสนเทศ", "คณะนิติศาสตร์",
+  "คณะนิเทศศาสตร์", "คณะบริหารธุรกิจ", "คณะโบราณคดี", "คณะประมง", "คณะพยาบาลศาสตร์",
+  "คณะพาณิชยศาสตร์และการบัญชี", "คณะแพทยศาสตร์", "คณะเภสัชศาสตร์", "คณะโภชนศาสตร์", "คณะมนุษยศาสตร์",
+  "คณะมัณฑนศิลป์", "คณะวนศาสตร์", "คณะวารสารศาสตร์และสื่อสารมวลชน", "คณะวิจิตรศิลป์", "คณะวิทยาการจัดการ",
+  "คณะวิทยาการสารสนเทศ", "คณะวิทยาศาสตร์", "คณะวิทยาศาสตร์การกีฬา", "คณะวิศวกรรมศาสตร์", "คณะศิลปกรรมศาสตร์",
+  "คณะศิลปศาสตร์", "คณะศิลปะและการออกแบบ", "คณะเศรษฐศาสตร์", "คณะสถาปัตยกรรมศาสตร์", "คณะสหเวชศาสตร์",
+  "คณะสัตวแพทยศาสตร์", "คณะสังคมสงเคราะห์ศาสตร์", "คณะสังคมศาสตร์", "คณะสาธารณสุขศาสตร์", "คณะศึกษาศาสตร์",
+  "คณะสิ่งแวดล้อมและทรัพยากรศาสตร์", "คณะอุตสาหกรรมเกษตร", "คณะอุตสาหกรรมสร้างสรรค์", "คณะอักษรศาสตร์",
+  "วิทยาลัยการคอมพิวเตอร์", "วิทยาลัยการภาพยนตร์ ศิลปะการแสดงและสื่อใหม่", "วิทยาลัยนานาชาติ", "วิทยาลัยนวัตกรรม",
   "วิทยาลัยป๊อปพิวเลชันศาสตร์", "วิทยาลัยสื่อสารการเมือง"
 ];
 
@@ -124,6 +124,7 @@ interface EducationEntry {
   graduationYear: string;
   gpa: string;
   hasHonors: boolean;
+  honors_level?: string | null;
 }
 
 interface SavedEducationEntry {
@@ -136,6 +137,7 @@ interface SavedEducationEntry {
   graduationYear: number | null;
   gpa: number | null;
   hasHonors: boolean;
+  honors_level?: string;
 }
 
 function createEntry(): EducationEntry {
@@ -271,7 +273,7 @@ export default function EducationPage() {
   ];
 
   const educationLevels = locale === 'en' ? EDUCATION_LEVELS_EN : EDUCATION_LEVELS_TH;
-  
+
   const facultiesOptions = FACULTIES_TH.map(f => ({
     value: f,
     label: locale === 'en' && FACULTY_EN_MAP[f] ? FACULTY_EN_MAP[f] : f
@@ -291,7 +293,7 @@ export default function EducationPage() {
     if (!user) return;
     const token = localStorage.getItem('accessToken');
     if (!token) return;
-    
+
     setCompletionPercent(17);
 
     fetch(`${API_URL}/users/me/educations`, {
@@ -301,7 +303,7 @@ export default function EducationPage() {
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
           setEntries(
-            data.map((d: SavedEducationEntry) => ({
+            data.map((d: any) => ({ // ใช้ any ชั่วคราวกันแดงเรื่อง Type ของ SavedEducationEntry ครับ
               id: d.id || Math.random().toString(36).slice(2),
               institution: d.institution || '',
               faculty: d.faculty || '',
@@ -311,6 +313,7 @@ export default function EducationPage() {
               graduationYear: d.graduationYear != null ? String(d.graduationYear) : '',
               gpa: d.gpa != null ? String(d.gpa) : '',
               hasHonors: d.hasHonors || false,
+              honors_level: d.honors_level || d.honorsLevel || '',
             })),
           );
         }
@@ -318,7 +321,7 @@ export default function EducationPage() {
       .catch(() => { });
   }, [user]);
 
-  const updateEntry = (id: string, field: keyof EducationEntry, value: string | boolean) => {
+  const updateEntry = (id: string, field: keyof EducationEntry, value: string | boolean | null) => {
     setEntries((prev) => prev.map((e) => (e.id === id ? { ...e, [field]: value } : e)));
   };
 
@@ -345,17 +348,28 @@ export default function EducationPage() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          items: validEntries.map(({ id, graduationYear, gpa, ...rest }) => {
-            const parsedYear = graduationYear ? parseInt(graduationYear, 10) : undefined;
-            const parsedGpa = gpa ? parseFloat(gpa) : undefined;
+          items: validEntries.map((entry) => {
+            const parsedYear = entry.graduationYear ? parseInt(entry.graduationYear, 10) : undefined;
+            const parsedGpa = entry.gpa ? parseFloat(entry.gpa) : undefined;
+
             return {
-              ...rest,
+              id: entry.id,
+              institution: entry.institution,
+              faculty: entry.faculty,
+              major: entry.major,
+              educationLevel: entry.educationLevel,
+              degreeName: entry.degreeName,
               graduationYear: parsedYear != null && !isNaN(parsedYear) ? parsedYear : undefined,
               gpa: parsedGpa != null && !isNaN(parsedGpa) ? parsedGpa : undefined,
+
+              // 🌟 ส่ง 2 ฟิลด์นี้ออกไปให้หลังบ้านอย่างชัดเจน ไม่ใช้ ...rest ป้องกันค่าหาย
+              hasHonors: !!entry.hasHonors,
+              honors_level: entry.hasHonors ? entry.honors_level || '' : '',
             };
           }),
         }),
       });
+
       if (!res.ok) {
         if (res.status === 401 || res.status === 404) {
           localStorage.removeItem('accessToken');
@@ -365,11 +379,11 @@ export default function EducationPage() {
         const errorData = await res.json().catch(() => null);
         throw new Error(getApiErrorMessage(errorData, 'Save failed'));
       }
-      
+
       setSaving(false);
       setMessage({ type: 'success', text: t.saveSuccess });
       setCompletionPercent(34);
-      
+
       setTimeout(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         router.push('/profile/work-history');
@@ -398,98 +412,98 @@ export default function EducationPage() {
       <Navbar />
 
       {/* Progress Banner */}
-<div
-  className="relative overflow-hidden"
-  style={{
-    background: 'linear-gradient(135deg, #0a1628 0%, #0e2a5e 40%, #1a3a7a 70%, #243b82 100%)',
-  }}
->
-  {/* Decorative elements */}
-  <div className="absolute inset-0 overflow-hidden pointer-events-none">
-    <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full opacity-[0.07]" style={{ background: 'radial-gradient(circle, #60a5fa, transparent)' }} />
-    <div className="absolute -bottom-32 -left-16 w-80 h-80 rounded-full opacity-[0.05]" style={{ background: 'radial-gradient(circle, #818cf8, transparent)' }} />
-  </div>
+      <div
+        className="relative overflow-hidden"
+        style={{
+          background: 'linear-gradient(135deg, #0a1628 0%, #0e2a5e 40%, #1a3a7a 70%, #243b82 100%)',
+        }}
+      >
+        {/* Decorative elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full opacity-[0.07]" style={{ background: 'radial-gradient(circle, #60a5fa, transparent)' }} />
+          <div className="absolute -bottom-32 -left-16 w-80 h-80 rounded-full opacity-[0.05]" style={{ background: 'radial-gradient(circle, #818cf8, transparent)' }} />
+        </div>
 
-  <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 md:py-14 relative z-10">
-    {/* Header */}
-    <div className="flex items-center gap-3 mb-8">
-      <div className="w-1 h-6 rounded-full bg-linear-to-b from-blue-400 to-cyan-400" />
-      <h2 className="text-white text-2xl md:text-3xl lg:text-4xl font-semibold tracking-wide">
-        {t.profileComplete}
-      </h2>
-    </div>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 md:py-14 relative z-10">
+          {/* Header */}
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-1 h-6 rounded-full bg-linear-to-b from-blue-400 to-cyan-400" />
+            <h2 className="text-white text-2xl md:text-3xl lg:text-4xl font-semibold tracking-wide">
+              {t.profileComplete}
+            </h2>
+          </div>
 
-    {/* Main Glass Card */}
-    <div
-      className="rounded-2xl border border-white/10 p-6 md:p-8"
-      style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(20px)' }}
-    >
-      <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
-        {/* Progress Ring */}
-        <div className="relative shrink-0">
-          <div className="relative w-32 h-32 md:w-36 md:h-36">
-            <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
-              <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
-              <circle
-                cx="60" cy="60" r="54" fill="none" stroke="url(#progressGradient)" strokeWidth="8"
-                strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset}
-                className="transition-all duration-1000 ease-out"
-              />
-              <defs>
-                <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#60a5fa" />
-                  <stop offset="50%" stopColor="#38bdf8" />
-                  <stop offset="100%" stopColor="#22d3ee" />
-                </linearGradient>
-              </defs>
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-3xl md:text-4xl font-bold text-white">{completionPercent}%</span>
-              <span className="text-[10px] text-blue-300/80 mt-0.5">{t.success}</span>
+          {/* Main Glass Card */}
+          <div
+            className="rounded-2xl border border-white/10 p-6 md:p-8"
+            style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(20px)' }}
+          >
+            <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+              {/* Progress Ring */}
+              <div className="relative shrink-0">
+                <div className="relative w-32 h-32 md:w-36 md:h-36">
+                  <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
+                    <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
+                    <circle
+                      cx="60" cy="60" r="54" fill="none" stroke="url(#progressGradient)" strokeWidth="8"
+                      strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset}
+                      className="transition-all duration-1000 ease-out"
+                    />
+                    <defs>
+                      <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#60a5fa" />
+                        <stop offset="50%" stopColor="#38bdf8" />
+                        <stop offset="100%" stopColor="#22d3ee" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-3xl md:text-4xl font-bold text-white">{completionPercent}%</span>
+                    <span className="text-[10px] text-blue-300/80 mt-0.5">{t.success}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Steps - Responsive Grid */}
+              <div className="flex-1 w-full">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                  {profileSteps.map((step, index) => {
+                    const Icon = step.icon;
+                    return (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => handleStepClick(step.path)}
+                        className={`group relative flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-300 cursor-pointer
+                    ${step.active
+                            ? 'bg-white/15 border border-white/20'
+                            : 'hover:bg-white/6 border border-transparent'
+                          }`}
+                      >
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300
+                    ${step.completed
+                            ? 'bg-linear-to-br from-blue-400 to-cyan-400'
+                            : 'bg-white/10'
+                          }`}
+                        >
+                          {step.completed ? (
+                            <Check className="w-5 h-5 text-white" />
+                          ) : (
+                            <Icon className="w-5 h-5 text-white/30" />
+                          )}
+                        </div>
+                        <span className="text-[11px] text-center font-medium text-white/70">
+                          {step.label}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
         </div>
-
-        {/* Steps - Responsive Grid */}
-        <div className="flex-1 w-full">
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {profileSteps.map((step, index) => {
-              const Icon = step.icon;
-              return (
-                <button
-                  key={index}
-                  type="button"
-                  onClick={() => handleStepClick(step.path)}
-                  className={`group relative flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-300 cursor-pointer
-                    ${step.active 
-                      ? 'bg-white/15 border border-white/20' 
-                      : 'hover:bg-white/6 border border-transparent'
-                    }`}
-                >
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300
-                    ${step.completed 
-                      ? 'bg-linear-to-br from-blue-400 to-cyan-400' 
-                      : 'bg-white/10'
-                    }`}
-                  >
-                    {step.completed ? (
-                      <Check className="w-5 h-5 text-white" />
-                    ) : (
-                      <Icon className="w-5 h-5 text-white/30" />
-                    )}
-                  </div>
-                  <span className="text-[11px] text-center font-medium text-white/70">
-                    {step.label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
       </div>
-    </div>
-  </div>
-</div>
 
       {/* Main Content Form */}
       <div className="max-w-4xl mx-auto px-4 py-8">
@@ -589,28 +603,101 @@ export default function EducationPage() {
                 <input
                   type="text"
                   value={entry.gpa}
-                  onChange={(e) => updateEntry(entry.id, 'gpa', e.target.value)}
+                  onChange={(e) => {
+                    let value = e.target.value;
+
+                    // 1. ล้างค่าที่ไม่ใช่ตัวเลขและจุดทศนิยมออกไปทันที (ป้องกันติดลบ และตัวอักษร)
+                    value = value.replace(/[^0-9.]/g, '');
+
+                    // 2. ป้องกันไม่ให้มีจุดทศนิยมซ้ำกันเกิน 1 ตัว (เช่น 3..5 หรือ 3.5.1)
+                    const parts = value.split('.');
+                    if (parts.length > 2) {
+                      value = parts[0] + '.' + parts.slice(1).join('');
+                    }
+
+                    // 3. ตรวจสอบว่าถ้าแปลงเป็นตัวเลขแล้ว ค่าต้องไม่เกิน 4.00
+                    if (value !== '' && value !== '.') {
+                      const num = parseFloat(value);
+                      if (num > 4.00) {
+                        value = '4.00'; // ถ้าเกิน 4 ให้ล็อคไว้ที่ 4.00 ทันที
+                      }
+                    }
+
+                    // ส่งค่าที่ผ่านการกรองแล้วไปอัปเดต State
+                    updateEntry(entry.id, 'gpa', value);
+                  }}
+                  // เพิ่มตรงนี้เพื่อกันเหนียว: ถ้าผู้ใช้พิมพ์ทิ้งไว้แค่ "." หรือพิมพ์ค้างไว้ พอกดออกจากกล่อง (Blur) ให้เคลียร์เป็นค่าว่างหรือจัดฟอร์แมตให้สวยงาม
+                  onBlur={(e) => {
+                    let value = e.target.value;
+                    if (value === '.') {
+                      updateEntry(entry.id, 'gpa', '');
+                    } else if (value !== '') {
+                      // ออปชันเสริม: ถ้าอยากให้กดออกจากกล่องแล้วแปลงเป็นทศนิยม 2 ตำแหน่งอัตโนมัติ (เช่น พิมพ์ 3.5 กลายเป็น 3.50)
+                      const num = parseFloat(value);
+                      if (!isNaN(num)) {
+                        updateEntry(entry.id, 'gpa', num.toFixed(2));
+                      }
+                    }
+                  }}
                   placeholder={t.gpaPlaceholder}
                   className="w-full bg-gray-100 border border-gray-300 text-gray-700 py-2.5 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 placeholder-gray-400"
                 />
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                role="switch"
-                aria-checked={entry.hasHonors}
-                onClick={() => updateEntry(entry.id, 'hasHonors', !entry.hasHonors)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${entry.hasHonors ? 'bg-blue-600' : 'bg-gray-300'
-                  }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${entry.hasHonors ? 'translate-x-6' : 'translate-x-1'
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={entry.hasHonors}
+                  onClick={() => {
+                    const nextState = !entry.hasHonors;
+                    updateEntry(entry.id, 'hasHonors', nextState);
+                    // ถ้าผู้ใช้เลื่อนสวิตช์ปิด ให้ล้างค่า honors_level ในฐานข้อมูลเป็น null (หรือ '') ทันที
+                    if (!nextState) {
+                      updateEntry(entry.id, 'honors_level', '');
+                    }
+                  }}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${entry.hasHonors ? 'bg-blue-600' : 'bg-gray-300'
                     }`}
-                />
-              </button>
-              <span className="text-sm text-gray-600">{t.honorsLabel}</span>
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${entry.hasHonors ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                  />
+                </button>
+                <span className="text-sm text-gray-600">{t.honorsLabel}</span>
+              </div>
+
+              {/* แสดง Radio Button เมื่อเปิด hasHonors และเซฟตัวเลือกได้ถูกต้อง */}
+              {entry.hasHonors && (
+                <div className="flex items-center gap-6 pl-14">
+                  <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                    <input
+                      type="radio"
+                      name={`honors_level-${entry.id}`}
+                      value="1"
+                      checked={entry.honors_level === '1'} // ผูกค่าเข้าฟิลด์ honors_level จริงใน DB เพื่อให้จำตัวเลือกเดิมได้
+                      onChange={(e) => updateEntry(entry.id, 'honors_level', e.target.value)}
+                      className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                    />
+                    <span>เกียรตินิยมอันดับ 1</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                    <input
+                      type="radio"
+                      name={`honors_level-${entry.id}`}
+                      value="2"
+                      checked={entry.honors_level === '2'} // ผูกค่าเข้าฟิลด์ honors_level
+                      onChange={(e) => updateEntry(entry.id, 'honors_level', e.target.value)}
+                      className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                    />
+                    <span>เกียรตินิยมอันดับ 2</span>
+                  </label>
+                </div>
+              )}
             </div>
           </div>
         ))}
