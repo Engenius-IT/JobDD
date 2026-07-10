@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useLocale } from 'next-intl';
 import { Search, Briefcase, CheckCircle2, XCircle, Clock, Eye, Filter, Check, X, MapPin, DollarSign, Loader2 } from 'lucide-react';
 import { ToastContainer } from '@/components/admin/Toast';
 
@@ -34,6 +35,7 @@ interface Toast {
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
 export default function JobManagementPage() {
+  const locale = useLocale();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -258,7 +260,7 @@ export default function JobManagementPage() {
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-2">
                           <a 
-                            href={`/jobs/${job.slug}`}
+                            href={`/${locale}/jobs/${job.slug}`}
                             target="_blank"
                             className="p-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-200 transition-all"
                           >
