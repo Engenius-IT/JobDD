@@ -208,34 +208,50 @@ export default function AdminVerifyCompaniesPage() {
                                     เอกสารที่แนบมา ({selectedCompany.verificationDocs?.length || 0})
                                 </h3>
 
-                                {selectedCompany.verificationDocs && selectedCompany.verificationDocs.length > 0 ? (
+                                {selectedCompany.verificationDocs && Array.isArray(selectedCompany.verificationDocs) && selectedCompany.verificationDocs.length > 0 ? (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         {selectedCompany.verificationDocs.map((doc, i) => {
-                                            const isImage = doc.match(/\.(jpeg|jpg|gif|png|webp)$/i) != null;
+                                            const docUrl = typeof doc === 'string' ? doc : (doc as any)?.url || '';
+                                            if (!docUrl) return null;
+                                            
+                                            const isImage = docUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i) != null;
+                                            const isPdf = docUrl.match(/\.pdf$/i) != null;
+                                            
                                             return (
                                                 <div key={i} className="group border border-gray-200 rounded-xl overflow-hidden bg-gray-50 flex flex-col hover:border-blue-300 hover:shadow-md transition-all">
                                                     {isImage ? (
                                                         <div className="h-48 w-full bg-gray-200 relative">
-                                                            <img src={doc} alt={`Document ${i + 1}`} className="w-full h-full object-cover" />
+                                                            <img src={docUrl} alt={`Document ${i + 1}`} className="w-full h-full object-cover" />
                                                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                                <a href={doc} target="_blank" rel="noreferrer" className="bg-white text-gray-900 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 shadow-lg">
+                                                                <a href={docUrl} target="_blank" rel="noreferrer" className="bg-white text-gray-900 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 shadow-lg">
                                                                     <ExternalLink className="w-4 h-4" /> ดูรูปเต็ม
                                                                 </a>
                                                             </div>
                                                         </div>
                                                     ) : (
                                                         <div className="h-48 flex flex-col items-center justify-center bg-gray-100 relative text-gray-400">
-                                                            <FileText className="w-12 h-12 mb-2" />
-                                                            <span className="text-sm font-medium">ไฟล์เอกสาร</span>
+                                                            {isPdf ? (
+                                                                <div className="text-center">
+                                                                    <FileText className="w-12 h-12 mb-2 text-red-400" />
+                                                                    <span className="text-sm font-medium text-gray-600">เอกสาร PDF</span>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="text-center">
+                                                                    <FileText className="w-12 h-12 mb-2" />
+                                                                    <span className="text-sm font-medium">ไฟล์เอกสาร</span>
+                                                                </div>
+                                                            )}
                                                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                                <a href={doc} target="_blank" rel="noreferrer" className="bg-white text-gray-900 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 shadow-lg">
+                                                                <a href={docUrl} target="_blank" rel="noreferrer" className="bg-white text-gray-900 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 shadow-lg">
                                                                     <ExternalLink className="w-4 h-4" /> เปิดดูเอกสาร
                                                                 </a>
                                                             </div>
                                                         </div>
                                                     )}
                                                     <div className="p-3 bg-white border-t border-gray-100 flex justify-between items-center">
-                                                        <span className="text-xs font-medium text-gray-600 truncate">เอกสารชุดที่ {i + 1}</span>
+                                                        <span className="text-xs font-medium text-gray-600 truncate">
+                                                            {isPdf ? 'เอกสาร PDF' : isImage ? 'รูปภาพเอกสาร' : 'เอกสารชุดที่'} {i + 1}
+                                                        </span>
                                                     </div>
                                                 </div>
                                             )

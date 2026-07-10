@@ -1,91 +1,66 @@
 'use client';
 
-import { useState } from 'react';
-import { Search, Filter, Download, User, Building2, Briefcase, Settings, CheckCircle2, XCircle, Edit3, Trash2, Calendar } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, Filter, Download, User, Building2, Briefcase, Settings, CheckCircle2, XCircle, Edit3, Trash2, Calendar, Loader2 } from 'lucide-react';
 
 interface ActivityLog {
   id: string;
-  admin: string;
+  admin: {
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
   action: string;
   type: 'approve' | 'reject' | 'create' | 'update' | 'delete' | 'settings';
   target: string;
   targetType: 'company' | 'job' | 'user' | 'system';
-  timestamp: string;
+  createdAt: string;
   status: 'success' | 'failed';
   details?: string;
 }
 
-const mockLogs: ActivityLog[] = [
-  {
-    id: '1',
-    admin: 'HR Engenius',
-    action: 'อนุมัติบริษัท',
-    type: 'approve',
-    target: 'Tech Innovators Co., Ltd.',
-    targetType: 'company',
-    timestamp: '2024-06-15 14:30:00',
-    status: 'success',
-    details: 'ตรวจสอบเอกสารแล้ว ผ่านการตรวจสอบ',
-  },
-  {
-    id: '2',
-    admin: 'HR Engenius',
-    action: 'ปฏิเสธบริษัท',
-    type: 'reject',
-    target: 'Global Logistics Inc.',
-    targetType: 'company',
-    timestamp: '2024-06-15 13:15:00',
-    status: 'success',
-    details: 'เอกสารไม่ครบถ้วน',
-  },
-  {
-    id: '3',
-    admin: 'Admin System',
-    action: 'สร้างงานใหม่',
-    type: 'create',
-    target: 'Senior Developer - Bangkok',
-    targetType: 'job',
-    timestamp: '2024-06-15 12:00:00',
-    status: 'success',
-  },
-  {
-    id: '4',
-    admin: 'HR Engenius',
-    action: 'แก้ไขตั้งค่าระบบ',
-    type: 'settings',
-    target: 'System Settings',
-    targetType: 'system',
-    timestamp: '2024-06-14 16:45:00',
-    status: 'success',
-    details: 'เปลี่ยนแปลง Commission Rate',
-  },
-  {
-    id: '5',
-    admin: 'HR Engenius',
-    action: 'ลบผู้ใช้',
-    type: 'delete',
-    target: 'user@example.com',
-    targetType: 'user',
-    timestamp: '2024-06-14 15:20:00',
-    status: 'success',
-  },
-];
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
 export default function ActivityLogsPage() {
-  const [logs, setLogs] = useState<ActivityLog[]>(mockLogs);
+  const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const limit = 20;
 
-  const filteredLogs = logs.filter((log) => {
-    const matchesSearch = 
-      log.admin.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      log.target.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      log.action.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesFilter = filterType === 'all' || log.type === filterType;
-    
-    return matchesSearch && matchesFilter;
-  });
+  useEffect(() => {
+    fetchLogs();
+  }, [page, searchTerm, filterType]);
+
+  const fetchLogs = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('accessToken');
+      const typeParam = filterType !== 'all' ? `&type=${filterType}` : '';
+      const searchParam = searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : '';
+      
+      const response = await fetch(
+        `${API_URL}/admin/audit-logs?page=${page}&limit=${limit}${searchParam}${typeParam}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error('Failed to fetch logs');
+
+      const data = await response.json();
+      setLogs(data.data);
+      setTotal(data.meta.total);
+    } catch (err) {
+      console.error('Error fetching logs:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getActionIcon = (type: string) => {
     switch (type) {
@@ -190,15 +165,17 @@ export default function ActivityLogsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredLogs.map((log) => (
+              {logs.map((log) => (
                 <tr key={log.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 text-sm text-gray-600">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 text-gray-400" />
-                      {log.timestamp}
+                      {new Date(log.createdAt).toLocaleString('th-TH')}
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{log.admin}</td>
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                    {log.admin.firstName} {log.admin.lastName}
+                  </td>
                   <td className="px-6 py-4 text-sm">
                     <div className="flex items-center gap-2">
                       {getActionIcon(log.type)}
@@ -229,32 +206,37 @@ export default function ActivityLogsPage() {
           </table>
         </div>
 
-        {filteredLogs.length === 0 && (
+        {logs.length === 0 && (
           <div className="p-12 text-center">
             <p className="text-gray-500">ไม่พบบันทึกกิจกรรมที่ค้นหา</p>
           </div>
         )}
       </div>
 
-      {/* Summary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-200">
-          <p className="text-xs text-gray-500 uppercase font-bold">ทั้งหมด</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{logs.length}</p>
+      {/* Pagination */}
+      {total > limit && (
+        <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+          <p className="text-sm text-gray-600">
+            หน้า {page} จาก {Math.ceil(total / limit)}
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="px-3 py-1 border border-gray-300 rounded-lg text-sm disabled:opacity-50"
+            >
+              ก่อนหน้า
+            </button>
+            <button
+              onClick={() => setPage(p => p + 1)}
+              disabled={page >= Math.ceil(total / limit)}
+              className="px-3 py-1 border border-gray-300 rounded-lg text-sm disabled:opacity-50"
+            >
+              ถัดไป
+            </button>
+          </div>
         </div>
-        <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-200">
-          <p className="text-xs text-green-600 uppercase font-bold">สำเร็จ</p>
-          <p className="text-2xl font-bold text-green-600 mt-1">{logs.filter(l => l.status === 'success').length}</p>
-        </div>
-        <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-200">
-          <p className="text-xs text-blue-600 uppercase font-bold">อนุมัติ</p>
-          <p className="text-2xl font-bold text-blue-600 mt-1">{logs.filter(l => l.type === 'approve').length}</p>
-        </div>
-        <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-200">
-          <p className="text-xs text-red-600 uppercase font-bold">ปฏิเสธ</p>
-          <p className="text-2xl font-bold text-red-600 mt-1">{logs.filter(l => l.type === 'reject').length}</p>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

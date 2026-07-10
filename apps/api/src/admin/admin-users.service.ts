@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { AdminAuditLogsService } from './admin-audit-logs.service';
 import { UserRole } from '@prisma/client';
 
 @Injectable()
 export class AdminUsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly auditLogsService: AdminAuditLogsService,
+  ) {}
 
   async getAllUsers(page: number, limit: number, searchTerm?: string, role?: UserRole) {
     const skip = (page - 1) * limit;
@@ -55,10 +59,74 @@ export class AdminUsersService {
     };
   }
 
-  async deleteUser(id: string) {
+  async getUserById(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        phone: true,
+        role: true,
+        emailVerified: true,
+        createdAt: true,
+      },
+    });
+
+    if (!user) throw new NotFoundException('ไม่พบข้อมูลผู้ใช้');
+    return user;
+  }
+
+  async updateUser(id: string, updateData: any, adminId: string) {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) throw new NotFoundException('ไม่พบข้อมูลผู้ใช้');
 
-    return this.prisma.user.delete({ where: { id } });
+    // Remove fields that shouldn't be updated directly via this endpoint if any
+    const { id: _, createdAt: __, ...data } = updateData;
+
+    const updated = await this.prisma.user.update({
+      where: { id },
+      data,
+    });
+
+    // บันทึก Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        adminId: adminId,
+        action: 'แก้ไขข้อมูลผู้ใช้',
+        type: 'update',
+        target: user.email,
+        targetType: 'user',
+        details: `แก้ไขข้อมูลผู้ใช้ ID: ${id} (${user.firstName} ${user.lastName}). ข้อมูลที่เปลี่ยน: ${JSON.stringify(data)}`,
+      });
+    } catch (err) {
+      console.error('Failed to create audit log:', err);
+    }
+
+    return updated;
+  }
+
+  async deleteUser(id: string, adminId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) throw new NotFoundException('ไม่พบข้อมูลผู้ใช้');
+
+    const deleted = await this.prisma.user.delete({ where: { id } });
+
+    // บันทึก Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        adminId: adminId,
+        action: 'ลบผู้ใช้',
+        type: 'delete',
+        target: user.email,
+        targetType: 'user',
+        details: `ลบผู้ใช้ ID: ${id} (${user.firstName} ${user.lastName})`,
+      });
+    } catch (err) {
+      console.error('Failed to create audit log:', err);
+    }
+
+    return deleted;
   }
 }

@@ -1,61 +1,93 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Bell, Settings, User, LogOut, X, Check, LayoutGrid } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
 import { useAuth } from '@/context/AuthContext';
 
-interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: 'info' | 'warning' | 'success' | 'error';
-  timestamp: string;
-  read: boolean;
-}
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
 export function AdminNavbar() {
   const router = useRouter();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: '1',
-      title: 'บริษัทใหม่สมัครมา',
-      message: 'บริษัท "Tech Solutions" ได้สมัครและรอการตรวจสอบเอกสาร',
-      type: 'info',
-      timestamp: '5 นาทีที่แล้ว',
-      read: false,
-    },
-    {
-      id: '2',
-      title: 'งานใหม่รอการอนุมัติ',
-      message: 'มีการลงประกาศงาน 3 ตำแหน่งรอการอนุมัติจากแอดมิน',
-      type: 'warning',
-      timestamp: '20 นาทีที่แล้ว',
-      read: false,
-    },
-    {
-      id: '3',
-      title: 'ผู้ใช้ใหม่ลงทะเบียน',
-      message: 'มีผู้ใช้ใหม่ 12 คนลงทะเบียนในระบบเมื่อวาน',
-      type: 'success',
-      timestamp: '1 ชั่วโมงที่แล้ว',
-      read: true,
-    },
-  ]);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) return;
 
-  const markAsRead = (id: string) => {
-    setNotifications(notifications.map(n => 
-      n.id === id ? { ...n, read: true } : n
-    ));
+        const [listRes, countRes] = await Promise.all([
+          fetch(`${API_URL}/notifications?limit=5`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          }),
+          fetch(`${API_URL}/notifications/unread-count`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          })
+        ]);
+
+        if (listRes.ok) {
+          const result = await listRes.json();
+          setNotifications(result.data || []);
+        }
+        if (countRes.ok) {
+          const result = await countRes.json();
+          setUnreadCount(result.count || 0);
+        }
+      } catch (error) {
+        console.error('Failed to fetch admin notifications:', error);
+      }
+    };
+
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const markAsRead = async (id: string) => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      await fetch(`${API_URL}/notifications/${id}/read`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      setNotifications(notifications.map(n => n.id === id ? { ...n, isRead: true } : n));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error);
+    }
   };
 
-  const deleteNotification = (id: string) => {
-    setNotifications(notifications.filter(n => n.id !== id));
+  const deleteNotification = async (id: string) => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      await fetch(`${API_URL}/notifications`, {
+        method: 'DELETE',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ ids: [id] })
+      });
+      setNotifications(notifications.filter(n => n.id !== id));
+    } catch (error) {
+      console.error('Failed to delete notification:', error);
+    }
+  };
+
+  const formatTimestamp = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    if (diff < 60) return 'เมื่อครู่';
+    if (diff < 3600) return `${Math.floor(diff / 60)} นาทีที่แล้ว`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} ชั่วโมงที่แล้ว`;
+    return date.toLocaleDateString('th-TH');
   };
 
   const getNotificationColor = (type: string) => {
@@ -145,19 +177,23 @@ export function AdminNavbar() {
                     notifications.map((notification) => (
                       <div
                         key={notification.id}
-                        className={`border-b border-gray-100 p-4 hover:bg-gray-50 transition-colors ${
-                          !notification.read ? 'bg-blue-50' : ''
+                        onClick={() => markAsRead(notification.id)}
+                        className={`border-b border-gray-100 p-4 hover:bg-gray-50 transition-colors cursor-pointer ${
+                          !notification.isRead ? 'bg-blue-50/50' : ''
                         }`}
                       >
                         <div className="flex gap-3">
-                          <div className={`flex-shrink-0 w-2 h-2 rounded-full mt-2 ${getNotificationIcon(notification.type)}`} />
+                          <div className={`flex-shrink-0 w-2 h-2 rounded-full mt-2 ${!notification.isRead ? 'bg-blue-500' : 'bg-gray-300'}`} />
                           <div className="flex-1 min-w-0">
                             <p className="font-semibold text-sm text-gray-900">{notification.title}</p>
                             <p className="text-xs text-gray-600 mt-1 line-clamp-2">{notification.message}</p>
-                            <p className="text-xs text-gray-400 mt-2">{notification.timestamp}</p>
+                            <p className="text-xs text-gray-400 mt-2">{formatTimestamp(notification.createdAt)}</p>
                           </div>
                           <button
-                            onClick={() => deleteNotification(notification.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteNotification(notification.id);
+                            }}
                             className="text-gray-400 hover:text-gray-600 flex-shrink-0"
                           >
                             <X className="w-4 h-4" />
@@ -188,18 +224,17 @@ export function AdminNavbar() {
               }}
               className="flex items-center gap-2 p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                HR
+                            <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                {user?.firstName?.charAt(0) || 'A'}
               </div>
-              <span className="text-sm font-medium hidden sm:inline">HR Admin</span>
+              <span className="text-sm font-medium hidden sm:inline">{user?.firstName || 'Admin'}</span>
             </button>
-
             {/* User Dropdown */}
             {showUserMenu && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden z-50">
                 <div className="p-4 border-b border-gray-200">
-                  <p className="font-semibold text-sm text-gray-900">HR Engenius</p>
-                  <p className="text-xs text-gray-500">hr@engenius.co.th</p>
+                  <p className="font-semibold text-sm text-gray-900">{user?.firstName} {user?.lastName}</p>
+                  <p className="text-xs text-gray-500">{user?.email}</p>
                 </div>
 
                 <div className="py-2">
