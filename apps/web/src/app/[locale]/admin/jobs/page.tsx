@@ -6,6 +6,7 @@ import { ToastContainer } from '@/components/admin/Toast';
 
 interface Job {
   id: string;
+  slug: string;
   title: string;
   company: {
     name: string;
@@ -257,7 +258,7 @@ export default function JobManagementPage() {
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-2">
                           <a 
-                            href={`/jobs/${job.id}`}
+                            href={`/jobs/${job.slug}`}
                             target="_blank"
                             className="p-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-200 transition-all"
                           >
