@@ -60,7 +60,12 @@ export default function ReportsPage() {
     newUsersThisMonth: 0,
     newCompaniesThisMonth: 0,
     newJobsThisMonth: 0,
+    chartData: [],
+    categoryStats: []
   };
+
+  const maxCount = Math.max(...(s.chartData?.map((d: any) => d.count) || [0]), 1);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -130,29 +135,60 @@ export default function ReportsPage() {
         </div>
       </div>
 
-      {/* Main Charts Placeholder */}
+      {/* Main Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 min-h-[400px] flex flex-col">
           <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-blue-600" /> แนวโน้มการสมัครงาน
+            <TrendingUp className="w-5 h-5 text-blue-600" /> แนวโน้มการสมัครงาน (6 เดือนล่าสุด)
           </h3>
-          <div className="flex-1 bg-gray-50 rounded-xl border border-dashed border-gray-300 flex items-center justify-center">
-            <div className="text-center">
-              <BarChart3 className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-              <p className="text-gray-400 text-sm">พื้นที่สำหรับแสดงกราฟแนวโน้ม</p>
-            </div>
+          <div className="flex-1 flex items-end justify-between gap-2 pt-10 pb-4 px-4">
+            {s.chartData?.map((item: any, idx: number) => (
+              <div key={idx} className="flex-1 flex flex-col items-center gap-2 group">
+                <div className="w-full relative flex items-end justify-center h-48">
+                  <div 
+                    className="w-full bg-blue-500 rounded-t-lg transition-all duration-500 group-hover:bg-blue-600"
+                    style={{ height: `${(item.count / maxCount) * 100}%` }}
+                  >
+                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                      {item.count} ครั้ง
+                    </div>
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold text-gray-500 uppercase">{item.name}</span>
+              </div>
+            ))}
+            {(!s.chartData || s.chartData.length === 0) && (
+              <div className="w-full h-full flex items-center justify-center text-gray-400 italic">
+                ไม่มีข้อมูลการสมัครงาน
+              </div>
+            )}
           </div>
         </div>
 
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 min-h-[400px] flex flex-col">
           <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-purple-600" /> สัดส่วนประเภทงาน
+            <BarChart3 className="w-5 h-5 text-purple-600" /> สถิติการสมัครรายเดือน
           </h3>
-          <div className="flex-1 bg-gray-50 rounded-xl border border-dashed border-gray-300 flex items-center justify-center">
-            <div className="text-center">
-              <BarChart3 className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-              <p className="text-gray-400 text-sm">พื้นที่สำหรับแสดงกราฟสัดส่วน</p>
-            </div>
+          <div className="flex-1 space-y-4 pt-4">
+            {s.chartData?.slice(-4).map((item: any, idx: number) => (
+              <div key={idx} className="space-y-1">
+                <div className="flex justify-between text-xs font-bold text-gray-600">
+                  <span>เดือน {item.name}</span>
+                  <span>{item.count} การสมัคร</span>
+                </div>
+                <div className="w-full bg-gray-100 rounded-full h-2">
+                  <div 
+                    className="bg-purple-500 h-2 rounded-full transition-all duration-500"
+                    style={{ width: `${(item.count / maxCount) * 100}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+            {(!s.chartData || s.chartData.length === 0) && (
+              <div className="w-full h-full flex items-center justify-center text-gray-400 italic">
+                ไม่มีข้อมูลสถิติ
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -173,19 +209,21 @@ export default function ReportsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {[
-                { cat: 'เทคโนโลยีและไอที', jobs: 120, apps: 850, rate: '7.1' },
-                { cat: 'การตลาดและโฆษณา', jobs: 85, apps: 420, rate: '4.9' },
-                { cat: 'บัญชีและการเงิน', jobs: 45, apps: 210, rate: '4.6' },
-                { cat: 'งานบริการและลูกค้าสัมพันธ์', jobs: 70, apps: 380, rate: '5.4' },
-              ].map((row, idx) => (
-                <tr key={idx}>
+              {s.categoryStats?.map((row: any, idx: number) => (
+                <tr key={idx} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 text-sm font-medium text-gray-900">{row.cat}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{row.jobs}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{row.apps}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{row.jobs} ตำแหน่ง</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{row.apps} ครั้ง</td>
                   <td className="px-6 py-4 text-sm font-bold text-blue-600">{row.rate}</td>
                 </tr>
               ))}
+              {(!s.categoryStats || s.categoryStats.length === 0) && (
+                <tr>
+                  <td colSpan={4} className="px-6 py-12 text-center text-gray-500 italic">
+                    ยังไม่มีข้อมูลสถิติแยกตามหมวดหมู่
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
