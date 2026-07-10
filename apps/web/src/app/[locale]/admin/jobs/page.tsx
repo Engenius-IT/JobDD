@@ -256,9 +256,13 @@ export default function JobManagementPage() {
                       <td className="px-6 py-4">{getStatusBadge(job.status)}</td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-2">
-                          <button className="p-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-200 transition-all">
+                          <a 
+                            href={`/jobs/${job.id}`}
+                            target="_blank"
+                            className="p-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-200 transition-all"
+                          >
                             <Eye className="w-4 h-4" />
-                          </button>
+                          </a>
                           <button
                             onClick={() => handleDelete(job.id)}
                             className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all"

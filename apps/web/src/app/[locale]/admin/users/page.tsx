@@ -234,12 +234,18 @@ export default function UserManagementPage() {
                       </td>
                       <td className="px-6 py-4 text-sm">
                         <div className="flex items-center gap-2">
-                          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                          <a 
+                            href={`/admin/users/${user.id}`}
+                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                          >
                             <Eye className="w-4 h-4 text-gray-600" />
-                          </button>
-                          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                          </a>
+                          <a 
+                            href={`/admin/users/${user.id}/edit`}
+                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                          >
                             <Edit2 className="w-4 h-4 text-gray-600" />
-                          </button>
+                          </a>
                           <button
                             onClick={() => handleDelete(user.id)}
                             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
