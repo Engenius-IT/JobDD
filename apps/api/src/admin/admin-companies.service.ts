@@ -64,7 +64,7 @@ export class AdminCompaniesService {
     try {
       await this.notificationsService.create({
         userId: company.ownerId,
-        type: NotificationType.SYSTEM,
+        type: NotificationType.GENERAL,
         title: status === 'VERIFIED' ? '✅ บริษัทของคุณได้รับการยืนยันแล้ว' : '❌ การยืนยันบริษัทไม่สำเร็จ',
         message: status === 'VERIFIED' 
           ? `บริษัท ${company.name} ได้รับการยืนยันตัวตนเรียบร้อยแล้ว คุณสามารถลงประกาศงานได้ทันที`
