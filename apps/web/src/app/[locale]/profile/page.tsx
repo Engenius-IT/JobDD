@@ -9,7 +9,7 @@ import { Footer } from '@/components/Footer';
 import { SearchableSelect } from '@/components/SearchableSelect';
 import { ThaiAddressFields } from '@/components/ThaiAddressFields';
 import { ProvinceSelect } from '@/components/ProvinceSelect';
-import { NATIONALITIES } from '@/data/nationalities';
+import { getSortedNationalities } from '@/data/nationalities';
 import {
   Pencil,
   Plus,
@@ -39,53 +39,6 @@ const MONTHS_EN = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
-
-// ดิกชันนารีแปลชื่อสัญชาติจากไทยเป็นอังกฤษ
-const NATIONALITY_EN_MAP: Record<string, string> = {
-  'ไทย': 'Thai',
-  'กัมพูชา': 'Cambodian',
-  'เกาหลีใต้': 'South Korean',
-  'เกาหลีเหนือ': 'North Korean',
-  'จีน': 'Chinese',
-  'ญี่ปุ่น': 'Japanese',
-  'เนปาล': 'Nepalese',
-  'บังกลาเทศ': 'Bangladeshi',
-  'บรูไน': 'Bruneian',
-  'ปากีสถาน': 'Pakistani',
-  'พม่า': 'Burmese',
-  'ฟิลิปปินส์': 'Filipino',
-  'มองโกเลีย': 'Mongolian',
-  'มาเลเซีย': 'Malaysian',
-  'ลาว': 'Laotian',
-  'เวียดนาม': 'Vietnamese',
-  'ศรีลังกา': 'Sri Lankan',
-  'สิงคโปร์': 'Singaporean',
-  'อัฟกานิสถาน': 'Afghan',
-  'อินเดีย': 'Indian',
-  'อินโดนีเซีย': 'Indonesian',
-  'อเมริกัน': 'American',
-  'อังกฤษ': 'British',
-  'ออสเตรเลีย': 'Australian',
-  'แคนาดา': 'Canadian',
-  'ฝรั่งเศส': 'French',
-  'เยอรมัน': 'German',
-  'รัสเซีย': 'Russian',
-  'เนเธอร์แลนด์': 'Dutch',
-  'นิวซีแลนด์': 'New Zealander',
-  'นอร์เวย์': 'Norwegian',
-  'โปแลนด์': 'Polish',
-  'โปรตุเกส': 'Portuguese',
-  'อิตาลี': 'Italian',
-  'สเปน': 'Spanish',
-  'สวิตเซอร์แลนด์': 'Swiss',
-  'สวีเดน': 'Swedish',
-  'ซาอุดีอาระเบีย': 'Saudi',
-  'สหรัฐอาหรับเอมิเรตส์': 'Emirati',
-  'โมร็อกโก': 'Moroccan',
-  'โมซัมบิก': 'Mozambican',
-  'นามิเบีย': 'Namibian',
-  'โรมาเนีย': 'Romanian'
-};
 
 function getErrorMessage(error: unknown, fallback: string) {
   if (error instanceof Error && error.message) {
@@ -187,6 +140,13 @@ export default function ProfilePage() {
       'พฤศจิกายน': 'พฤศจิกายน',
       'ธันวาคม': 'ธันวาคม',
       'ไทย': 'ไทย',
+      'พุทธ': 'พุทธ',
+      'คริสต์': 'คริสต์',
+      'อิสลาม': 'อิสลาม',
+      'ฮินดู': 'ฮินดู',
+      'ซิกข์': 'ซิกข์',
+      'ไม่นับถือศาสนา': 'ไม่นับถือศาสนา',
+      'อื่น ๆ': 'อื่น ๆ',
       // ... (สัญชาติอื่นๆ คงเดิม)
     },
     en: {
@@ -235,6 +195,13 @@ export default function ProfilePage() {
       'จังหวัดที่สนใจทำงาน (เลือกได้หลายที่)': 'Preferred Work Locations (Multiple choices)',
       'อัพโหลดรูปภาพโปรไฟล์สำเร็จ ✓': 'Profile picture uploaded successfully ✓',
       'บันทึกข้อมูลเรียบร้อยแล้ว ✓': 'Data saved successfully ✓',
+      'พุทธ': 'Buddhism',
+      'คริสต์': 'Christianity',
+      'อิสลาม': 'Islam',
+      'ฮินดู': 'Hinduism',
+      'ซิกข์': 'Sikhism',
+      'ไม่นับถือศาสนา': 'None',
+      'อื่น ๆ': 'Other',
       // ... (สัญชาติอื่นๆ คงเดิม)
     }
   };
@@ -307,13 +274,48 @@ export default function ProfilePage() {
     setIsEditingName(false);
   };
 
+
+  // 🚀 ฟังก์ชันคำนวณหาจำนวนวันในเดือนนั้น ๆ แบบ Dynamic
+  const getDaysInMonth = () => {
+    const month = form.birthMonth;
+    const yearStr = form.birthYear;
+
+    // ค่า Default ถ้ายังไม่เลือกเดือน ให้มี 31 วันไปก่อนครับพี่
+    if (!month) return Array.from({ length: 31 }, (_, i) => i + 1);
+
+    // ดึงค่า Index ของเดือน (0 = มกราคม, 1 = กุมภาพันธ์, ...) โดยอิงจากอาเรย์ MONTHS_TH ของพี่
+    const monthIndex = MONTHS_TH.indexOf(month);
+
+    // แปลงปีคริสตศักราช (ค.ศ.) มาใช้คำนวณ (เผื่อระบบพี่บันทึกเป็น พ.ศ. ให้แปลงกลับด้วยการลบ 543)
+    let year = yearStr ? Number(yearStr) : 2000; // default ปีเพื่อคำนวณเฉยๆ
+    if (year > 2400) {
+      year = year - 543; // เปลี่ยน พ.ศ. เป็น ค.ศ.
+    }
+
+    // ทริคเด็ด JavaScript: ใส่หลักวันเป็น 0 ในเดือนถัดไป จะได้จำนวนวันทั้งหมดของเดือนปัจจุบันทันที!
+    const totalDays = new Date(year, monthIndex + 1, 0).getDate();
+
+    return Array.from({ length: totalDays }, (_, i) => i + 1);
+  };
+
+  // 💡 ดักทางเพิ่ม: ถ้าเลือกวันที่ 31 ไว้ แล้วเปลี่ยนเดือนเป็น ยน (มี 30 วัน) ให้ปัดลงอัตโนมัติ
+  useEffect(() => {
+    if (form.birthDay && form.birthMonth) {
+      const availableDays = getDaysInMonth();
+      const currentDay = Number(form.birthDay);
+
+      // ถ้าวันปัจจุบันที่เลือกอยู่ มันดันมากกว่าจำนวนวันสูงสุดของเดือนนั้น
+      if (currentDay > availableDays.length) {
+        // ให้ปรับลดลงมาเป็นวันสูงสุดของเดือนนั้น ๆ (เช่น 31 เปลี่ยนเป็น 30 หรือ 29)
+        setForm((prev) => ({ ...prev, birthDay: String(availableDays.length) }));
+      }
+    }
+  }, [form.birthMonth, form.birthYear]);
+
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-
-
-  const days = Array.from({ length: 31 }, (_, i) => i + 1);
   const years = Array.from({ length: 100 }, (_, i) => 2567 - i);
 
   const profileSteps = [
@@ -796,13 +798,18 @@ export default function ProfilePage() {
               </label>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                {/* 🗓️ ช่องวัน: ดึงข้อมูลจำนวนวันแบบ Dynamic */}
                 <SearchableSelect
+                  locale={locale}
                   placeholder={t('วัน')}
                   value={form.birthDay}
-                  onChange={(val) => setForm({ ...form, birthDay: val })}
-                  options={days.map((d) => ({ value: String(d), label: String(d) }))}
+                  onChange={(val) => setForm((prev) => ({ ...prev, birthDay: val }))}
+                  options={getDaysInMonth().map((d) => ({ value: String(d), label: String(d) }))}
                 />
+
+                {/* 🌙 ช่องเดือน */}
                 <SearchableSelect
+                  locale={locale}
                   placeholder={t('เดือน')}
                   value={form.birthMonth}
                   onChange={(val) => setForm((prev) => ({ ...prev, birthMonth: val }))}
@@ -811,10 +818,13 @@ export default function ProfilePage() {
                     label: locale === 'en' ? MONTHS_EN[index] : mTh
                   }))}
                 />
+
+                {/* ☀️ ช่องปี */}
                 <SearchableSelect
+                  locale={locale}
                   placeholder={t('ปี')}
                   value={form.birthYear}
-                  onChange={(val) => setForm({ ...form, birthYear: val })}
+                  onChange={(val) => setForm((prev) => ({ ...prev, birthYear: val }))}
                   options={years.map((y) => ({ value: String(y), label: String(y) }))}
                 />
               </div>
@@ -871,12 +881,26 @@ export default function ProfilePage() {
           {/* Row 2: Gender, Phone */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">{t('เงินเดือนที่ต้องการ')}</label>
+              <label className="block text-sm font-bold text-gray-700 mb-2">
+                {t('เงินเดือนที่ต้องการ')}
+              </label>
               <input
                 type="number"
-                name="expectedSalary"
-                value={form.expectedSalary}
-                onChange={handleChange}
+                name="expectedSalary" // 🚀 เปลี่ยนเป็น expectedSalary ตาม Type พี่เป๊ะ ๆ แล้วครับ
+                min="0"
+                value={form.expectedSalary} // 🚀 จุดที่เคยเออร์เรอร์ แก้ให้ตรงกันแล้วครับ
+                onChange={(e) => {
+                  const val = Number(e.target.value);
+                  if (val < 0) {
+                    e.target.value = '0';
+                  }
+                  handleChange(e);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === '-' || e.key === 'e' || e.key === 'E' || e.key === '.') {
+                    e.preventDefault();
+                  }
+                }}
                 placeholder={t('ระบุเป็นตัวเลข (เช่น 25000)')}
                 className="w-full bg-gray-100 border border-gray-300 text-gray-700 py-2.5 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 placeholder-gray-400"
               />
@@ -906,8 +930,19 @@ export default function ProfilePage() {
                 type="tel"
                 name="phone"
                 value={form.phone}
-                onChange={handleChange}
+                onChange={(e) => {
+                  // 1. กรองเอาเฉพาะตัวเลข 0-9 เท่านั้น (ลบตัวอักษรและอักขระพิเศษทิ้งทันที)
+                  const onlyNums = e.target.value.replace(/[^0-9]/g, '');
+
+                  // 2. ล็อคความยาวให้ใส่ได้ไม่เกิน 10 ตัวอักษร
+                  if (onlyNums.length <= 10) {
+                    // อัปเดตค่าที่กรองแล้วกลับเข้าสู่ e.target.value เพื่อส่งต่อให้ handleChange ทำงานได้ตามปกติครับ
+                    e.target.value = onlyNums;
+                    handleChange(e);
+                  }
+                }}
                 placeholder={t('โปรดระบุ')}
+                maxLength={10} // บล็อกที่ฝั่ง UI เผื่อไว้อีกชั้นนึงครับ
                 className="w-full bg-gray-100 border border-gray-300 text-gray-700 py-2.5 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 placeholder-gray-400"
               />
             </div>
@@ -931,26 +966,39 @@ export default function ProfilePage() {
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">{t('สัญชาติ')}</label>
               <SearchableSelect
+                locale={locale}
                 placeholder={t('สัญชาติ')}
                 value={form.nationality}
                 onChange={(val) => setForm((prev) => ({ ...prev, nationality: val }))}
-                //  ปรับช่อง options ให้ดึงข้อความแปลตามภาษาปัจจุบัน
-                options={NATIONALITIES.map((n) => ({
-                  value: n, // ส่งค่าไทยเข้าฐานข้อมูลตามเดิมเพื่อป้องกัน Supabase บันทึกไม่ผ่าน
-                  label: locale === 'en' ? (NATIONALITY_EN_MAP[n] || n) : n // ถ้าเป็นภาษาอังกฤษให้ดึงจาก Map (ถ้าหาไม่เจอจะคืนค่าไทยเป็นตัวเลือกสำรอง)
+
+                // 🚀 เรียกใช้ฟังก์ชันที่เรียงพจนานุกรมและแปลภาษามาให้แล้ว
+                options={getSortedNationalities(locale as 'th' | 'en').map((nat) => ({
+                  // ส่งค่าเป็นภาษาไทยตรง ๆ กลับไปบันทึกที่ฐานข้อมูลตามสไตล์เดิมของพี่ (ใช้คีย์จากไฟล์ nationalities.ts มาแมปกลับ)
+                  value: nat.key === 'thai' ? 'ไทย' : nat.label,
+                  label: nat.label // แสดงผลตัวเลือกบนหน้าจอตามภาษาปัจจุบัน (ไทยเรียง ก-ฮ, อังกฤษเรียง A-Z)
                 }))}
               />
             </div>
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">{t('ศาสนา')}</label>
-              <input
-                type="text"
-                name="religion"
-                value={form.religion}
-                onChange={handleChange}
-                placeholder={t('โปรดระบุ')}
-                className="w-full bg-gray-100 border border-gray-300 text-gray-700 py-2.5 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 placeholder-gray-400"
-              />
+              <div className="relative">
+                <select
+                  name="religion"
+                  value={form.religion}
+                  onChange={handleChange}
+                  className="w-full appearance-none bg-gray-100 border border-gray-300 text-gray-700 py-2.5 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
+                >
+                  <option value="">{t('โปรดเลือก')}</option>
+                  <option value="พุทธ">{t('พุทธ')}</option>
+                  <option value="คริสต์">{t('คริสต์')}</option>
+                  <option value="อิสลาม">{t('อิสลาม')}</option>
+                  <option value="ฮินดู">{t('ฮินดู')}</option>
+                  <option value="ซิกข์">{t('ซิกข์')}</option>
+                  <option value="ไม่นับถือศาสนา">{t('ไม่นับถือศาสนา')}</option>
+                  <option value="อื่น ๆ">{t('อื่น ๆ')}</option>
+                </select>
+                <ChevronDown className="absolute right-2 top-3 w-4 h-4 text-gray-400 pointer-events-none" />
+              </div>
             </div>
           </div>
 
@@ -961,11 +1009,16 @@ export default function ProfilePage() {
               <div className="relative">
                 <select
                   name="maritalStatus"
-                  value={form.maritalStatus}
+                  // 🚀 ดักไว้: ถ้าค่าใน database เป็น null หรือ undefined ให้ถอยกลับมาใช้ค่าว่าง "" เพื่อให้แสดงคำว่า "โปรดระบุ"
+                  value={form.maritalStatus ?? ""}
                   onChange={handleChange}
                   className="w-full appearance-none bg-gray-100 border border-gray-300 text-gray-700 py-2.5 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
                 >
-                  <option value="">{t('โปรดเลือก')}</option>
+                  {/* 🌟 ตัวเลือกแรกสุดทำหน้าที่เหมือน Placeholder ครับ */}
+                  {/* disabled ยิงให้กดเลือกซ้ำไม่ได้ และ hidden แอบไว้ตอนกดเปิดดู เพื่อความเนี๊ยบ */}
+                  <option value="" disabled hidden>
+                    {t('โปรดระบุ')}
+                  </option>
                   <option value="โสด">{t('โสด')}</option>
                   <option value="สมรส">{t('สมรส')}</option>
                 </select>
@@ -977,11 +1030,15 @@ export default function ProfilePage() {
               <div className="relative">
                 <select
                   name="militaryStatus"
-                  value={form.militaryStatus}
+                  // 🚀 แก้ตรงนี้: ถ้าใน database ส่งค่ามาเป็น null ให้สลับร่างเป็นค่าว่าง "" ทันทีเพื่อความแม่นยำ
+                  value={form.militaryStatus ?? ""}
                   onChange={handleChange}
                   className="w-full appearance-none bg-gray-100 border border-gray-300 text-gray-700 py-2.5 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
                 >
-                  <option value="">{t('โปรดเลือก')}</option>
+                  {/* 🌟 ปรับเป็นคำว่า "โปรดระบุ" และทำหน้าที่เป็น Placeholder (disabled + hidden) */}
+                  <option value="" disabled hidden>
+                    {t('โปรดระบุ')}
+                  </option>
                   <option value="ได้รับการยกเว้น">{t('ได้รับการยกเว้น')}</option>
                   <option value="ผ่านการเกณฑ์ทหารแล้ว">{t('ผ่านการเกณฑ์ทหารแล้ว')}</option>
                   <option value="ยังไม่ผ่านการเกณฑ์ทหาร">{t('ยังไม่ผ่านการเกณฑ์ทหาร')}</option>
@@ -1012,10 +1069,8 @@ export default function ProfilePage() {
             <ProvinceSelect
               locale={locale}
               selectedProvinces={form.desiredProvinces || []}
+              // 🚀 ใส่ onChange กลับเข้ามาแบบเรียบง่าย ไทป์ตรง เออร์เรอร์หายกริบแน่นอนครับ!
               onChange={(provinces) => {
-                // ดักไว้: ถ้าค่าที่ส่งมาไม่ใช่ Array หรือเป็นค่าว่างเปล่าจากการพิมพ์ค้นหา ให้ข้ามไป ไม่ต้องเซฟ
-                if (!Array.isArray(provinces)) return;
-
                 setForm(prev => ({
                   ...prev,
                   desiredProvinces: provinces

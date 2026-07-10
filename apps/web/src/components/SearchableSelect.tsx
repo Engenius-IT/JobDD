@@ -14,7 +14,6 @@ interface SearchableSelectProps {
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
-  // เพิ่ม 2 บรรทัดนี้เข้าไปครับ
   locale?: 'th' | 'en'; 
   isMulti?: boolean;
 }
@@ -25,23 +24,30 @@ export function SearchableSelect({
   onChange,
   placeholder = 'พิมพ์เพื่อค้นหา...',
   className = '',
+  locale = 'th',
 }: SearchableSelectProps) {
   const [open, setOpen] = useState(false);
   
-  // ใส่นำค้นหาที่ผู้ใช้กำลังพิมพ์จริง
   const [typedSearch, setTypedSearch] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // ค้นหาวัตถุ option ปัจจุบันที่ตรงกับ value เพื่อเอาฉลาก (Label) มาแสดงผลให้ถูกภาษา
+  // 🌟 เขียน dictionary ลอกตามแพทเทิร์นเป๊ะ ๆ แบบที่พี่ต้องการ ไม่เดาเพิ่มแล้วครับ!
+  const t = {
+    th: {
+      empty: 'ไม่มีในรายการ (ระบบจะใช้ค่าที่คุณพิมพ์)'
+    },
+    en: {
+      empty: 'Not found in list (system will use your typed value)'
+    }
+  }[locale || 'th'];
+
   const currentOption = options.find((o) => o.value === value);
 
-  // กำหนดข้อความที่จะแสดงในช่อง Input: ถ้ากำลังพิมพ์ให้ใช้ค่าที่พิมพ์ ถ้าไม่ได้พิมพ์ให้ดึง Label ของค่านั้นๆ มาแสดง
   const displayInputValue = isTyping ? typedSearch : (currentOption?.label || value);
 
-  // ตัวกรอง Logic: ถ้ากำลังพิมพ์และมีคำค้นหา ให้ค้นหาจาก label ในตัวเลือก
   const filtered = isTyping && typedSearch
     ? options.filter((o) => o.label.toLowerCase().includes(typedSearch.toLowerCase()))
     : options;
@@ -56,7 +62,6 @@ export function SearchableSelect({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // เมื่อปิด Dropdown ให้รีเซ็ตสถานะกลับมาโหมดปกติ (ไม่ใช่โหมดกำลังพิมพ์)
   useEffect(() => {
     if (!open) {
       setIsTyping(false);
@@ -75,7 +80,6 @@ export function SearchableSelect({
     setTypedSearch(inputValue);
     setIsTyping(true);
     
-    // พยายามหาว่าสิ่งที่พิมพ์ตรงกับ option ไหนไหม ถ้าใช่ให้ส่งค่านั้นไป ถ้าไม่ใช่ให้ส่งค่าดิบๆ ไปก่อน
     const matchedOption = options.find((o) => o.label.toLowerCase() === inputValue.toLowerCase());
     onChange(matchedOption ? matchedOption.value : inputValue);
     
@@ -84,9 +88,8 @@ export function SearchableSelect({
 
   const handleFocus = () => {
     setOpen(true);
-    setIsTyping(false); // ตอนคลิกเข้ามาดึงรายการทั้งหมดขึ้นมาก่อน ไม่ต้องกรอง
+    setIsTyping(false); 
     
-    // ไฮไลต์ข้อความอัตโนมัติเพื่อให้พิมพ์ทับได้ง่ายๆ
     setTimeout(() => {
       inputRef.current?.select();
     }, 50);
@@ -112,7 +115,8 @@ export function SearchableSelect({
         <div className="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg">
           {filtered.length === 0 ? (
             <div className="px-3 py-2 text-sm text-gray-400 italic">
-              ไม่มีในรายการ (ระบบจะใช้ค่าที่คุณพิมพ์)
+              {/* 🚀 เรียกใช้งานผ่าน t.empty แบบเดียวกับคอมโพเนนต์อื่น ๆ เลยครับพี่ชาย */}
+              {t.empty}
             </div>
           ) : (
             filtered.map((opt) => (

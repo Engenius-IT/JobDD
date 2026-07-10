@@ -293,7 +293,6 @@
     "noAccount": "Don't have an account?",
     "register": "Register",
     "forgotPassword": "Forgot Password?"
-
   },
   "Login": {
     "heading": "Sign In",
@@ -313,7 +312,7 @@
     "btnChangePassword": "Change Password",
     "forgotPassword": "Forgot Password?"
   },
- "ChangePassword": {
+  "ChangePassword": {
     "heading": "Change Password",
     "placeholderEmail": "User Email",
     "placeholderOldPassword": "Current Password",
@@ -370,7 +369,7 @@
       "FREELANCE": "Freelance"
     }
   },
-"FAQ": {
+  "FAQ": {
     "title": "Frequently Asked Questions",
     "subtitle": "We've gathered the questions and answers you might have about using WorksDD here,\nso you can find the right candidates with confidence.",
     "employerTitle": "For Employers",
@@ -609,21 +608,14 @@
       "totalExperience": "Total Experience",
       "noOtherLanguages": "No Other Languages",
       "religion": "Religion",
-      "religionValue": {
-        "buddhist": "Buddhism",
-        "Buddhist": "Buddhism",
-        "christian": "Christianity",
-        "islam": "Islam",
-        "hindu": "Hinduism",
-        "sikh": "Sikhism",
-        "judaism": "Judaism",
-        "พุทธ": "Buddhism",
-        "คริสต์": "Christianity",
-        "อิสลาม": "Islam",
-        "ฮินดู": "Hinduism",
-        "ซิกข์": "Sikhism",
-        "ยิว": "Judaism"
-      },
+      "ศาสนา": "Religion",
+      "พุทธ": "Buddhism",
+      "คริสต์": "Christianity",
+      "อิสลาม": "Islam",
+      "ฮินดู": "Hinduism",
+      "ซิกข์": "Sikhism",
+      "ไม่นับถือศาสนา": "None",
+      "อื่น ๆ": "Other",
       "nationality": " Nationality",
       "nationalityValue": {
         "thai": "Thai",
@@ -1093,7 +1085,7 @@
       }
     }
   },
-"AIjobmatch": {
+  "AIjobmatch": {
     "aimatch": "JOBDD AI MATCHING",
     "aimatcher": "Let our AI system match you with the perfect job based on your skills, experience, and resume to find the right opportunities faster.",
     "useprofiledata": "Use data from your profile",
@@ -1475,52 +1467,52 @@
       "thu": "Thu",
       "fri": "Fri",
       "sat": "Sat"
-  },
-  "months": {
-    "january": "January",
-    "february": "February",
-    "march": "March",
-    "april": "April",
-    "may": "May",
-    "june": "June",
-    "july": "July",
-    "august": "August",
-    "september": "September",
-    "october": "October",
-    "november": "November",
-    "december": "December"
-  },
-  "verificationBanner": {
-    "verificationRejectedTitle": "Company Verification Failed",
-    "reason": "Reason",
-    "verificationRejectedDefaultReason": "The submitted documents are invalid or unclear. Please review and upload the required documents again.",
-    "resubmitDocuments": "Resubmit Documents",
-    "verificationPendingTitle": "Verification in Progress",
-    "verificationPendingDescription": "Your company has successfully submitted the verification documents. Our administrators are reviewing them, which may take 1-2 business days.",
-    "verificationRequiredTitle": "Account Not Verified",
-    "verificationRequiredDescription1": "Please upload",
-    "verificationRequiredDocument1": "Certificate of Incorporation",
-    "verificationRequiredOr": "or",
-    "verificationRequiredDocument2": "VAT Registration (PP.20)",
-    "verificationRequiredDescription2": "to verify your company.",
-    "verificationRequiredDescription3": "After approval, you will be able to",
-    "verificationRequiredHighlight": "publish job postings",
-    "verificationRequiredDescription4": "and access all platform features.",
-    "startVerification": "Start Verification Now",
-    "noInterviewSelectedDay": "No interviews on the selected day",
-    "noInterviewTodayHint": "No interviews today · Click a marked date to view details",
-    "noInterview": "No interviews scheduled"
-  },
-  "companyEdit": {
-    "title": "Edit Company Information",
-    "logoTitle": "Company Logo",
-    "logoUploadLabel": "Change Logo",
-    "logoDescriptionLine1": "Upload your company logo to increase credibility",
-    "logoDescriptionLine2": "Supports JPG, PNG, WEBP up to 5MB",
-    "uploadFailed": "Failed to upload image",
-    "backgroundTitle": "Company Background",
-    "noBackground": "No background image",
-    "changeBackground": "Change Background Image"
+    },
+    "months": {
+      "january": "January",
+      "february": "February",
+      "march": "March",
+      "april": "April",
+      "may": "May",
+      "june": "June",
+      "july": "July",
+      "august": "August",
+      "september": "September",
+      "october": "October",
+      "november": "November",
+      "december": "December"
+    },
+    "verificationBanner": {
+      "verificationRejectedTitle": "Company Verification Failed",
+      "reason": "Reason",
+      "verificationRejectedDefaultReason": "The submitted documents are invalid or unclear. Please review and upload the required documents again.",
+      "resubmitDocuments": "Resubmit Documents",
+      "verificationPendingTitle": "Verification in Progress",
+      "verificationPendingDescription": "Your company has successfully submitted the verification documents. Our administrators are reviewing them, which may take 1-2 business days.",
+      "verificationRequiredTitle": "Account Not Verified",
+      "verificationRequiredDescription1": "Please upload",
+      "verificationRequiredDocument1": "Certificate of Incorporation",
+      "verificationRequiredOr": "or",
+      "verificationRequiredDocument2": "VAT Registration (PP.20)",
+      "verificationRequiredDescription2": "to verify your company.",
+      "verificationRequiredDescription3": "After approval, you will be able to",
+      "verificationRequiredHighlight": "publish job postings",
+      "verificationRequiredDescription4": "and access all platform features.",
+      "startVerification": "Start Verification Now",
+      "noInterviewSelectedDay": "No interviews on the selected day",
+      "noInterviewTodayHint": "No interviews today · Click a marked date to view details",
+      "noInterview": "No interviews scheduled"
+    },
+    "companyEdit": {
+      "title": "Edit Company Information",
+      "logoTitle": "Company Logo",
+      "logoUploadLabel": "Change Logo",
+      "logoDescriptionLine1": "Upload your company logo to increase credibility",
+      "logoDescriptionLine2": "Supports JPG, PNG, WEBP up to 5MB",
+      "uploadFailed": "Failed to upload image",
+      "backgroundTitle": "Company Background",
+      "noBackground": "No background image",
+      "changeBackground": "Change Background Image"
+    }
   }
-}
 }

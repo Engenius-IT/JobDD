@@ -240,6 +240,7 @@ const getProfileValueLabel = (key: string, value: string | undefined, isEn: bool
       'คริสต์': 'Christianity',
       'อิสลาม': 'Islam',
       'ฮินดู': 'Hinduism',
+      'อื่นๆ' : 'Other',
     }
   };
 

@@ -74,10 +74,17 @@ export function ProvinceSelect({ selectedProvinces = [], onChange, locale }: Pro
     }, []);
 
     const handleSelect = (province: string) => {
-        if (!selectedProvinces.includes(province)) {
-            onChange([...selectedProvinces, province]);
-        }
-    };
+    // ดักเทียบแบบ Case-Insensitive (ไม่สนตัวพิมพ์เล็ก-ใหญ่) ปลอดภัย 100%
+    const isValidProvince = provinces.some(
+        (p) => p.toLowerCase() === province.trim().toLowerCase()
+    );
+
+    if (!isValidProvince) return;
+
+    if (!selectedProvinces.includes(province)) {
+        onChange([...selectedProvinces, province]);
+    }
+};
 
     const handleRemove = (province: string) => {
         onChange(selectedProvinces.filter(p => p !== province));
