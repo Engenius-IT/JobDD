@@ -93,4 +93,20 @@ export class AdminDashboardService {
       ]
     };
   }
+
+  async getReportStats() {
+    // ใช้ข้อมูลจาก getStats มาจัดรูปแบบสำหรับหน้า Reports
+    const stats = await this.getStats();
+    
+    return {
+      summary: {
+        users: stats.totalUsers,
+        companies: stats.totalCompanies,
+        jobs: stats.totalJobs,
+        applications: stats.totalApplications
+      },
+      monthlyTrend: stats.chartData,
+      categoryStats: stats.categoryStats
+    };
+  }
 }
