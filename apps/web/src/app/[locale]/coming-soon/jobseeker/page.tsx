@@ -423,51 +423,55 @@ export default function JobseekerSystemGuidePage() {
             </div>
           </div>
 
-          {/* ❓ FAQ Section */}
-          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm mb-12 max-w-4xl mx-auto">
-            <div className="text-center mb-6">
-              <h2 className="text-xl md:text-2xl font-extrabold text-[#020263] mb-1">
-                {t('faqTitle')}
-              </h2>
-              <p className="text-gray-400 text-xs md:text-sm">
-                {t('faqDesc')}
+         {/* ❓ FAQ Section */}
+<div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm mb-12 max-w-4xl mx-auto">
+  <div className="text-center mb-6">
+    <h2 className="text-xl md:text-2xl font-extrabold text-[#020263] mb-1">
+      {t('faqTitle')}
+    </h2>
+    <p className="text-gray-400 text-xs md:text-sm">
+      {t('faqDesc')}
+    </p>
+  </div>
+
+  <div className="space-y-3">
+    {faqs.map((faq) => {
+      const isOpen = openFaq === faq.id;
+      return (
+        <div 
+          key={faq.id}
+          className="border border-gray-100 rounded-xl overflow-hidden bg-gray-50/50 transition-colors duration-150"
+        >
+          <button
+            onClick={() => toggleFaq(faq.id)}
+            className="w-full flex items-center justify-between p-4 bg-white hover:bg-gray-50 text-left transition-colors cursor-pointer select-none"
+          >
+            <span className="font-bold text-gray-800 text-xs md:text-sm pr-4">
+              {faq.q}
+            </span>
+            <div className="shrink-0 w-5 h-5 rounded-full bg-blue-50 text-[#020263] flex items-center justify-center">
+              {isOpen ? <Minus className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
+            </div>
+          </button>
+          
+          <div 
+            className={`transition-all duration-300 ease-in-out grid overflow-hidden ${
+              isOpen 
+                ? 'grid-rows-[1fr] border-t border-gray-100 opacity-100 bg-gray-50' 
+                : 'grid-rows-[0fr] opacity-0'
+            }`}
+          >
+            <div className="overflow-hidden">
+              <p className="text-gray-600 text-xs md:text-sm leading-relaxed p-4">
+                {faq.a}
               </p>
             </div>
-
-            <div className="space-y-3">
-              {faqs.map((faq) => {
-                const isOpen = openFaq === faq.id;
-                return (
-                  <div 
-                    key={faq.id}
-                    className="border border-gray-100 rounded-xl overflow-hidden bg-gray-50/50 transition-colors duration-150"
-                  >
-                    <button
-                      onClick={() => toggleFaq(faq.id)}
-                      className="w-full flex items-center justify-between p-4 bg-white hover:bg-gray-50 text-left transition-colors cursor-pointer select-none"
-                    >
-                      <span className="font-bold text-gray-800 text-xs md:text-sm pr-4">
-                        {faq.q}
-                      </span>
-                      <div className="shrink-0 w-5 h-5 rounded-full bg-blue-50 text-[#020263] flex items-center justify-center">
-                        {isOpen ? <Minus className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
-                      </div>
-                    </button>
-
-                    <div 
-                      className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                        isOpen ? 'max-h-40 border-t border-gray-100 opacity-100 p-4 bg-gray-50' : 'max-h-0 opacity-0'
-                      }`}
-                    >
-                      <p className="text-gray-600 text-xs md:text-sm leading-relaxed">
-                        {faq.a}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
           </div>
+        </div>
+      );
+    })}
+  </div>
+</div>
 
           {/* 🔘 ปุ่มนำทางกลับหน้าหลัก */}
           <div className="mt-6 mb-12 flex justify-center w-full">
