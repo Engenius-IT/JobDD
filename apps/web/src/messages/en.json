@@ -335,7 +335,10 @@
     "marketing": "Marketing / Communication",
     "tech": "IT / Telecommunication",
     "accounting": "Accounting",
-    "admin": "Administrative"
+    "admin": "Administrative",
+    "title": "Find the Right Candidates by Job Category",
+    "subtitle": "Filter high-quality resumes ready to start immediately",
+    "viewAllButton": "Search All Resumes"
   },
   "AISkillBanner": {
     "title": "AI Skill Analysis to help you find the right job",
@@ -403,28 +406,28 @@
     ],
     "candidate": [
       {
-        "q": "Is there any cost for registering and using the platform?",
-        "a": "Creating a profile and applying for jobs through WorksDD is completely free for all job seekers."
+        "q": "Is there a fee to register and use the platform?",
+        "a": "WorksDD is a free platform for all job seekers. You can create a profile and apply for jobs at no cost."
       },
       {
-        "q": "What should I do if I forget my password or cannot log in?",
-        "a": "You can click the 'Forgot Password' button on the login page to request a password reset link sent to your registered email."
+        "q": "What should I do if I forget my account password?",
+        "a": "You can click the 'Forget Password' button on the login page to receive a password reset link via the email you registered with."
       },
       {
-        "q": "Can I adjust the privacy settings of my resume?",
-        "a": "Yes, you can set your profile status to Private so your personal information won't appear in company search results until you choose to apply for that specific job."
+        "q": "Can users set privacy settings for their resume?",
+        "a": "You can set your profile status to Private so your personal information won't appear in employer searches until you apply directly to a job."
       },
       {
-        "q": "How does the website help recommend suitable jobs for me?",
-        "a": "We utilize an AI-powered Recommendation system that analyzes the skills and experience on your resume to suggest the jobs that match you best."
+        "q": "How does WorksDD help recommend suitable jobs to job seekers?",
+        "a": "WorksDD has an AI-powered Recommendation system that analyzes the skills and experience from your resume to suggest jobs that best match your profile."
       },
       {
         "q": "Can I apply to multiple companies at the same time?",
         "a": "There are no limitations. You can submit applications to an unlimited number of positions that interest you, and the system will help track the status of each application on a single page."
       },
       {
-        "q": "Can I edit my resume after I have already applied for a job?",
-        "a": "If you wish to update your information, you can upload a new resume on your profile page, which will be saved for your next job applications."
+        "q": "Can job seekers edit their resume after they've already applied for a job?",
+        "a": "You can edit your resume information at any time, but you cannot edit the resume data attached to an application you've already submitted. Any edited resume will be saved as your base resume for future job applications."
       }
     ],
     "stillHaveQuestions": "If you have any further questions",
@@ -1382,7 +1385,7 @@
       },
       "step3": {
         "title": "3. Manage Applicants",
-        "desc": "View lists of candidates who applied, along with their resumes and contact info. You can filter and sort them as appropriate.",
+        "desc": "View the list of candidates who submitted applications and resumes. The website will provide initial screening for you, and you can sort applicants as appropriate.",
         "badge": "Screening",
         "tips": "Open and view candidate resumes and contact details instantly once they apply—no need to wait for them to send additional files."
       },
@@ -1467,6 +1470,9 @@
     "rejected": "Rejected",
     "unverified": "Unverified",
     "saveFailed": "Failed to save. Please try again.",
+    "vip": "Top-Tier Account (VIP)",
+    "premium": "Premium Account (Premium)",
+    "pro": "Pro Account (Pro Account)",
     "days": {
       "sun": "Sun",
       "mon": "Mon",
@@ -1521,6 +1527,52 @@
     "backgroundTitle": "Company Background",
     "noBackground": "No background image",
     "changeBackground": "Change Background Image"
+  },
+  "companyProfileForm": {
+    "logoHint": "This image will be displayed on your Company Profile page",
+    "nameLabel": "Company Name",
+    "descriptionLabel": "About the Company",
+    "descriptionHint": "(Briefly describe the company's business)",
+    "companyTypeLabel": "Company Type",
+    "companyTypePrivate": "Private",
+    "companyTypeState": "State Enterprise",
+    "sizeLabel": "Number of Employees",
+    "sizePlaceholder": "Select number of employees",
+    "industryLabel": "Industry / Field",
+    "industryPlaceholder": "e.g. IT, Finance, Healthcare",
+    "addressSectionTitle": "Company Address",
+    "provinceLabel": "Province",
+    "districtLabel": "District",
+    "addressLabel": "Address",
+    "contactSectionTitle": "Company Contact Information",
+    "phoneLabel": "Phone Number",
+    "websiteLabel": "Company Website",
+    "websitePlaceholder": "https://",
+    "cancelButton": "Cancel",
+    "saveButton": "Save",
+    "savingButton": "Saving...",
+    "noCompanyData": "No company information yet"
+    },
+  "bookmarkList": {
+    "confirmRemove": "Confirm removal from your saved list?",
+    "removeFailed": "Unable to remove this item. Please try again.",
+    "unknownName": "Name not specified",
+    "unknownEmail": "Email not specified",
+    "unknownPosition": "Position not specified",
+    "unknownLocation": "Location not specified"
+    },
+  "applicantList": {
+    "statusShortlisted": "Interview Scheduled",
+    "statusRejected": "Rejected",
+    "statusApplied": "Applied",
+    "positionLabel": "Position",
+    "appliedDateLabel": "Applied Date",
+    "viewDetails": "View Details"
+    },
+  "candidateCard": {
+    "unknownEmail": "Email not specified",
+    "positionLabel": "Interested Position",
+    "unknownPosition": "Position not specified"
+    }
   }
-}
 }
