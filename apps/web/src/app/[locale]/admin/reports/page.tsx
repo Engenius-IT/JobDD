@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -9,10 +10,57 @@ import {
   Download,
   Calendar,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  Loader2
 } from 'lucide-react';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+
 export default function ReportsPage() {
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem('accessToken');
+        const response = await fetch(`${API_URL}/admin/dashboard/stats`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setStats(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center p-24 space-y-4">
+        <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
+        <p className="text-gray-500 font-medium">กำลังโหลดข้อมูลรายงาน...</p>
+      </div>
+    );
+  }
+
+  const s = stats || {
+    totalUsers: 0,
+    totalCompanies: 0,
+    totalJobs: 0,
+    totalApplications: 0,
+    newUsersThisMonth: 0,
+    newCompaniesThisMonth: 0,
+    newJobsThisMonth: 0,
+  };
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -38,12 +86,15 @@ export default function ReportsPage() {
             <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
               <Users className="w-6 h-6" />
             </div>
-            <span className="flex items-center gap-1 text-green-600 text-xs font-bold bg-green-50 px-2 py-1 rounded-full">
-              <ArrowUpRight className="w-3 h-3" /> 12%
-            </span>
+            {s.newUsersThisMonth > 0 && (
+              <span className="flex items-center gap-1 text-green-600 text-xs font-bold bg-green-50 px-2 py-1 rounded-full">
+                <ArrowUpRight className="w-3 h-3" /> ใหม่
+              </span>
+            )}
           </div>
           <p className="text-sm text-gray-500 font-medium">ผู้ใช้ใหม่รายเดือน</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">1,240 คน</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">{s.newUsersThisMonth.toLocaleString()} คน</p>
+          <p className="text-xs text-gray-400 mt-2">จากทั้งหมด {s.totalUsers.toLocaleString()} คน</p>
         </div>
 
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
@@ -51,12 +102,15 @@ export default function ReportsPage() {
             <div className="p-2 bg-green-50 rounded-lg text-green-600">
               <Building2 className="w-6 h-6" />
             </div>
-            <span className="flex items-center gap-1 text-green-600 text-xs font-bold bg-green-50 px-2 py-1 rounded-full">
-              <ArrowUpRight className="w-3 h-3" /> 8%
-            </span>
+            {s.newCompaniesThisMonth > 0 && (
+              <span className="flex items-center gap-1 text-green-600 text-xs font-bold bg-green-50 px-2 py-1 rounded-full">
+                <ArrowUpRight className="w-3 h-3" /> ใหม่
+              </span>
+            )}
           </div>
           <p className="text-sm text-gray-500 font-medium">บริษัทใหม่รายเดือน</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">45 บริษัท</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">{s.newCompaniesThisMonth || 0} บริษัท</p>
+          <p className="text-xs text-gray-400 mt-2">จากทั้งหมด {s.totalCompanies.toLocaleString()} บริษัท</p>
         </div>
 
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
@@ -64,12 +118,15 @@ export default function ReportsPage() {
             <div className="p-2 bg-purple-50 rounded-lg text-purple-600">
               <Briefcase className="w-6 h-6" />
             </div>
-            <span className="flex items-center gap-1 text-red-600 text-xs font-bold bg-red-50 px-2 py-1 rounded-full">
-              <ArrowDownRight className="w-3 h-3" /> 3%
-            </span>
+            {s.newJobsThisMonth > 0 && (
+              <span className="flex items-center gap-1 text-green-600 text-xs font-bold bg-green-50 px-2 py-1 rounded-full">
+                <ArrowUpRight className="w-3 h-3" /> ใหม่
+              </span>
+            )}
           </div>
           <p className="text-sm text-gray-500 font-medium">งานที่ลงใหม่รายเดือน</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">320 ตำแหน่ง</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">{s.newJobsThisMonth.toLocaleString()} ตำแหน่ง</p>
+          <p className="text-xs text-gray-400 mt-2">จากทั้งหมด {s.totalJobs.toLocaleString()} ตำแหน่ง</p>
         </div>
       </div>
 

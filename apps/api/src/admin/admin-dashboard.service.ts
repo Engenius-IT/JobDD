@@ -17,6 +17,7 @@ export class AdminDashboardService {
       totalApplications,
       pendingCompanies,
       newUsersThisMonth,
+      newCompaniesThisMonth,
       newJobsThisMonth,
       newApplicationsThisMonth,
     ] = await Promise.all([
@@ -28,6 +29,9 @@ export class AdminDashboardService {
         where: { verificationStatus: VerificationStatus.PENDING_REVIEW },
       }),
       this.prisma.user.count({
+        where: { createdAt: { gte: firstDayOfMonth } },
+      }),
+      this.prisma.company.count({
         where: { createdAt: { gte: firstDayOfMonth } },
       }),
       this.prisma.job.count({
@@ -45,6 +49,7 @@ export class AdminDashboardService {
       totalApplications,
       pendingCompanies,
       newUsersThisMonth,
+      newCompaniesThisMonth,
       newJobsThisMonth,
       newApplicationsThisMonth,
     };
