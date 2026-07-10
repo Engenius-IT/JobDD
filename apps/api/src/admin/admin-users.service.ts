@@ -59,6 +59,54 @@ export class AdminUsersService {
     };
   }
 
+  async getUserById(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        phone: true,
+        role: true,
+        emailVerified: true,
+        createdAt: true,
+      },
+    });
+
+    if (!user) throw new NotFoundException('ไม่พบข้อมูลผู้ใช้');
+    return user;
+  }
+
+  async updateUser(id: string, updateData: any, adminId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) throw new NotFoundException('ไม่พบข้อมูลผู้ใช้');
+
+    // Remove fields that shouldn't be updated directly via this endpoint if any
+    const { id: _, createdAt: __, ...data } = updateData;
+
+    const updated = await this.prisma.user.update({
+      where: { id },
+      data,
+    });
+
+    // บันทึก Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        adminId: adminId,
+        action: 'แก้ไขข้อมูลผู้ใช้',
+        type: 'update',
+        target: user.email,
+        targetType: 'user',
+        details: `แก้ไขข้อมูลผู้ใช้ ID: ${id} (${user.firstName} ${user.lastName}). ข้อมูลที่เปลี่ยน: ${JSON.stringify(data)}`,
+      });
+    } catch (err) {
+      console.error('Failed to create audit log:', err);
+    }
+
+    return updated;
+  }
+
   async deleteUser(id: string, adminId: string) {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) throw new NotFoundException('ไม่พบข้อมูลผู้ใช้');
