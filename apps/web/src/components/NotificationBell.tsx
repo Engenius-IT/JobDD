@@ -523,21 +523,19 @@ export function NotificationBell({ customBellClass }: NotificationBellProps) {
             </div>
 
             {/* Footer View All */}
-            {user.role !== 'EMPLOYER' && user.role !== 'ADMIN' && (
-              <div className="border-t border-gray-100 bg-gray-50 py-2 px-3">
-                <button
-                  onClick={() => {
-                    setIsOpen(false);      // ปิด Dropdown เล็ก
-                    setSelectedNotificationForModal(null);
-                    setIsModalOpen(true);  // เปิดหน้าจอ Premium Modal ตัวเต็ม
-                  }}
-                  className="w-full py-2 text-center text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
-                  aria-label={t.viewAll}
-                >
-                  {t.viewAll}
-                </button>
-              </div>
-            )}
+            <div className="border-t border-gray-100 bg-gray-50 py-2 px-3">
+              <button
+                onClick={() => {
+                  setIsOpen(false);      // ปิด Dropdown เล็ก
+                  setSelectedNotificationForModal(null);
+                  setIsModalOpen(true);  // เปิดหน้าจอ Premium Modal ตัวเต็ม
+                }}
+                className="w-full py-2 text-center text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+                aria-label={t.viewAll}
+              >
+                {t.viewAll}
+              </button>
+            </div>
           </div>
         )}
       </div>

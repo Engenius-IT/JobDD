@@ -582,13 +582,13 @@ function CompanyEditModal({
             </div>
 
             <p className="text-xs text-gray-400 mt-2">
-              รูปนี้จะแสดงบนหน้า Company Profile ของบริษัท
+              {t('companyProfileForm.logoHint')}
             </p>
           </div>
 
           {/* ชื่อบริษัท */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">ชื่อบริษัท</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t('companyProfileForm.nameLabel')}</label>
             <input
               type="text"
               value={form.name ?? ''}
@@ -600,9 +600,9 @@ function CompanyEditModal({
           {/* เกี่ยวกับบริษัท */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-              เกี่ยวกับบริษัท
+              {t('companyProfileForm.descriptionLabel')}
               <span className="text-gray-400 font-normal ml-1 text-xs">
-                (อธิบายคร่าวๆ บริษัทประกอบการเกี่ยวกัน)
+                {t('companyProfileForm.descriptionHint')}
               </span>
             </label>
             <textarea
@@ -615,9 +615,9 @@ function CompanyEditModal({
 
           {/* รูปแบบบริษัท */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">รูปแบบบริษัท</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">{t('companyProfileForm.companyTypeLabel')}</label>
             <div className="flex gap-6">
-              {['เอกชน', 'รัฐวิสาหกิจ'].map((t) => (
+              {['' + t('companyProfileForm.companyTypePrivate'), t('companyProfileForm.companyTypeState')].map((t) => (
                 <label key={t} className="flex items-center gap-2 cursor-pointer">
                   <div className="relative flex items-center">
                     <input
@@ -637,14 +637,14 @@ function CompanyEditModal({
 
           {/* จำนวนพนักงาน */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">จำนวนพนักงาน</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t('companyProfileForm.sizeLabel')}</label>
             <div className="relative">
               <select
                 value={form.size ?? ''}
                 onChange={(e) => set('size', e.target.value)}
                 className="w-full h-11 px-4 bg-gray-100 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm appearance-none pr-10"
               >
-                <option value="">เลือกจำนวนพนักงาน</option>
+                <option value="">{t('companyProfileForm.sizePlaceholder')}</option>
                 {SIZE_OPTIONS.map((s) => (
                   <option key={s} value={s}>
                     {s}
@@ -672,23 +672,23 @@ function CompanyEditModal({
           {/* สายงาน */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-              สายงาน / อุตสาหกรรม
+              {t('companyProfileForm.industryLabel')}
             </label>
             <input
               type="text"
               value={form.industry ?? ''}
               onChange={(e) => set('industry', e.target.value)}
-              placeholder="เช่น IT, การเงิน, การแพทย์"
+              placeholder={t('companyProfileForm.industryPlaceholder')}
               className="w-full h-11 px-4 bg-gray-100 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
             />
           </div>
 
           {/* ข้อมูลที่อยู่บริษัท */}
           <div className="border-t border-gray-100 pt-5">
-            <h3 className="text-base font-bold text-gray-800 mb-4">ข้อมูลที่อยู่บริษัท</h3>
+            <h3 className="text-base font-bold text-gray-800 mb-4">{t('companyProfileForm.addressSectionTitle')}</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">จังหวัด</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t('companyProfileForm.provinceLabel')}</label>
                 <input
                   type="text"
                   value={form.province ?? ''}
@@ -698,7 +698,7 @@ function CompanyEditModal({
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                  อำเภอ/เขต
+                  {t('companyProfileForm.districtLabel')}
                 </label>
                 <input
                   type="text"
@@ -709,7 +709,7 @@ function CompanyEditModal({
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                  ที่อยู่ เลขที่
+                  {t('companyProfileForm.addressLabel')}
                 </label>
                 <input
                   type="text"
@@ -723,11 +723,11 @@ function CompanyEditModal({
 
           {/* ข้อมูลติดต่อบริษัท */}
           <div className="border-t border-gray-100 pt-5">
-            <h3 className="text-base font-bold text-gray-800 mb-4">ข้อมูลติดต่อบริษัท</h3>
+            <h3 className="text-base font-bold text-gray-800 mb-4">{t('companyProfileForm.contactSectionTitle')}</h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                  เบอร์โทรศัพท์
+                  {t('companyProfileForm.phoneLabel')}
                 </label>
                 <input
                   type="text"
@@ -738,13 +738,13 @@ function CompanyEditModal({
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                  เว็บไซต์บริษัท
+                  {t('companyProfileForm.websiteLabel')}
                 </label>
                 <input
                   type="text"
                   value={form.website ?? ''}
                   onChange={(e) => set('website', e.target.value)}
-                  placeholder="https://"
+                  placeholder={t('companyProfileForm.websitePlaceholder')}
                   className="w-full h-11 px-4 bg-gray-100 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                 />
               </div>
@@ -760,14 +760,14 @@ function CompanyEditModal({
             onClick={onClose}
             className="flex-1 h-11 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
           >
-            ยกเลิก
+            {t('companyEdit.cancelButton')}
           </button>
           <button
             onClick={handleSave}
             disabled={saving}
             className="flex-1 h-11 rounded-xl bg-[#E00016] hover:bg-[#A80010] text-white text-sm font-semibold transition-colors disabled:opacity-60"
           >
-            {saving ? 'กำลังบันทึก...' : 'บันทึก'}
+            {saving ? t('companyProfileForm.savingButton') : t('companyProfileForm.saveButton')}
           </button>
         </div>
       </div>
@@ -808,13 +808,13 @@ export default function EmployerDashboard() {
   const [selectedApplicantId, setSelectedApplicantId] = useState<string | null>(null);
 
   const handleUnbookmark = async (candidateId: string) => {
-    if (!confirm('ยืนยันการลบออกจากรายการที่บันทึกไว้?')) return;
+    if (!confirm(t('bookmarkList.confirmRemove'))) return;
     try {
       await bookmarkService.toggle(candidateId);
       // ลบออกจาก candidates เพราะเราเปลี่ยนมาใช้ตัวนี้ตัวเดียว
       setCandidates((prev) => prev.filter((c) => c.id !== candidateId));
     } catch (err) {
-      alert('ไม่สามารถลบรายการได้ กรุณาลองใหม่อีกครั้ง');
+      alert(t('bookmarkList.removeFailed'));
     }
   };
 
@@ -830,11 +830,11 @@ export default function EmployerDashboard() {
 
         return {
           id: item.candidateId || c?.id,
-          fullName: c?.firstName ? `${c.firstName} ${c.lastName || ''}` : 'ไม่ระบุชื่อ',
-          email: c?.email || 'ไม่ระบุอีเมล',
+          fullName: c?.firstName ? `${c.firstName} ${c.lastName || ''}` : t('bookmarkList.unknownName'),
+          email: c?.email || t('bookmarkList.unknownEmail'),
           avatarUrl: c?.avatarUrl || null,
-          position: c?.jobPreferences?.[0]?.position || 'ไม่ได้ระบุตำแหน่ง',
-          location: p?.province || 'ไม่ระบุพื้นที่',
+          position: c?.jobPreferences?.[0]?.position || t('bookmarkList.unknownPosition'),
+          location: p?.province || t('bookmarkList.unknownLocation'),
           updatedAt: item.createdAt || new Date().toISOString()
         };
       });
@@ -865,10 +865,10 @@ export default function EmployerDashboard() {
   }, [company?.id]);
 
   const getTimeLeftLabel = (endDate: string | Date | null, currentTime: Date) => {
-    if (!endDate) return "ไม่ระบุ";
+    if (!endDate) return "{t('timeLeft.unknown')}";
 
     const total = new Date(endDate).getTime() - currentTime.getTime();
-    if (total <= 0) return "(หมดอายุแล้ว)";
+    if (total <= 0) return "{t('timeLeft.expired')}";
 
     const seconds = Math.floor((total / 1000) % 60);
     const minutes = Math.floor((total / 1000 / 60) % 60);
@@ -1206,7 +1206,7 @@ export default function EmployerDashboard() {
                 <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
                   <Building2 className="w-6 h-6 text-gray-300" />
                 </div>
-                <p className="text-sm text-gray-400">ยังไม่มีข้อมูลบริษัท</p>
+                <p className="text-sm text-gray-400">{t('companyProfileForm.noCompanyData')}</p>
               </div>
             )}
           </div>
@@ -1548,17 +1548,17 @@ export default function EmployerDashboard() {
                       {packageInfo?.name === 'VIP' ? (
                         <div className="w-full h-full font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 border-2 border-white/20 shadow-xl bg-gradient-to-r from-rose-500 via-red-600 to-rose-600 text-white tracking-wide">
                           <Star className="w-4 h-4 fill-white text-white animate-pulse" />
-                          บัญชีระดับสูงสุด (VIP)
+                          {t('vip')}
                         </div>
                       ) : packageInfo?.name === 'Premium' ? (
                         <div className="w-full h-full font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 border-2 border-blue-950/40 shadow-xl bg-gradient-to-r from-blue-700 to-indigo-800 text-white tracking-wide">
                           <Crown className="w-4 h-4 text-blue-200 fill-blue-200" />
-                          บัญชีระดับพรีเมียม (Premium)
+                          {t('premium')}
                         </div>
                       ) : packageInfo?.name === 'Pro' ? (
                         <div className="w-full h-full font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 border-b-4 border-amber-800 bg-gradient-to-r from-amber-500 to-amber-600 text-white tracking-wide">
                           <Zap className="w-4 h-4 text-white fill-white" />
-                          บัญชีระดับโปร (Pro Account)
+                          {t('pro')}
                         </div>
                       ) : (
                         <div className="w-full h-full font-medium py-2.5 rounded-xl text-xs flex items-center justify-center border border-gray-200 bg-gray-50 text-gray-600">
@@ -1654,14 +1654,14 @@ export default function EmployerDashboard() {
                           {a.user?.firstName} {a.user?.lastName}
                         </div>
                         <div className={`text-[10px] font-medium ${a.status === 'SHORTLISTED' ? 'text-green-500' : a.status === 'REJECTED' ? 'text-red-500' : 'text-gray-400'}`}>
-                          {a.status === 'SHORTLISTED' ? 'นัดสัมภาษณ์' : a.status === 'REJECTED' ? 'ปฏิเสธ' : 'สมัครงานแล้ว'}
+                          {a.status === 'SHORTLISTED' ? t('applicantList.statusShortlisted') : a.status === 'REJECTED' ? t('applicantList.statusRejected') : t('applicantList.statusApplied')}
                         </div>
                       </div>
                     </div>
 
                     {/* 2. Position - บนมือถือให้มีหัวข้อกำกับเล็กๆ */}
                     <div className="w-full md:w-auto">
-                      <span className="md:hidden text-[10px] text-gray-400 font-bold block mb-0.5 uppercase">ตำแหน่ง</span>
+                      <span className="md:hidden text-[10px] text-gray-400 font-bold block mb-0.5 uppercase">{t('applicantList.positionLabel')}</span>
                       <div className="text-xs text-gray-600 truncate bg-gray-50 md:bg-transparent p-1.5 md:p-0 rounded">
                         {a.job?.title}
                       </div>
@@ -1669,7 +1669,7 @@ export default function EmployerDashboard() {
 
                     {/* 3. Date */}
                     <div className="w-full md:w-auto">
-                      <span className="md:hidden text-[10px] text-gray-400 font-bold block mb-0.5 uppercase">วันที่สมัคร</span>
+                      <span className="md:hidden text-[10px] text-gray-400 font-bold block mb-0.5 uppercase">{t('applicantList.appliedDateLabel')}</span>
                       <div className="text-[11px] text-gray-500">
                         {formatAppliedAt(a.appliedAt)}
                       </div>
@@ -1682,7 +1682,7 @@ export default function EmployerDashboard() {
                         className="flex items-center justify-center gap-2 w-full md:w-auto px-4 py-2 md:p-1.5 rounded-xl md:rounded-lg bg-blue-50 md:bg-transparent text-[#E00016] hover:bg-blue-100 transition-colors"
                       >
                         <Eye className="w-4 h-4" />
-                        <span className="md:hidden text-xs font-bold text-[#E00016]">ดูรายละเอียด</span>
+                        <span className="md:hidden text-xs font-bold text-[#E00016]">{t('applicantList.viewDetails')}</span>
                       </button>
                     </div>
                   </div>
@@ -1765,16 +1765,16 @@ export default function EmployerDashboard() {
                         {candidate.fullName}
                       </div>
                       <div className="text-[10px] text-gray-400 mt-0.5 truncate italic">
-                        {candidate.email || "ไม่ได้ระบุอีเมล"}
+                        {candidate.email || t('candidateCard.unknownEmail')}
                       </div>
                     </div>
                   </div>
 
                   {/* 2. ตำแหน่งที่สนใจ */}
                   <div className="md:col-span-5 min-w-0 w-full md:pr-4">
-                    <span className="md:hidden text-[10px] text-gray-400 font-bold block mb-1 uppercase">ตำแหน่งที่สนใจ</span>
+                    <span className="md:hidden text-[10px] text-gray-400 font-bold block mb-1 uppercase">{t('candidateCard.positionLabel')}</span>
                     <div className="text-xs text-gray-600 truncate bg-gray-100/50 md:bg-transparent px-2 py-1 md:p-0 rounded-md inline-block md:block">
-                      {candidate.position || 'ไม่ได้ระบุตำแหน่ง'}
+                      {candidate.position || t('candidateCard.unknownPosition')}
                     </div>
                   </div>
 

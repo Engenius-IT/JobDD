@@ -314,6 +314,7 @@ function EmployerJobCard({
 export function EmployerJobCategories() {
     const [storefrontSection, setStorefrontSection] = useState<JobItem[]>(storefrontResumes);
     const [officeSection, setOfficeSection] = useState<JobItem[]>(officeResumes);
+    const t = useTranslations('JobCategories');
 
     interface ApiItem {
         id: string;
@@ -376,8 +377,8 @@ export function EmployerJobCategories() {
             <div className="container mx-auto px-4 max-w-6xl">
                 {/* Header Section */}
                 <div className="mb-12 text-center">
-                    <h2 className="text-3xl font-bold text-[#020263]">ค้นหาแคนดิเดตที่ใช่ตามสายงาน</h2>
-                    <p className="text-gray-500 mt-2">คัดกรองเรซูเม่คุณภาพที่พร้อมเริ่มงานได้ทันที</p>
+                    <h2 className="text-3xl font-bold text-[#020263]">{t('title')}</h2>
+                    <p className="text-gray-500 mt-2">{t('subtitle')}</p>
                 </div>
 
 
@@ -445,7 +446,7 @@ export function EmployerJobCategories() {
                         className="group inline-flex items-center gap-2.5 px-8 py-3.5 rounded-xl bg-[#020263] text-white font-bold text-sm hover:bg-[#0a0a7a] hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
                     >
                         <LayoutGrid className="w-4.5 h-4.5 stroke-[2.5] group-hover:rotate-90 transition-transform duration-300" />
-                        ค้นหาเรซูเม่ทั้งหมด
+                        {t('viewAllButton')}
                     </Link>
                 </div>
             </div>

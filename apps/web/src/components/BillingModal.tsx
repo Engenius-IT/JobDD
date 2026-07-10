@@ -136,6 +136,8 @@ export const BillingModal: React.FC<BillingModalProps> = ({
           letter-spacing: 0.02em;
           padding: 2px 8px;
           border-radius: 6px;
+          display: inline-block;
+          white-space: nowrap;
         }
         .row-hover:hover {
           transform: translateY(-1px);
@@ -180,17 +182,34 @@ export const BillingModal: React.FC<BillingModalProps> = ({
           background: rgba(255, 255, 255, 0.18);
           transform: translateY(-1px);
         }
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+          height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-button {
+          display: none;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(148, 163, 184, 0.3);
+          border-radius: 99px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(148, 163, 184, 0.5);
+        }
       `}} />
 
       {/* Main Modal Container */}
       <div
         onClick={(e) => e.stopPropagation()}
-        className="glass-background w-full h-[850px] rounded-3xl overflow-hidden shadow-2xl flex flex-col border border-white/60 text-slate-800 animate-scale-up"
-        style={{ maxWidth: '1000px' }}
+        className="glass-background w-full max-h-[90vh] rounded-3xl overflow-hidden shadow-2xl flex flex-col border border-white/60 text-slate-800 animate-scale-up"
+        style={{ maxWidth: '900px' }}
       >
-        <main className="flex-grow flex flex-col min-w-0 overflow-y-auto">
+        <main className="custom-scrollbar flex-grow flex flex-col min-w-0 overflow-y-auto">
           {/* Header */}
-          <header className="sticky top-0 z-20 bg-white/60 backdrop-blur-xl px-8 py-5 border-b border-gray-200/50 flex items-center justify-between">
+          <header className="sticky top-0 z-20 bg-white/60 backdrop-blur-xl px-6 py-4 border-b border-gray-200/50 flex items-center justify-between">
             <div className="flex items-center gap-6">
               <button
                 onClick={onClose}
@@ -214,10 +233,10 @@ export const BillingModal: React.FC<BillingModalProps> = ({
             </div>
           </header>
 
-          <div className="p-8 space-y-8 max-w-5xl mx-auto w-full flex-1">
+          <div className="p-6 space-y-6 max-w-4xl mx-auto w-full flex-1">
             {/* Section 1: Redesigned Premium Hero Card */}
             <section>
-              <div className="premium-hero-card p-10 relative overflow-hidden flex items-center">
+              <div className="premium-hero-card p-6 md:p-8 relative overflow-hidden flex items-center">
                 {/* Ambient glows */}
                 <div className="ambient-glow -left-20 -top-20"></div>
                 <div className="ambient-glow -right-10 -bottom-10"></div>
@@ -310,29 +329,29 @@ export const BillingModal: React.FC<BillingModalProps> = ({
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="border-b border-gray-100 text-slate-400 bg-gray-50/50">
-                        <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-wider w-[15%]">{t('invoiceId')}</th>
-                        <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-wider w-[15%]">{t('date')}</th>
-                        <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-wider w-1/3">{t('description')}</th>
-                        <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-right min-w-[120px]">{t('amount')}</th>
-                        <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-wider w-[15%]">{t('method')}</th>
-                        <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-center w-[10%]">{t('status')}</th>
+                        <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-wider w-[15%]">{t('invoiceId')}</th>
+                        <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-wider w-[15%]">{t('date')}</th>
+                        <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-wider w-1/3">{t('description')}</th>
+                        <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-right min-w-[120px]">{t('amount')}</th>
+                        <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-wider w-[15%]">{t('method')}</th>
+                        <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-center w-[12%]">{t('status')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                       {transactions.map((row) => (
                         <tr key={row.id} className="row-hover transition-standard bg-white">
-                          <td className="px-6 py-5 font-bold text-sm text-slate-900">{row.id}</td>
-                          <td className="px-6 py-5 text-slate-500 text-sm">{formatDate(row.createdAt)}</td>
-                          <td className="px-6 py-5">
+                          <td className="px-6 py-3.5 font-bold text-sm text-slate-900">{row.id}</td>
+                          <td className="px-6 py-3.5 text-slate-500 text-sm">{formatDate(row.createdAt)}</td>
+                          <td className="px-6 py-3.5">
                             <div className="flex flex-col">
                               <span className="text-sm font-semibold text-slate-900">{row.planName}</span>
                               <span className="text-xs text-slate-400">{row.description}</span>
                             </div>
                           </td>
-                          <td className="px-6 py-5 text-right font-semibold text-sm text-slate-900">
+                          <td className="px-6 py-3.5 text-right font-semibold text-sm text-slate-900 whitespace-nowrap">
                             {row.amount.toLocaleString()} THB
                           </td>
-                          <td className="px-6 py-5">
+                          <td className="px-6 py-3.5">
                             <div className="flex items-center gap-2 text-slate-500">
                               {row.method === 'credit_card' ? (
                                 <>
@@ -347,7 +366,7 @@ export const BillingModal: React.FC<BillingModalProps> = ({
                               )}
                             </div>
                           </td>
-                          <td className="px-6 py-5 text-center">
+                          <td className="px-6 py-3.5 text-center">
                             <span className={`status-badge ${
                               row.status === 'SUCCESS'
                                 ? 'bg-emerald-50 text-emerald-700'
