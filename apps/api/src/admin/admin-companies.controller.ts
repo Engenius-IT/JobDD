@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Patch, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { AdminCompaniesService } from './admin-companies.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -25,7 +25,9 @@ export class AdminCompaniesController {
   async verifyCompany(
     @Param('id') id: string,
     @Body() dto: { status: 'VERIFIED' | 'REJECTED'; rejectionReason?: string },
+    @Request() req: any,
   ) {
-    return this.adminCompaniesService.verifyCompany(id, dto.status, dto.rejectionReason);
+    const adminId = req.user.id;
+    return this.adminCompaniesService.verifyCompany(id, dto.status, adminId, dto.rejectionReason);
   }
 }

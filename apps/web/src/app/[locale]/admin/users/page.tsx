@@ -45,8 +45,9 @@ export default function UserManagementPage() {
       setLoading(true);
       const token = localStorage.getItem('accessToken');
       const roleParam = filterRole !== 'all' ? `&role=${filterRole}` : '';
+      const searchParam = searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : '';
       const response = await fetch(
-        `${API_URL}/admin/users?page=${page}&limit=${limit}&search=${encodeURIComponent(searchTerm)}${roleParam}`,
+        `${API_URL}/admin/users?page=${page}&limit=${limit}${searchParam}${roleParam}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
