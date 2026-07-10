@@ -458,12 +458,10 @@ export default function SavedJobsPage() {
                       </h3>
                       {selectedJob.description.trimStart().startsWith('<') ? (
                         <div
-                          /* 🟢 เพิ่ม break-words และสยบปัญหา scroll แนวนอนของคลาส prose */
                           className="text-gray-600 text-sm leading-relaxed prose prose-sm max-w-none break-words whitespace-pre-wrap [word-break:break-word]"
                           dangerouslySetInnerHTML={{ __html: selectedJob.description }}
                         />
                       ) : (
-                        /* 🟢 เพิ่ม break-words และปรับเป็น whitespace-pre-wrap เพื่อบังคับตัดคำอย่างสมบูรณ์ */
                         <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap break-words [word-break:break-word]">
                           {selectedJob.description}
                         </p>
@@ -477,10 +475,17 @@ export default function SavedJobsPage() {
                         <span className="w-1 h-4 bg-[#E00016] rounded-full inline-block" />
                         {t.sectionRequirements}
                       </h3>
-                      {/* 🟢 เติมท่าตัดคำกันพังตรงส่วนคุณสมบัติด้วยครับ */}
-                      <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap break-words [word-break:break-word]">
-                        {selectedJob.requirements}
-                      </p>
+                      {/* 🛠️ แก้ไขตรงนี้: เพิ่มการดักจับแท็ก <p> หรือ HTML เหมือนกะด้านบนเลยครับพี่ */}
+                      {selectedJob.requirements.trimStart().startsWith('<') ? (
+                        <div
+                          className="text-gray-600 text-sm leading-relaxed prose prose-sm max-w-none break-words whitespace-pre-wrap [word-break:break-word]"
+                          dangerouslySetInnerHTML={{ __html: selectedJob.requirements }}
+                        />
+                      ) : (
+                        <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap break-words [word-break:break-word]">
+                          {selectedJob.requirements}
+                        </p>
+                      )}
                     </div>
                   )}
 
