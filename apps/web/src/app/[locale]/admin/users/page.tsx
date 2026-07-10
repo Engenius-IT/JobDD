@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Search, Filter, MoreVertical, Edit2, Trash2, Eye, Loader2 } from 'lucide-react';
 import { ToastContainer } from '@/components/admin/Toast';
+import { Link } from '@/i18n/routing';
 
 interface User {
   id: string;
@@ -235,13 +236,13 @@ export default function UserManagementPage() {
                       <td className="px-6 py-4 text-sm">
                         <div className="flex items-center gap-2">
                           <Link 
-                            href={`/th/admin/users/${user.id}`}
+                            href={`/admin/users/${user.id}`}
                             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                           >
                             <Eye className="w-4 h-4 text-gray-600" />
                           </Link>
                           <Link 
-                            href={`/th/admin/users/${user.id}`}
+                            href={`/admin/users/${user.id}`}
                             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                           >
                             <Edit2 className="w-4 h-4 text-gray-600" />

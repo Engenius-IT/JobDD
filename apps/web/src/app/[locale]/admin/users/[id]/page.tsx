@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { User, Mail, Phone, Briefcase, Calendar, Edit, Save, XCircle, Loader2, ShieldCheck, ShieldOff } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 
 interface UserData {
   id: string;
