@@ -422,7 +422,7 @@ export default function ProfileFullPage() {
           setCertificates(data);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   useEffect(() => {
@@ -585,53 +585,53 @@ export default function ProfileFullPage() {
     }
   };
 
- const handleTogglePublic = async () => {
-  const currentIsPublic = profile?.isPublic ?? true;
-  const newStatus = !currentIsPublic;
+  const handleTogglePublic = async () => {
+    const currentIsPublic = profile?.isPublic ?? true;
+    const newStatus = !currentIsPublic;
 
-  const previousProfile = profile;
-  const newProfile = profile
-    ? { ...profile, isPublic: newStatus }
-    : ({ isPublic: newStatus } as ProfileData);
-  setProfile(newProfile);
+    const previousProfile = profile;
+    const newProfile = profile
+      ? { ...profile, isPublic: newStatus }
+      : ({ isPublic: newStatus } as ProfileData);
+    setProfile(newProfile);
 
-  try {
-    const token = localStorage.getItem('accessToken');
-    
-    // 1. เช็คก่อนว่ามี Token ไหม ถ้าไม่มีให้เตือนเลย
-    if (!token) {
-      throw new Error(isEn ? 'No access token found' : 'ไม่พบ Access Token กรุณาเข้าสู่ระบบใหม่');
+    try {
+      const token = localStorage.getItem('accessToken');
+
+      // 1. เช็คก่อนว่ามี Token ไหม ถ้าไม่มีให้เตือนเลย
+      if (!token) {
+        throw new Error(isEn ? 'No access token found' : 'ไม่พบ Access Token กรุณาเข้าสู่ระบบใหม่');
+      }
+
+      const res = await fetch(`${API_URL}/users/me/profile`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ isPublic: newStatus }),
+      });
+
+      // 2. ถ้า API ส่ง Error กลับมา ให้ดึง response message จากหลังบ้านมาดู
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        const serverMessage = errorData.message || errorData.error || `Status ${res.status}`;
+        throw new Error(serverMessage);
+      }
+
+    } catch (error: any) {
+      // ย้อนสถานะกลับถ้าอัปเดตไม่สำเร็จ
+      console.error('Failed to update visibility:', error);
+      setProfile(previousProfile);
+
+      // แสดงข้อความ Error จริงๆ ให้เราเห็น
+      alert(
+        isEn
+          ? `Error updating status: ${error.message}`
+          : `เกิดข้อผิดพลาดในการอัปเดตสถานะ: ${error.message}`
+      );
     }
-
-    const res = await fetch(`${API_URL}/users/me/profile`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ isPublic: newStatus }),
-    });
-
-    // 2. ถ้า API ส่ง Error กลับมา ให้ดึง response message จากหลังบ้านมาดู
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      const serverMessage = errorData.message || errorData.error || `Status ${res.status}`;
-      throw new Error(serverMessage);
-    }
-
-  } catch (error: any) {
-    // ย้อนสถานะกลับถ้าอัปเดตไม่สำเร็จ
-    console.error('Failed to update visibility:', error);
-    setProfile(previousProfile);
-    
-    // แสดงข้อความ Error จริงๆ ให้เราเห็น
-    alert(
-      isEn 
-        ? `Error updating status: ${error.message}` 
-        : `เกิดข้อผิดพลาดในการอัปเดตสถานะ: ${error.message}`
-    );
-  }
-};
+  };
 
   if (authLoading || loading) {
     return (
@@ -999,38 +999,70 @@ export default function ProfileFullPage() {
             <div className="mt-auto">
               {educations.length > 0 ? (
                 <div className="pt-4 border-t border-slate-100 flex flex-col gap-y-4">
-                  {educations.map((e) => (
-                    <div key={e.id} className="relative pl-4 border-b border-slate-50 last:border-none pb-3 last:pb-0">
-                      <div className="absolute left-0 top-[7px] w-[5px] h-[5px] bg-[#f97316] rounded-full"></div>
+                  {educations.map((e: any) => { // 🌟 ใส่ : any ตรงนี้เพื่อดับไฟแดงทั้งหมดของตัว e ครับพี่!
+                    // 🌟 ดักเอาค่า honors_level ออกมาจากตัวแปร
+                    const currentLevel = e.honors_level || e.honorsLevel;
+                    const isLevel1 = currentLevel === '1' || currentLevel === 1;
+                    const isLevel2 = currentLevel === '2' || currentLevel === 2;
+                    const showHonorsBadge = e.hasHonors && (isLevel1 || isLevel2);
 
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="text-[13px] font-bold text-slate-800 leading-tight">
-                          {/* 🟢 เรียกฟังก์ชัน getEducationLabel แยกกับฟิลด์อื่นอย่างชัดเจน */}
-                          {getEducationLabel('faculty', e.faculty, isEn)}
-                          {e.major && ` (${isEn ? 'Major' : 'สาขา'}: ${e.major})`}
-                        </div>
-                        <span className="shrink-0 inline-block text-[10px] text-[#f97316] bg-[#fef4eb] font-bold px-2 py-0.5 rounded-full">
-                          {getEducationLabel('educationLevel', e.educationLevel, isEn)}
-                        </span>
-                      </div>
+                    return (
+                      <div key={e.id} className="relative pl-4 border-b border-slate-50 last:border-none pb-3 last:pb-0">
 
-                      <div className="text-[11px] text-slate-500 mt-1 font-medium">
-                        {e.institution} {e.graduationYear ? `(${e.graduationYear})` : ''}
-                      </div>
+                        {/* 🟠 จุดสีส้มข้างหน้า: จะโชว์เฉพาะตอนที่ "ไม่มี" เกียรตินิยมเท่านั้น ถ้ามีเกียรตินิยมจะซ่อนจุดนี้ไปเลยครับ */}
+                        {!showHonorsBadge && (
+                          <div className="absolute left-0 top-[7px] w-[5px] h-[5px] bg-[#f97316] rounded-full"></div>
+                        )}
 
-                      {/* 🟢 แสดงข้อมูลเพิ่มเติม: Degree Name & GPA ตามที่ขอเพิ่ม */}
-                      <div className="mt-2 grid grid-cols-2 gap-2 bg-slate-50/70 p-2 rounded-xl border border-slate-100">
-                        <div className="flex flex-col">
-                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{isEn ? 'Degree' : 'วุฒิปริญญา'}</span>
-                          <span className="text-[11px] font-semibold text-slate-700 truncate">{e.degreeName || '-'}</span>
+                        {/* 🥇 แสดง Badge เกียรตินิยมไว้บนสุด (ไม่มีจุดส้มนำหน้าแล้ว เขยิบมาซ้ายสุดอย่างสวยงาม) */}
+                        {showHonorsBadge && (
+                          <div className="mb-2 flex items-center pl-0">
+                            {isLevel1 ? (
+                              /* เกียรตินิยมอันดับ 1 */
+                              <div className="inline-flex items-center gap-1 text-[10px] font-extrabold text-[#9a3412] bg-[#fef3c7] border border-[#fde68a] px-2.5 py-0.5 rounded-full shadow-sm">
+                                <span className="text-sm leading-none"></span>
+                                <span>{isEn ? '1st Class Honors' : 'เกียรตินิยมอันดับ 1'}</span>
+                              </div>
+                            ) : (
+                              /* เกียรตินิยมอันดับ 2 */
+                              <div className="inline-flex items-center gap-1 text-[10px] font-extrabold text-[#475569] bg-[#f1f5f9] border border-[#e2e8f0] px-2.5 py-0.5 rounded-full shadow-sm">
+                                <span className="text-sm leading-none"></span>
+                                <span>{isEn ? '2nd Class Honors' : 'เกียรตินิยมอันดับ 2'}</span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* ข้อมูล คณะ และ สาขา */}
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="text-[13px] font-bold text-slate-800 leading-tight">
+                            {getEducationLabel('faculty', e.faculty, isEn)}
+                            {e.major && ` (${isEn ? 'Major' : 'สาขา'}: ${e.major})`}
+                          </div>
+                          <span className="shrink-0 inline-block text-[10px] text-[#f97316] bg-[#fef4eb] font-bold px-2 py-0.5 rounded-full">
+                            {getEducationLabel('educationLevel', e.educationLevel, isEn)}
+                          </span>
                         </div>
-                        <div className="flex flex-col">
-                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{isEn ? 'GPA' : 'เกรดเฉลี่ย (GPA)'}</span>
-                          <span className="text-[11px] font-bold text-[#f97316]">{e.gpa || '-'}</span>
+
+                        <div className="text-[11px] text-slate-500 mt-1 font-medium">
+                          {e.institution} {e.graduationYear ? `(${e.graduationYear})` : ''}
+                        </div>
+
+                        {/* ข้อมูล วุฒิปริญญา & เกรดเฉลี่ย */}
+                        <div className="mt-2 grid grid-cols-2 gap-2 bg-slate-50/70 p-2 rounded-xl border border-slate-100">
+                          <div className="flex flex-col">
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{isEn ? 'Degree' : 'วุฒิปริญญา'}</span>
+                            <span className="text-[11px] font-semibold text-slate-700 truncate">{e.degreeName || '-'}</span>
+                          </div>
+
+                          <div className="flex flex-col">
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{isEn ? 'GPA' : 'เกรดเฉลี่ย (GPA)'}</span>
+                            <span className="text-[11px] font-bold text-[#f97316]">{e.gpa || '-'}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <button
@@ -1043,7 +1075,6 @@ export default function ProfileFullPage() {
               )}
             </div>
           </div>
-
           {/* Card 3: Work History */}
           <div className="bg-white rounded-4xl p-6 shadow-sm flex flex-col border border-slate-100/50 drop-shadow-lg">
             <div className="flex items-start justify-between mb-4">
@@ -1151,7 +1182,7 @@ export default function ProfileFullPage() {
             <div className="mt-auto">
               {((languages && languages.length > 0) || (languageTests && languageTests.length > 0)) ? (
                 <div className="pt-4 border-t border-slate-100 space-y-4">
-                  
+
                   {/* 1. ส่วนแสดงทักษะภาษาหลัก */}
                   {languages && languages.map((l: any) => (
                     <div key={l.id} className="p-3 bg-slate-50 rounded-2xl border border-slate-100/70">
@@ -1211,21 +1242,21 @@ export default function ProfileFullPage() {
                       <div className="flex justify-between items-center pb-1 border-b border-blue-100/40">
                         <span className="font-bold text-blue-800">{isEn ? 'Language Test Result' : 'ผลการทดสอบทางภาษา'}</span>
                       </div>
-                      
+
                       {tEntry.testName && (
                         <div className="flex justify-between">
                           <span className="text-slate-400">{isEn ? 'Test:' : 'การทดสอบ:'}</span>
                           <span className="font-medium text-slate-700">{tEntry.testName}</span>
                         </div>
                       )}
-                      
+
                       {tEntry.score && (
                         <div className="flex justify-between items-center">
                           <span className="text-slate-400">{isEn ? 'Score:' : 'คะแนนที่ได้:'}</span>
                           <span className="font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">{tEntry.score}</span>
                         </div>
                       )}
-                      
+
                       {tEntry.fileUrl && (
                         <div className="flex items-center justify-between pt-1 min-w-0 w-full">
                           <span className="text-slate-400 shrink-0">{isEn ? 'Attachment:' : 'เอกสารแนบ:'}</span>
@@ -1423,15 +1454,15 @@ export default function ProfileFullPage() {
             </div>
           </div>
 
-           {/* ==================== 🏆 ✨ Card 7: Certificates (การ์ดแถวยาวเต็มความกว้าง) ==================== */}
+          {/* ==================== 🏆 ✨ Card 7: Certificates (การ์ดแถวยาวเต็มความกว้าง) ==================== */}
           <div className="col-span-1 lg:col-span-3 w-full bg-white rounded-4xl p-6 shadow-sm border border-slate-100/50 drop-shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-6">
-            
+
             {/* ฝั่งซ้าย: ไอคอน และ ข้อมูลรายชื่อใบเซอร์ */}
             <div className="flex items-start gap-4 flex-1">
               <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
                 <Award className="w-5 h-5" />
               </div>
-              
+
               <div className="flex-1 min-w-0">
                 <h3 className="font-bold text-slate-800 text-[17px] mb-1">
                   {locale === 'th' ? 'ใบประกาศนียบัตร / เกียรติบัตร' : 'Certificates & Awards'}
@@ -1487,6 +1518,6 @@ export default function ProfileFullPage() {
         </div> {/* ปิด Container หลักของกลุ่ม Card */}
       </div> {/* ปิด Layout Wrapper ชั้นนอก */}
       <Footer />
-    </div> 
+    </div>
   );
 }         

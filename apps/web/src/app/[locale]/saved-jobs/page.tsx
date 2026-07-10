@@ -284,7 +284,7 @@ export default function SavedJobsPage() {
             )}
 
             {/* Job Cards */}
-            <div className="flex-1 min-w-0"> {/* เพิ่มคลาสให้ยืดหยุ่น */}
+            <div className="flex-1 min-w-0">
               {!loading && filteredJobs.length > 0 && (
                 <div className="space-y-3">
                   {filteredJobs.map((job) => (
@@ -292,8 +292,8 @@ export default function SavedJobsPage() {
                       key={job.id}
                       onClick={() => setSelectedJob(job)}
                       className={`w-full text-left bg-white border-2 rounded-2xl p-5 transition-all hover:drop-shadow-md cursor-pointer group ${selectedJob?.id === job.id
-                          ? 'border-[#020263] ring-2 ring-[#020263]/10'
-                          : 'border-gray-200 hover:border-[#020263]/40'
+                        ? 'border-[#020263] ring-2 ring-[#020263]/10'
+                        : 'border-gray-200 hover:border-[#020263]/40'
                         }`}
                     >
                       <div className="flex gap-4 items-start">
@@ -353,161 +353,161 @@ export default function SavedJobsPage() {
                 </div>
               )}
             </div>
+          </div>
 
-            {/* ═══ RIGHT: JOB DETAIL (สำหรับจอใหญ่แสดงแบบเดิม / สำหรับจอเล็กสลับเป็น Mobile Sheet Drawer) ═══ */}
-            {selectedJob && (
-              // [แก้ไข]: เพิ่ม touch-none บนโมบายโหมด เพื่อกันการลากเลื่อนพื้นหลังผ่านขอบจอ
-              <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs lg:static lg:bg-transparent lg:backdrop-blur-none lg:z-auto lg:block w-full lg:w-[380px] shrink-0 flex items-end lg:items-start justify-center p-0 lg:p-0 transition-opacity overscroll-none">
-                {/* พื้นหลังข้างหลังกดปิดได้เมื่ออยู่บนจอเล็ก */}
-                <div className="absolute inset-0 lg:hidden" onClick={() => setSelectedJob(null)} />
+          {/* ═══ RIGHT: JOB DETAIL (สลับโหมดเฉพาะความกว้างหน้าจอไม่เกิน 700px เท่านั้น) ═══ */}
+          {selectedJob && (
+            <div className="max-[700px]:fixed max-[700px]:inset-0 max-[700px]:z-50 max-[700px]:bg-black/40 max-[700px]:backdrop-blur-xs max-[700px]:flex max-[700px]:items-end max-[700px]:justify-center max-[700px]:p-0 max-[700px]:touch-none max-[700px]:overscroll-none min-[701px]:static min-[701px]:bg-transparent min-[701px]:backdrop-blur-none min-[701px]:z-auto min-[701px]:block w-full min-[701px]:w-[420px] xl:w-[480px] shrink-0 transition-opacity">
+              {/* พื้นหลังข้างหลังกดปิดได้เมื่ออยู่บนจอเล็กกว่าหรือเท่ากับ 700px */}
+              <div className="absolute inset-0 min-[701px]:hidden" onClick={() => setSelectedJob(null)} />
 
-                {/* [แก้ไข]: ปรับเพิ่ม overscroll-contain เพื่อตัดการส่งต่อ scroll ไปยังด้านหลัง */}
-                <div className="bg-white rounded-t-3xl lg:rounded-2xl border border-gray-200 sticky lg:top-6 overflow-hidden w-full max-h-[85vh] lg:max-h-none flex flex-col relative z-10 shadow-xl lg:shadow-none animate-slide-up lg:animate-none overscroll-contain">
+              <div className="bg-white max-[700px]:rounded-t-3xl min-[701px]:rounded-2xl border border-gray-200 min-[701px]:sticky min-[701px]:top-6 overflow-hidden w-full max-[700px]:max-h-[85vh] flex flex-col relative z-10 max-[700px]:shadow-xl min-[701px]:shadow-none max-[700px]:animate-slide-up max-[700px]:overscroll-contain">
 
-                  {/* ปุ่มปิดสำหรับจอมือถือ/จอ 700px */}
-                  <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100 lg:hidden bg-gray-50">
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Detail</span>
+                {/* ปุ่มปิดสำหรับหน้าจอมือถือที่กว้างไม่เกิน 700px */}
+                <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100 min-[701px]:hidden bg-gray-50">
+                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Detail</span>
+                  <button
+                    onClick={() => setSelectedJob(null)}
+                    className="p-1 rounded-full hover:bg-gray-200 text-gray-500 transition-colors"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Header */}
+                <div className="p-5 sm:p-6 border-b border-gray-100">
+                  <div className="flex items-start gap-4">
+                    <CompanyAvatar company={selectedJob.company} size="lg" />
+                    <div className="flex-1 min-w-0">
+                      <h2 className="font-bold text-base sm:text-lg text-[#020263] leading-snug line-clamp-2">
+                        {selectedJob.title}
+                      </h2>
+                      <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
+                        {isVerifiedCompany(selectedJob.company) && (
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                        )}
+                        <p className="text-sm text-gray-500 truncate">{selectedJob.company.name}</p>
+                      </div>
+                      {/* Badges */}
+                      <div className="flex flex-wrap gap-1.5 mt-3">
+                        <span className="text-xs bg-blue-50 text-blue-700 border border-blue-100 px-2.5 py-0.5 rounded-full font-medium">
+                          {t.jobTypes[selectedJob.jobType as keyof typeof t.jobTypes] || selectedJob.jobType}
+                        </span>
+                        <span className="text-xs bg-gray-50 text-gray-600 border border-gray-200 px-2.5 py-0.5 rounded-full font-medium">
+                          {WORK_MODEL_LABEL[selectedJob.workModel] || selectedJob.workModel}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Location + Salary */}
+                  <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-4 text-sm text-gray-600">
+                    {selectedJob.locationProvince && (
+                      <span className="flex items-center gap-1.5">
+                        <svg className="w-4 h-4 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                          <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                        </svg>
+                        {selectedJob.locationProvince}
+                        {selectedJob.locationDistrict ? ` · ${selectedJob.locationDistrict}` : ''}
+                      </span>
+                    )}
+                    <span className="flex items-center gap-1.5 text-orange-500 font-medium">
+                      💰 {salaryText(selectedJob, t)}
+                    </span>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-2 mt-5">
+                    <div className="flex gap-2 flex-1">
+                      <Link
+                        href={`/jobs/${selectedJob.slug}`}
+                        className="flex-1 flex items-center justify-center gap-2 py-3 bg-[#E00016] hover:bg-[#A80010] text-white font-bold rounded-xl transition-colors text-sm"
+                      >
+                        {t.btnApply}
+                      </Link>
+
+                      <Link
+                        href={`/jobs/${selectedJob.slug}`}
+                        target="_blank"
+                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 border-2 border-[#020263] text-[#020263] hover:bg-[#020263] hover:text-white font-bold rounded-xl transition-colors text-sm text-center"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                        <span>{t.btnFullPage}</span>
+                      </Link>
+                    </div>
+
                     <button
-                      onClick={() => setSelectedJob(null)}
-                      className="p-1 rounded-full hover:bg-gray-200 text-gray-500 transition-colors"
+                      onClick={() => handleUnsave(selectedJob.slug)}
+                      title={t.btnUnsave}
+                      className="w-full sm:w-auto flex justify-center items-center p-3 border border-gray-200 rounded-xl text-gray-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-colors"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                      </svg>
+                      <Bookmark className="w-4 h-4 fill-[#E00016] stroke-[#E00016]" />
                     </button>
                   </div>
+                </div>
 
-                  {/* Header */}
-                  <div className="p-5 sm:p-6 border-b border-gray-100">
-                    <div className="flex items-start gap-4">
-                      <CompanyAvatar company={selectedJob.company} size="lg" />
-                      <div className="flex-1 min-w-0">
-                        <h2 className="font-bold text-base sm:text-lg text-[#020263] leading-snug line-clamp-2">
-                          {selectedJob.title}
-                        </h2>
-                        <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
-                          {isVerifiedCompany(selectedJob.company) && (
-                            <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                          )}
-                          <p className="text-sm text-gray-500 truncate">{selectedJob.company.name}</p>
-                        </div>
-                        {/* Badges */}
-                        <div className="flex flex-wrap gap-1.5 mt-3">
-                          <span className="text-xs bg-blue-50 text-blue-700 border border-blue-100 px-2.5 py-0.5 rounded-full font-medium">
-                            {t.jobTypes[selectedJob.jobType as keyof typeof t.jobTypes] || selectedJob.jobType}
-                          </span>
-                          <span className="text-xs bg-gray-50 text-gray-600 border border-gray-200 px-2.5 py-0.5 rounded-full font-medium">
-                            {WORK_MODEL_LABEL[selectedJob.workModel] || selectedJob.workModel}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Location + Salary */}
-                    <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-4 text-sm text-gray-600">
-                      {selectedJob.locationProvince && (
-                        <span className="flex items-center gap-1.5">
-                          <svg className="w-4 h-4 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                            <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
-                          </svg>
-                          {selectedJob.locationProvince}
-                          {selectedJob.locationDistrict ? ` · ${selectedJob.locationDistrict}` : ''}
-                        </span>
-                      )}
-                      <span className="flex items-center gap-1.5 text-orange-500 font-medium">
-                        💰 {salaryText(selectedJob, t)}
-                      </span>
-                    </div>
-
-                    {/* [แก้ไขส่วนนี้]: Action Buttons - ทำให้เป็นแนวตั้งบน Mobile และเป็นแนวนอนบน Desktop */}
-                    <div className="flex flex-col sm:flex-row gap-2 mt-5">
-                      <div className="flex gap-2 flex-1">
-                        <Link
-                          href={`/jobs/${selectedJob.slug}`}
-                          className="flex-1 flex items-center justify-center gap-2 py-3 bg-[#E00016] hover:bg-[#A80010] text-white font-bold rounded-xl transition-colors text-sm"
-                        >
-                          {t.btnApply}
-                        </Link>
-
-                        <Link
-                          href={`/jobs/${selectedJob.slug}`}
-                          target="_blank"
-                          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 border-2 border-[#020263] text-[#020263] hover:bg-[#020263] hover:text-white font-bold rounded-xl transition-colors text-sm text-center"
-                        >
-                          <ExternalLink className="w-3.5 h-3.5 shrink-0" />
-                          <span>{t.btnFullPage}</span>
-                        </Link>
-                      </div>
-
-                      <button
-                        onClick={() => handleUnsave(selectedJob.slug)}
-                        title={t.btnUnsave}
-                        className="w-full sm:w-auto flex justify-center items-center p-3 border border-gray-200 rounded-xl text-gray-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-colors"
-                      >
-                        <Bookmark className="w-4 h-4 fill-[#E00016] stroke-[#E00016]" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Detail Body */}
-                  <div className="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1 lg:max-h-[calc(100vh-420px)]">
-                    {selectedJob.description && (
-                      <div>
-                        <h3 className="font-bold text-[#020263] text-sm mb-2 flex items-center gap-2">
-                          <span className="w-1 h-4 bg-[#E00016] rounded-full inline-block" />
-                          {t.sectionDetail}
-                        </h3>
-                        {selectedJob.description.trimStart().startsWith('<') ? (
-                          <div
-                            className="text-gray-600 text-sm leading-relaxed prose prose-sm max-w-none"
-                            dangerouslySetInnerHTML={{ __html: selectedJob.description }}
-                          />
-                        ) : (
-                          <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
-                            {selectedJob.description}
-                          </p>
-                        )}
-                      </div>
-                    )}
-
-                    {selectedJob.requirements && (
-                      <div>
-                        <h3 className="font-bold text-[#020263] text-sm mb-2 flex items-center gap-2">
-                          <span className="w-1 h-4 bg-[#E00016] rounded-full inline-block" />
-                          {t.sectionRequirements}
-                        </h3>
-                        <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
-                          {selectedJob.requirements}
+                {/* Detail Body */}
+                <div className="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1 min-[701px]:max-h-[calc(100vh-320px)] break-words">
+                  {selectedJob.description && (
+                    <div>
+                      <h3 className="font-bold text-[#020263] text-sm mb-2 flex items-center gap-2">
+                        <span className="w-1 h-4 bg-[#E00016] rounded-full inline-block" />
+                        {t.sectionDetail}
+                      </h3>
+                      {selectedJob.description.trimStart().startsWith('<') ? (
+                        <div
+                          /* 🟢 เพิ่ม break-words และสยบปัญหา scroll แนวนอนของคลาส prose */
+                          className="text-gray-600 text-sm leading-relaxed prose prose-sm max-w-none break-words whitespace-pre-wrap [word-break:break-word]"
+                          dangerouslySetInnerHTML={{ __html: selectedJob.description }}
+                        />
+                      ) : (
+                        /* 🟢 เพิ่ม break-words และปรับเป็น whitespace-pre-wrap เพื่อบังคับตัดคำอย่างสมบูรณ์ */
+                        <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap break-words [word-break:break-word]">
+                          {selectedJob.description}
                         </p>
-                      </div>
-                    )}
+                      )}
+                    </div>
+                  )}
 
-                    {selectedJob.requiredSkills && selectedJob.requiredSkills.length > 0 && (
-                      <div>
-                        <h3 className="font-bold text-[#020263] text-sm mb-2 flex items-center gap-2">
-                          <span className="w-1 h-4 bg-[#E00016] rounded-full inline-block" />
-                          {t.sectionSkills}
-                        </h3>
-                        <div className="flex flex-wrap gap-1.5">
-                          {selectedJob.requiredSkills.map((skill) => (
-                            <span
-                              key={skill}
-                              className="text-xs text-gray-600 bg-gray-50 border border-gray-200 px-3 py-1 rounded-full"
-                            >
-                              {skill}
-                            </span>
-                          ))}
-                        </div>
+                  {selectedJob.requirements && (
+                    <div>
+                      <h3 className="font-bold text-[#020263] text-sm mb-2 flex items-center gap-2">
+                        <span className="w-1 h-4 bg-[#E00016] rounded-full inline-block" />
+                        {t.sectionRequirements}
+                      </h3>
+                      {/* 🟢 เติมท่าตัดคำกันพังตรงส่วนคุณสมบัติด้วยครับ */}
+                      <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap break-words [word-break:break-word]">
+                        {selectedJob.requirements}
+                      </p>
+                    </div>
+                  )}
+
+                  {selectedJob.requiredSkills && selectedJob.requiredSkills.length > 0 && (
+                    <div>
+                      <h3 className="font-bold text-[#020263] text-sm mb-2 flex items-center gap-2">
+                        <span className="w-1 h-4 bg-[#E00016] rounded-full inline-full" />
+                        {t.sectionSkills}
+                      </h3>
+                      <div className="flex flex-wrap gap-1.5">
+                        {selectedJob.requiredSkills.map((skill) => (
+                          <span
+                            key={skill}
+                            className="text-xs text-gray-600 bg-gray-50 border border-gray-200 px-3 py-1 rounded-full break-all"
+                          >
+                            {skill}
+                          </span>
+                        ))}
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
-
 
       <Footer />
     </div>

@@ -19,4 +19,10 @@ export class AdminDashboardController {
   async getStats() {
     return this.adminDashboardService.getStats();
   }
+
+  @Get('reports')
+  @ApiOperation({ summary: 'ดึงข้อมูลสถิติและกราฟสำหรับหน้า Reports (Admin)' })
+  async getReports() {
+    return this.adminDashboardService.getReportStats();
+  }
 }

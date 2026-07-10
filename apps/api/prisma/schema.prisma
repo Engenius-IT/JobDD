@@ -42,6 +42,7 @@ model User {
   languages         UserLanguage[]
   profile           UserProfile?
   workHistories     WorkHistory[]
+  auditLogs         AuditLog[]
 
   @@map("users")
 }
@@ -373,6 +374,26 @@ model Bookmark {
 
   @@unique([employerId, candidateId])
   @@map("bookmarks")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  adminId    String   @map("admin_id") @db.Uuid
+  action     String
+  type       String   // approve, reject, create, update, delete, settings
+  target     String
+  targetType String   @map("target_type") // company, job, user, system
+  details    String?
+  status     String   @default("success") // success, failed
+  ipAddress  String?  @map("ip_address")
+  createdAt  DateTime @default(now()) @map("created_at")
+  admin      User     @relation(fields: [adminId], references: [id])
+
+  @@index([adminId])
+  @@index([type])
+  @@index([targetType])
+  @@index([createdAt])
+  @@map("audit_logs")
 }
 
 model DrivingSkill {

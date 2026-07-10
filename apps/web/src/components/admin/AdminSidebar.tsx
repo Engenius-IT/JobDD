@@ -41,8 +41,8 @@ export function AdminSidebar() {
       icon: <Users className="w-5 h-5" />,
     },
     {
-      label: 'จัดการบริษัท',
-      href: '/admin/companies',
+      label: 'ตรวจสอบเอกสารบริษัท',
+      href: '/admin/companies/verify',
       icon: <Building2 className="w-5 h-5" />,
       badge: 12,
     },

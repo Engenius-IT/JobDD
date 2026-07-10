@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, Building2, CheckCircle2, XCircle, Clock, Eye, ShieldCheck, Check, X } from 'lucide-react';
+import { Search, Building2, CheckCircle2, XCircle, Clock, Eye, ShieldCheck, Check, X, FileSearch } from 'lucide-react';
+import { Link } from '@/i18n/routing';
 import { ToastContainer } from '@/components/admin/Toast';
 
 interface Company {
@@ -188,20 +189,12 @@ export default function CompaniesManagementPage() {
             </div>
             <div className="bg-gray-50 px-6 py-4 border-t border-gray-100">
               {company.status === 'pending' ? (
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleApprove(company.id)}
-                    className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-700 transition-colors"
-                  >
-                    <Check className="w-4 h-4" /> อนุมัติ
-                  </button>
-                  <button
-                    onClick={() => handleReject(company.id)}
-                    className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-red-600 text-white rounded-lg text-sm font-bold hover:bg-red-700 transition-colors"
-                  >
-                    <X className="w-4 h-4" /> ปฏิเสธ
-                  </button>
-                </div>
+                <Link
+                  href="/admin/companies/verify"
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors"
+                >
+                  <FileSearch className="w-4 h-4" /> ไปหน้าตรวจสอบเอกสารจริง
+                </Link>
               ) : (
                 <button className="w-full flex items-center gap-1 justify-center text-blue-600 font-bold text-sm hover:text-blue-700">
                   <Eye className="w-4 h-4" /> ดูรายละเอียด

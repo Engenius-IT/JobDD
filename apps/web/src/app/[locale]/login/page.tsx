@@ -15,9 +15,17 @@ const OAUTH_ERROR_MESSAGES: Record<string, string> = {
 };
 
 function LoginForm() {
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const searchParams = useSearchParams();
   const router = useRouter();
+
+  // Redirect to home if already logged in
+  useEffect(() => {
+    if (user) {
+      const currentLocale = typeof window !== 'undefined' ? window.location.pathname.split('/')[1] || 'th' : 'th';
+      router.replace(`/${currentLocale}`);
+    }
+  }, [user, router]);
 
   /* State สำหรับจัดการ Role (เฉพาะฟอร์มกรอก Password ปกติ) */
   const [role, setRole] = useState<'JOBSEEKER' | 'EMPLOYER'>('JOBSEEKER');

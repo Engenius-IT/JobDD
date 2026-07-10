@@ -1,10 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { VerificationStatus } from '@prisma/client';
+import { VerificationStatus, NotificationType } from '@prisma/client';
+import { NotificationsService } from '../notifications/notifications.service';
+import { AdminAuditLogsService } from './admin-audit-logs.service';
 
 @Injectable()
 export class AdminCompaniesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationsService: NotificationsService,
+    private readonly auditLogsService: AdminAuditLogsService,
+  ) {}
 
   async getPendingCompanies(page: number, limit: number) {
     const skip = (page - 1) * limit;
@@ -42,11 +48,11 @@ export class AdminCompaniesService {
     };
   }
 
-  async verifyCompany(id: string, status: 'VERIFIED' | 'REJECTED', rejectionReason?: string) {
+  async verifyCompany(id: string, status: 'VERIFIED' | 'REJECTED', adminId: string, rejectionReason?: string) {
     const company = await this.prisma.company.findUnique({ where: { id } });
     if (!company) throw new NotFoundException('ไม่พบข้อมูลบริษัท');
 
-    return this.prisma.company.update({
+    const updatedCompany = await this.prisma.company.update({
       where: { id },
       data: {
         verificationStatus: VerificationStatus[status],
@@ -55,5 +61,36 @@ export class AdminCompaniesService {
         verifiedAt: status === 'VERIFIED' ? new Date() : null,
       },
     });
+
+    // ส่งการแจ้งเตือนไปยังเจ้าของบริษัท
+    try {
+      await this.notificationsService.create({
+        userId: company.ownerId,
+        type: NotificationType.GENERAL,
+        title: status === 'VERIFIED' ? '✅ บริษัทของคุณได้รับการยืนยันแล้ว' : '❌ การยืนยันบริษัทไม่สำเร็จ',
+        message: status === 'VERIFIED' 
+          ? `บริษัท ${company.name} ได้รับการยืนยันตัวตนเรียบร้อยแล้ว คุณสามารถลงประกาศงานได้ทันที`
+          : `การยืนยันบริษัท ${company.name} ถูกปฏิเสธ เนื่องจาก: ${rejectionReason || 'เอกสารไม่ครบถ้วน'}`,
+        linkUrl: '/employer/status',
+      });
+    } catch (err) {
+      console.error('Failed to send verification notification:', err);
+    }
+
+    // บันทึก Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        adminId: adminId,
+        action: status === 'VERIFIED' ? 'อนุมัติบริษัท' : 'ปฏิเสธบริษัท',
+        type: status === 'VERIFIED' ? 'approve' : 'reject',
+        target: company.name,
+        targetType: 'company',
+        details: status === 'REJECTED' ? rejectionReason : 'ตรวจสอบเอกสารแล้ว ผ่านการตรวจสอบ',
+      });
+    } catch (err) {
+      console.error('Failed to create audit log:', err);
+    }
+
+    return updatedCompany;
   }
 }

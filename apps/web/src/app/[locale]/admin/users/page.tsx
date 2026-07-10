@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Search, Filter, MoreVertical, Edit2, Trash2, Eye, Loader2 } from 'lucide-react';
 import { ToastContainer } from '@/components/admin/Toast';
+import { Link } from '@/i18n/routing';
 
 interface User {
   id: string;
@@ -45,8 +46,9 @@ export default function UserManagementPage() {
       setLoading(true);
       const token = localStorage.getItem('accessToken');
       const roleParam = filterRole !== 'all' ? `&role=${filterRole}` : '';
+      const searchParam = searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : '';
       const response = await fetch(
-        `${API_URL}/admin/users?page=${page}&limit=${limit}&search=${encodeURIComponent(searchTerm)}${roleParam}`,
+        `${API_URL}/admin/users?page=${page}&limit=${limit}${searchParam}${roleParam}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -233,12 +235,18 @@ export default function UserManagementPage() {
                       </td>
                       <td className="px-6 py-4 text-sm">
                         <div className="flex items-center gap-2">
-                          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                          <Link 
+                            href={`/admin/users/${user.id}`}
+                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                          >
                             <Eye className="w-4 h-4 text-gray-600" />
-                          </button>
-                          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                          </Link>
+                          <Link 
+                            href={`/admin/users/${user.id}`}
+                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                          >
                             <Edit2 className="w-4 h-4 text-gray-600" />
-                          </button>
+                          </Link>
                           <button
                             onClick={() => handleDelete(user.id)}
                             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
