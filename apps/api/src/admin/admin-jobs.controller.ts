@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Patch, Delete, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { AdminJobsService } from './admin-jobs.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -35,7 +35,8 @@ export class AdminJobsController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'ลบงาน (Admin)' })
-  async deleteJob(@Param('id') id: string) {
-    return this.adminJobsService.deleteJob(id);
+  async deleteJob(@Param('id') id: string, @Request() req: any) {
+    const adminId = req.user.id;
+    return this.adminJobsService.deleteJob(id, adminId);
   }
 }

@@ -1,10 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { UserRole } from '@prisma/client';
+import { AdminAuditLogsService } from './admin-audit-logs.service';
 
 @Injectable()
 export class AdminUsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly auditLogsService: AdminAuditLogsService,
+  ) {}
 
   async getAllUsers(page: number, limit: number, searchTerm?: string, role?: UserRole) {
     const skip = (page - 1) * limit;
@@ -55,10 +58,26 @@ export class AdminUsersService {
     };
   }
 
-  async deleteUser(id: string) {
+  async deleteUser(id: string, adminId: string) {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) throw new NotFoundException('ไม่พบข้อมูลผู้ใช้');
 
-    return this.prisma.user.delete({ where: { id } });
+    const deleted = await this.prisma.user.delete({ where: { id } });
+
+    // บันทึก Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        adminId: adminId,
+        action: 'ลบผู้ใช้',
+        type: 'delete',
+        target: user.email,
+        targetType: 'user',
+        details: `ลบผู้ใช้ ID: ${id} (${user.firstName} ${user.lastName})`,
+      });
+    } catch (err) {
+      console.error('Failed to create audit log:', err);
+    }
+
+    return deleted;
   }
 }

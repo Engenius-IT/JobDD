@@ -139,9 +139,12 @@ export default function AdminDashboardPage() {
                 <p className="text-xs text-gray-500">กรุณาตรวจสอบความถูกต้องของใบอนุญาต</p>
               </div>
             </div>
-            <button className="px-4 py-2 bg-yellow-600 text-white rounded-lg text-sm font-medium">
+            <a 
+              href="/admin/companies/verify"
+              className="px-4 py-2 bg-yellow-600 text-white rounded-lg text-sm font-medium hover:bg-yellow-700 transition-colors"
+            >
               ตรวจสอบเลย
-            </button>
+            </a>
           </div>
         </div>
 

@@ -1,4 +1,4 @@
-import { Controller, Get, Delete, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Delete, Param, Query, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { AdminUsersService } from './admin-users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -27,7 +27,8 @@ export class AdminUsersController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'ลบผู้ใช้ (Admin)' })
-  async deleteUser(@Param('id') id: string) {
-    return this.adminUsersService.deleteUser(id);
+  async deleteUser(@Param('id') id: string, @Request() req: any) {
+    const adminId = req.user.id;
+    return this.adminUsersService.deleteUser(id, adminId);
   }
 }
