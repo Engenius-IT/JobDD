@@ -1074,8 +1074,8 @@
         }
       },
       "regional": {
-        "title": "Candidates by Region",
-        "subtitle": "Search candidates by region across Thailand",
+        "title": "Employers by Region",
+        "subtitle": "Search for employers in regions across Thailand",
         "items": {
           "bangkok": "Bangkok & Vicinity",
           "central": "Central Thailand",
@@ -1473,54 +1473,6 @@
       "thu": "Thu",
       "fri": "Fri",
       "sat": "Sat"
-<<<<<<< HEAD
-    },
-    "months": {
-      "january": "January",
-      "february": "February",
-      "march": "March",
-      "april": "April",
-      "may": "May",
-      "june": "June",
-      "july": "July",
-      "august": "August",
-      "september": "September",
-      "october": "October",
-      "november": "November",
-      "december": "December"
-    },
-    "verificationBanner": {
-      "verificationRejectedTitle": "Company Verification Failed",
-      "reason": "Reason",
-      "verificationRejectedDefaultReason": "The submitted documents are invalid or unclear. Please review and upload the required documents again.",
-      "resubmitDocuments": "Resubmit Documents",
-      "verificationPendingTitle": "Verification in Progress",
-      "verificationPendingDescription": "Your company has successfully submitted the verification documents. Our administrators are reviewing them, which may take 1-2 business days.",
-      "verificationRequiredTitle": "Account Not Verified",
-      "verificationRequiredDescription1": "Please upload",
-      "verificationRequiredDocument1": "Certificate of Incorporation",
-      "verificationRequiredOr": "or",
-      "verificationRequiredDocument2": "VAT Registration (PP.20)",
-      "verificationRequiredDescription2": "to verify your company.",
-      "verificationRequiredDescription3": "After approval, you will be able to",
-      "verificationRequiredHighlight": "publish job postings",
-      "verificationRequiredDescription4": "and access all platform features.",
-      "startVerification": "Start Verification Now",
-      "noInterviewSelectedDay": "No interviews on the selected day",
-      "noInterviewTodayHint": "No interviews today · Click a marked date to view details",
-      "noInterview": "No interviews scheduled"
-    },
-    "companyEdit": {
-      "title": "Edit Company Information",
-      "logoTitle": "Company Logo",
-      "logoUploadLabel": "Change Logo",
-      "logoDescriptionLine1": "Upload your company logo to increase credibility",
-      "logoDescriptionLine2": "Supports JPG, PNG, WEBP up to 5MB",
-      "uploadFailed": "Failed to upload image",
-      "backgroundTitle": "Company Background",
-      "noBackground": "No background image",
-      "changeBackground": "Change Background Image"
-=======
   },
   "months": {
     "january": "January",
@@ -1613,7 +1565,6 @@
     "unknownEmail": "Email not specified",
     "positionLabel": "Interested Position",
     "unknownPosition": "Position not specified"
->>>>>>> 1918021babc837f908a7cfaac903c0d409664548
     }
   }
 }
