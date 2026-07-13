@@ -117,7 +117,6 @@ const TEST_NAMES = [
   'DELF/DALF',
   'TestDaF',
   'DELE',
-  'อื่นๆ',
 ];
 
 const translations = {

@@ -171,6 +171,8 @@ const getLanguageLabel = (key: 'language' | 'level', value: string | undefined, 
       'ภาษาลาว': 'Lao',
       'ไทย': 'Thai',
       'อังกฤษ': 'English',
+      'อื่นๆ': 'Other',
+      
     },
     level: {
       'เบื้องต้น': 'Basic',
@@ -240,7 +242,10 @@ const getProfileValueLabel = (key: string, value: string | undefined, isEn: bool
       'คริสต์': 'Christianity',
       'อิสลาม': 'Islam',
       'ฮินดู': 'Hinduism',
-      'อื่นๆ' : 'Other',
+      'ซิกข์' : 'Sikhism',
+      'ไม่นับถือศาสนา' : 'None',
+      'อื่น ๆ' : 'Other',
+
     }
   };
 

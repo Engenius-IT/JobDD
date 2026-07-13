@@ -178,7 +178,7 @@ export default function ProfilePage() {
       'โปรดเลือก': 'Please select',
       'ชาย': 'Male',
       'หญิง': 'Female',
-      'อื่นๆ': 'Other',
+      'นอนไบนารี่': 'Non-Binary',
       'เบอร์โทรศัพท์มือถือ': 'Mobile Phone Number',
       'LINE ID': 'LINE ID',
       '(ไม่บังคับ)': '(Optional)',
@@ -910,14 +910,18 @@ export default function ProfilePage() {
               <div className="relative">
                 <select
                   name="gender"
-                  value={form.gender}
+                  // 🚀 สกัดบั๊กค่านัล: ถ้าใน database ส่งค่ามาเป็น null ให้สลับร่างเป็นค่าว่าง "" เพื่อให้ตรงกับ option โปรดระบุ
+                  value={form.gender ?? ""}
                   onChange={handleChange}
                   className="w-full appearance-none bg-gray-100 border border-gray-300 text-gray-700 py-2.5 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
                 >
-                  <option value="">{t('โปรดเลือก')}</option>
+                  {/* 🌟 ปรับเป็นคำว่า "โปรดระบุ" และทำหน้าที่เป็น Placeholder (disabled + hidden) */}
+                  <option value="" disabled hidden>
+                    {t('โปรดระบุ')}
+                  </option>
                   <option value="male">{t('ชาย')}</option>
                   <option value="female">{t('หญิง')}</option>
-                  <option value="other">{t('อื่นๆ')}</option>
+                  <option value="non-Binary">{t('นอนไบนารี่')}</option>
                 </select>
                 <ChevronDown className="absolute right-2 top-3 w-4 h-4 text-gray-400 pointer-events-none" />
               </div>
@@ -984,11 +988,15 @@ export default function ProfilePage() {
               <div className="relative">
                 <select
                   name="religion"
-                  value={form.religion}
+                  // 🚀 สกัดบั๊กค่านัล: ถ้าใน database ส่งค่ามาเป็น null ให้สลับร่างเป็นค่าว่าง "" เพื่อให้แสดงคำว่า "โปรดระบุ" ทันที
+                  value={form.religion ?? ""}
                   onChange={handleChange}
                   className="w-full appearance-none bg-gray-100 border border-gray-300 text-gray-700 py-2.5 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
                 >
-                  <option value="">{t('โปรดเลือก')}</option>
+                  {/* 🌟 ปรับเป็นคำว่า "โปรดระบุ" และทำหน้าที่เป็น Placeholder (disabled + hidden) */}
+                  <option value="" disabled hidden>
+                    {t('โปรดระบุ')}
+                  </option>
                   <option value="พุทธ">{t('พุทธ')}</option>
                   <option value="คริสต์">{t('คริสต์')}</option>
                   <option value="อิสลาม">{t('อิสลาม')}</option>
@@ -1014,8 +1022,7 @@ export default function ProfilePage() {
                   onChange={handleChange}
                   className="w-full appearance-none bg-gray-100 border border-gray-300 text-gray-700 py-2.5 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
                 >
-                  {/* 🌟 ตัวเลือกแรกสุดทำหน้าที่เหมือน Placeholder ครับ */}
-                  {/* disabled ยิงให้กดเลือกซ้ำไม่ได้ และ hidden แอบไว้ตอนกดเปิดดู เพื่อความเนี๊ยบ */}
+
                   <option value="" disabled hidden>
                     {t('โปรดระบุ')}
                   </option>
