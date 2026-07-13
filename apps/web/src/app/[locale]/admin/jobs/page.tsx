@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useLocale } from 'next-intl';
-import { Search, Briefcase, CheckCircle2, XCircle, Clock, Eye, Filter, Check, X, MapPin, DollarSign, Loader2 } from 'lucide-react';
+import { Search, Briefcase, CheckCircle2, XCircle, Clock, Eye, Filter, Check, X, MapPin, DollarSign, Loader2, Edit } from 'lucide-react';
 import { ToastContainer } from '@/components/admin/Toast';
 
 interface Job {
@@ -263,8 +263,16 @@ export default function JobManagementPage() {
                             href={`/${locale}/jobs/${job.slug}`}
                             target="_blank"
                             className="p-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-200 transition-all"
+                            title="ดู"
                           >
                             <Eye className="w-4 h-4" />
+                          </a>
+                          <a 
+                            href={`/${locale}/admin/jobs/${job.id}/edit`}
+                            className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-all"
+                            title="แก้ไข"
+                          >
+                            <Edit className="w-4 h-4" />
                           </a>
                           <button
                             onClick={() => handleDelete(job.id)}
