@@ -623,11 +623,13 @@ export function HeroSearch({ onSearch, initialValues }: HeroSearchProps = {}) {
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
+                  <rect x="2" y="6" width="20" height="12" rx="2" strokeWidth={2} />
+                  <circle cx="12" cy="12" r="2" strokeWidth={2} />
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V7m0 1v8m0 0v1m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                    d="M6 12h.01M18 12h.01"
                   />
                 </svg>
                 <span className="truncate max-w-[140px]">
