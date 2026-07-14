@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from '@/i18n/routing';
 import { useAuth } from '@/context/AuthContext';
+import { usePackage } from '@/hooks/usePackage';
 import { Navbar } from '@/components/Navbar';
 import { CompanyLogo } from '@/components/CompanyLogo';
 import {
@@ -19,6 +20,7 @@ import {
   Rocket,
   Search,
   History,
+  Crown,
 } from 'lucide-react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
@@ -195,18 +197,128 @@ function EngagementCard({
 }
 
 /* ---------- Premium Upgrade Card ---------- */
-function PremiumCard() {
+function PremiumCard({ onUpgradeClick }: { onUpgradeClick: () => void }) {
   return (
-    <div className="relative bg-[#020263] rounded-xl p-6 overflow-hidden">
+    <div className="relative bg-[#020263] rounded-xl p-6 overflow-hidden shadow-sm">
       {/* Rocket watermark */}
       <Rocket className="absolute -bottom-3 -right-3 w-24 h-24 text-[#00003D] opacity-40 rotate-12 pointer-events-none" />
       <h3 className="font-bold text-white text-sm mb-1.5 relative z-10">อัปเกรดเป็นพรีเมียม</h3>
       <p className="text-[#A5CBE5] text-xs leading-relaxed relative z-10">
         รับการแสดงผลที่มากขึ้น 3 เท่า และเครื่องมือวิเคราะห์ขั้นสูง
       </p>
-      <button className="relative z-10 mt-4 w-full py-2.5 bg-white text-[#020263] font-semibold text-sm rounded-full hover:bg-gray-50 transition-colors">
+      <button 
+        onClick={onUpgradeClick}
+        className="relative z-10 mt-4 w-full py-2.5 bg-white text-[#020263] font-semibold text-sm rounded-full hover:bg-gray-50 transition-all hover:scale-[1.02] active:scale-98 shadow-sm"
+      >
         ดูแพ็กเกจทั้งหมด
       </button>
+    </div>
+  );
+}
+
+/* ---------- Active Package Card ---------- */
+function ActivePackageCard({ packageInfo, onManageClick }: { packageInfo: any; onManageClick: () => void }) {
+  const isVip = packageInfo?.name === 'VIP';
+  const isPremium = packageInfo?.name === 'Premium';
+  const isPro = packageInfo?.name === 'Pro';
+
+  // Format end date
+  const formatDate = (dateStr: string) => {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
+  };
+
+  const totalCredits = packageInfo?.acQuotaTotal ?? 0;
+  const usedCredits = packageInfo?.acQuotaUsed ?? 0;
+  const remainingCredits = Math.max(0, totalCredits - usedCredits);
+
+  // Background and style definitions based on the package tier
+  let cardClass = 'bg-white border-gray-100 text-slate-800 shadow-sm';
+  let badgeClass = 'bg-gray-100 text-gray-700';
+  let textColorClass = 'text-gray-500';
+  let iconClass = 'bg-gray-100 text-gray-500';
+  let buttonClass = 'bg-gray-100 text-gray-700 hover:bg-gray-200';
+
+  if (isVip) {
+    cardClass = 'bg-gradient-to-br from-rose-900 via-red-950 to-[#020263] text-white border-red-800/40 shadow-xl shadow-rose-950/20';
+    badgeClass = 'bg-gradient-to-r from-rose-500 via-red-600 to-rose-700 text-white border border-white/20 font-black shadow-md tracking-wider';
+    textColorClass = 'text-rose-200';
+    iconClass = 'bg-rose-500/20 text-rose-300';
+    buttonClass = 'bg-white/10 hover:bg-white/20 text-white border border-white/10';
+  } else if (isPremium) {
+    cardClass = 'bg-gradient-to-br from-slate-900 via-[#03034f] to-[#01013a] text-white border-blue-900/50 shadow-xl shadow-blue-950/30';
+    badgeClass = 'bg-[#020263] border border-blue-400 text-blue-100 font-black shadow-md tracking-wider';
+    textColorClass = 'text-blue-200';
+    iconClass = 'bg-blue-500/20 text-blue-300';
+    buttonClass = 'bg-white/10 hover:bg-white/20 text-white border border-white/10';
+  } else if (isPro) {
+    cardClass = 'bg-gradient-to-br from-amber-50/70 via-white to-white text-slate-800 border-amber-200/50 shadow-lg';
+    badgeClass = 'bg-gradient-to-r from-amber-500 to-yellow-600 text-white font-black shadow-sm tracking-wider';
+    textColorClass = 'text-amber-800/80';
+    iconClass = 'bg-amber-100 text-amber-600 border border-amber-200/50';
+    buttonClass = 'bg-amber-600 hover:bg-amber-700 text-white shadow-sm';
+  }
+
+  return (
+    <div className={`relative rounded-xl p-6 overflow-hidden border transition-all duration-300 ${cardClass}`}>
+      {/* Background radial highlight for VIP/Premium */}
+      {(isVip || isPremium) && (
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl pointer-events-none" />
+      )}
+      
+      <div className="relative z-10 flex flex-col gap-4">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${iconClass}`}>
+              <Crown className="w-4 h-4" />
+            </div>
+            <div>
+              <span className={`text-[10px] uppercase font-black px-2 py-0.5 rounded-full ${badgeClass}`}>
+                {packageInfo?.name} MEMBER
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Quota details */}
+        <div className="space-y-2 mt-1">
+          <div className="flex justify-between text-xs">
+            <span className={isVip || isPremium ? 'text-slate-300' : 'text-gray-500'}>โควตาการลงงาน (Active Credits)</span>
+            <span className="font-bold">{remainingCredits} / {totalCredits} AC เหลืออยู่</span>
+          </div>
+          {/* Progress bar */}
+          <div className="w-full h-1.5 bg-gray-200/20 rounded-full overflow-hidden">
+            <div 
+              className={`h-full rounded-full transition-all duration-500 ${
+                isVip ? 'bg-gradient-to-r from-rose-400 to-red-500' : 
+                isPremium ? 'bg-blue-400' : 'bg-amber-500'
+              }`}
+              style={{ width: `${totalCredits > 0 ? (remainingCredits / totalCredits) * 100 : 0}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Expiration date */}
+        {packageInfo?.endDate && (
+          <div className="flex items-center gap-1.5 text-xs">
+            <span className={isVip || isPremium ? 'text-rose-200/80' : 'text-gray-500'}>
+              แพ็กเกจจะหมดอายุวันที่:
+            </span>
+            <span className="font-semibold">
+              {formatDate(packageInfo.endDate)}
+            </span>
+          </div>
+        )}
+
+        <button
+          onClick={onManageClick}
+          className={`w-full py-2 px-4 rounded-full text-xs font-semibold transition-all hover:scale-[1.01] active:scale-99 ${buttonClass}`}
+        >
+          ดูรายละเอียดแพ็กเกจ
+        </button>
+      </div>
     </div>
   );
 }
@@ -249,6 +361,7 @@ export default function EmployerJobsPage() {
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState('newest'); // <-- Added Sort State
   // --- เพิ่ม State สำหรับ Search History ---
+  const { packageInfo, isLoading: loadingPackage } = usePackage();
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -830,7 +943,18 @@ export default function EmployerJobsPage() {
                 </div>
                 <BarChart />
               </div>
-              <PremiumCard />
+              
+              {/* Dynamic Subscription Banner */}
+              {loadingPackage ? (
+                <div className="h-32 w-full bg-slate-100 rounded-xl animate-pulse" />
+              ) : packageInfo && packageInfo.name !== 'Free Plan' ? (
+                <ActivePackageCard 
+                  packageInfo={packageInfo} 
+                  onManageClick={() => router.push('/employer/packages')} 
+                />
+              ) : (
+                <PremiumCard onUpgradeClick={() => router.push('/employer/packages')} />
+              )}
             </div>
           </div>
         )}
