@@ -265,8 +265,8 @@ const getEducationLabel = (key: string, value: string | undefined, isEn: boolean
 
   const translations: Record<string, Record<string, string>> = {
     educationLevel: {
-      'มัธยมศึกษาตอนต้น': 'Lower Secondary School',
-      'มัธยมศึกษาตอนปลาย': 'Upper Secondary School',
+      'ต่ำกว่ามัธยมศึกษาตอนปลาย': 'Below High School',
+      'มัธยมศึกษาตอนปลาย': 'High School',
       'ปวช.': 'Certificate of Vocational Education (Voc. Cert.)',
       'ปวส.': 'Diploma of Vocational Education (High Voc. Cert.)',
       'ปริญญาตรี': "Bachelor's Degree",

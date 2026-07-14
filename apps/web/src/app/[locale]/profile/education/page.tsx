@@ -127,18 +127,6 @@ interface EducationEntry {
   honors_level?: string | null;
 }
 
-interface SavedEducationEntry {
-  id: string;
-  institution: string;
-  faculty: string;
-  major: string;
-  educationLevel: string;
-  degreeName: string;
-  graduationYear: number | null;
-  gpa: number | null;
-  hasHonors: boolean;
-  honors_level?: string;
-}
 
 function createEntry(): EducationEntry {
   return {

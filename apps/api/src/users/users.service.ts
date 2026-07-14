@@ -57,49 +57,60 @@ export class UsersService {
     }
 
     async upsertProfile(userId: string, dto: UpdateProfileDto) {
-        const userExists = await this.prisma.user.findUnique({ where: { id: userId } });
-        if (!userExists) {
-            throw new NotFoundException('ไม่พบผู้ใช้ กรุณาออกจากระบบแล้วเข้าสู่ระบบใหม่');
-        }
-
-        const data: any = {
-            gender: dto.gender,
-            phone: dto.phone,
-            lineId: dto.lineId,
-            nationality: dto.nationality,
-            maritalStatus: dto.maritalStatus,
-            militaryStatus: dto.militaryStatus,
-            address: dto.address,
-            province: dto.province,
-            district: dto.district,
-            subDistrict: dto.subDistrict,
-            postalCode: dto.postalCode,
-            experience: dto.experience !== undefined ? Number(dto.experience) : undefined,
-            religion: dto.religion,
-            expectedSalary: dto.expectedSalary !== undefined ? Number(dto.expectedSalary) : undefined,
-        };
-
-        if (dto.isPublic !== undefined) {
-            data.isPublic = dto.isPublic;
-        }
-
-        if (dto.birthDate) {
-            data.birthDate = new Date(dto.birthDate);
-        }
-        if (dto.height !== undefined && dto.height !== null) {
-            data.height = dto.height;
-        }
-        if (dto.weight !== undefined && dto.weight !== null) {
-            data.weight = dto.weight;
-        }
-
-        const profile = await this.prisma.userProfile.upsert({
-            where: { userId },
-            create: { userId, ...data },
-            update: data,
-        });
-        return profile;
+    const userExists = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!userExists) {
+        throw new NotFoundException('ไม่พบผู้ใช้ กรุณาออกจากระบบแล้วเข้าสู่ระบบใหม่');
     }
+
+    // 🛠️ 1. เพิ่มตรงนี้: อัปเดตชื่อ-นามสกุลลงตาราง User หลัก
+    // (หมายเหตุ: พี่อิงตามฝั่ง Frontend ที่ดึงข้อมูลจาก user.firstName[cite: 1] คาดว่าฟิลด์ใน Schema Prisma ของน้องจะเป็นแบบ CamelCase นะครับ)
+    await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+            firstName: dto.first_name, // หากใน schema.prisma ใช้ตัวพิมพ์เล็กมีขีด ให้เปลี่ยนเป็น first_name: dto.first_name
+            lastName: dto.last_name,   // หากใน schema.prisma ใช้ตัวพิมพ์เล็กมีขีด ให้เปลี่ยนเป็น last_name: dto.last_name
+        },
+    });
+
+    // 2. ข้อมูลสำหรับตาราง userProfile (โค้ดเดิมของน้องทั้งหมด)
+    const data: any = {
+        gender: dto.gender,
+        phone: dto.phone,
+        lineId: dto.lineId,
+        nationality: dto.nationality,
+        maritalStatus: dto.maritalStatus,
+        militaryStatus: dto.militaryStatus,
+        address: dto.address,
+        province: dto.province,
+        district: dto.district,
+        subDistrict: dto.subDistrict,
+        postalCode: dto.postalCode,
+        experience: dto.experience !== undefined ? Number(dto.experience) : undefined,
+        religion: dto.religion,
+        expectedSalary: dto.expectedSalary !== undefined ? Number(dto.expectedSalary) : undefined,
+    };
+
+    if (dto.isPublic !== undefined) {
+        data.isPublic = dto.isPublic;
+    }
+
+    if (dto.birthDate) {
+        data.birthDate = new Date(dto.birthDate);
+    }
+    if (dto.height !== undefined && dto.height !== null) {
+        data.height = dto.height;
+    }
+    if (dto.weight !== undefined && dto.weight !== null) {
+        data.weight = dto.weight;
+    }
+
+    const profile = await this.prisma.userProfile.upsert({
+        where: { userId },
+        create: { userId, ...data },
+        update: data,
+    });
+    return profile;
+}
 
     // ===================================
     // Desired Provinces (สถานที่ที่ต้องการทำงาน)

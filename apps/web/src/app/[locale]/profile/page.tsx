@@ -527,24 +527,26 @@ export default function ProfilePage() {
     }
 
     const body = {
-      birthDate,
-      height: form.height !== '' ? Number(form.height) : null,
-      weight: form.weight !== '' ? Number(form.weight) : null,
-      gender: form.gender || null,
-      phone: form.phone || null,
-      lineId: form.lineId || null,
-      experience: form.experience !== '' ? Number(form.experience) : 0,
-      nationality: form.nationality || null,
-      maritalStatus: form.maritalStatus || null,
-      militaryStatus: form.militaryStatus || null,
-      address: form.address || null,
-      province: form.province || null,
-      district: form.district || null,
-      subDistrict: form.subDistrict || null,
-      postalCode: form.postalCode || null,
-      religion: form.religion || null,
-      expectedSalary: form.expectedSalary !== '' ? Number(form.expectedSalary) : null,
-    };
+  first_name: firstName.trim(), // ดึงจาก State และลบช่องว่างหัว-ท้าย
+  last_name: lastName.trim(),   // ดึงจาก State และลบช่องว่างหัว-ท้าย
+  birthDate,
+  height: form.height !== '' ? Number(form.height) : null,
+  weight: form.weight !== '' ? Number(form.weight) : null,
+  gender: form.gender || null,
+  phone: form.phone || null,
+  lineId: form.lineId || null,
+  experience: form.experience !== '' ? Number(form.experience) : 0,
+  nationality: form.nationality || null,
+  maritalStatus: form.maritalStatus || null,
+  militaryStatus: form.militaryStatus || null,
+  address: form.address || null,
+  province: form.province || null,
+  district: form.district || null,
+  subDistrict: form.subDistrict || null,
+  postalCode: form.postalCode || null,
+  religion: form.religion || null,
+  expectedSalary: form.expectedSalary !== '' ? Number(form.expectedSalary) : null,
+};
 
     try {
       const res = await fetch(`${API_URL}/users/me/profile`, {
