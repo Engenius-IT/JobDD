@@ -156,7 +156,7 @@ interface Company {
   rejectionReason?: string;
 }
 
-const SIZE_OPTIONS = ['1 - 10 คน', '10 - 30 คน', '30 - 100 คน', '100 - 500 คน', '500+ คน'];
+const SIZE_RANGES = ['1 - 10', '10 - 30', '30 - 100', '100 - 500', '500+'];
 
 interface InterviewItem {
   id: string;
@@ -384,7 +384,8 @@ function CompanyEditModal({
   const [form, setForm] = useState<Company>({ ...company });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-
+  
+  const SIZE_OPTIONS = SIZE_RANGES.map((range) => `${range} ${t('companyProfileForm.employeesUnit')}`);
 
   const set = (field: keyof Company, value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -617,19 +618,22 @@ function CompanyEditModal({
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">{t('companyProfileForm.companyTypeLabel')}</label>
             <div className="flex gap-6">
-              {['' + t('companyProfileForm.companyTypePrivate'), t('companyProfileForm.companyTypeState')].map((t) => (
-                <label key={t} className="flex items-center gap-2 cursor-pointer">
+              {[
+                { key: 'companyTypePrivate', value: 'private' },
+                { key: 'companyTypeState', value: 'state' },
+              ].map((type) => (
+                <label key={type.key} className="flex items-center gap-2 cursor-pointer">
                   <div className="relative flex items-center">
                     <input
                       type="radio"
                       name="companyType"
-                      value={t}
-                      checked={form.companyType === t}
-                      onChange={() => set('companyType', t)}
+                      value={type.value}
+                      checked={form.companyType === type.value}
+                      onChange={() => set('companyType', type.value)}
                       className="w-4 h-4 accent-blue-600"
                     />
                   </div>
-                  <span className="text-sm text-gray-700">{t}</span>
+                  <span className="text-sm text-gray-700">{t(`companyProfileForm.${type.key}`)}</span>
                 </label>
               ))}
             </div>
@@ -1576,7 +1580,7 @@ export default function EmployerDashboard() {
                         packageInfo?.name === 'Pro' ? 'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100' :
                           'border-gray-200 text-gray-400 bg-white hover:bg-gray-50'
                       }`}
-                    title="ประวัติการชำระเงิน"
+                    title={t('paymentHistoryTitle')}
                   >
                     <FileText className="w-4 h-4" />
                   </button>

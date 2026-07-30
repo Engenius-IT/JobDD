@@ -1512,6 +1512,7 @@
     "saveFailed": "บันทึกไม่สำเร็จ กรุณาลองใหม่",
     "vip": "บัญชีระดับสูงสุด (VIP)",
     "premium": "บัญชีระดับพรีเมียม (Premium)",
+    "paymentHistoryTitle": "ประวัติการชำระเงิน",
     "pro": "บัญชีระดับโปร (Pro Account)",
     "days": {
       "sun": "อา",
@@ -1573,6 +1574,7 @@
     "nameLabel": "ชื่อบริษัท",
     "descriptionLabel": "เกี่ยวกับบริษัท",
     "descriptionHint": "(อธิบายคร่าวๆ บริษัทประกอบการเกี่ยวกัน)",
+    "employeesUnit": "คน",
     "companyTypeLabel": "รูปแบบบริษัท",
     "companyTypePrivate": "เอกชน",
     "companyTypeState": "รัฐวิสาหกิจ",

@@ -1464,6 +1464,7 @@
     "saveFailed": "Failed to save. Please try again.",
     "vip": "Top-Tier Account (VIP)",
     "premium": "Premium Account (Premium)",
+    "paymentHistoryTitle": "Payment History",
     "pro": "Pro Account (Pro Account)",
     "days": {
       "sun": "Sun",
@@ -1525,6 +1526,7 @@
     "nameLabel": "Company Name",
     "descriptionLabel": "About the Company",
     "descriptionHint": "(Briefly describe the company's business)",
+    "employeesUnit": "employees",
     "companyTypeLabel": "Company Type",
     "companyTypePrivate": "Private",
     "companyTypeState": "State Enterprise",
