@@ -1351,6 +1351,7 @@
     "badge": "WORKSDD Employer Guide",
     "title": "System Interface & Usage Guide",
     "description": "Understand the process of setting up your company profile, posting job vacancies, and managing applicants to start recruiting with confidence.",
+    "additionalTipsLabel": "Additional Tips:",
     "overview": {
       "setupTitle": "Easy Company Setup",
       "setupDesc": "Fill in your information once and use it for every job posting.",

@@ -346,7 +346,7 @@ export default function EmployerSystemGuidePage() {
                           {isCurrent && (
                             <div className="mt-3 p-3 bg-gray-50 border-l-2 border-red-600 rounded-r-lg text-xs text-gray-500 animate-fadeIn">
                               <p className="font-bold text-[#020263] flex items-center gap-1 mb-0.5">
-                                <HelpCircle className="w-3.5 h-3.5 text-red-600" /> คำแนะนำเพิ่มเติม:
+                                <HelpCircle className="w-3.5 h-3.5 text-red-600" /> {t('additionalTipsLabel')}
                               </p>
                               <span>{step.tips}</span>
                             </div>
