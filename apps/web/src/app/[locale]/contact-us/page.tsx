@@ -109,7 +109,7 @@ export default function ContactUsPage() {
                     </div>
                     <div>
                       <h3 className="font-bold text-gray-900 mb-1">{t('phone')}</h3>
-                      <p className="text-gray-600 text-sm">02-XXX-XXXX</p>
+                      <p className="text-gray-600 text-sm">02-117-4742</p>
                     </div>
                   </div>
 
@@ -119,7 +119,7 @@ export default function ContactUsPage() {
                     </div>
                     <div>
                       <h3 className="font-bold text-gray-900 mb-1">{t('email')}</h3>
-                      <p className="text-gray-600 text-sm">support@jobsabuy.com</p>
+                      <p className="text-gray-600 text-sm">hr@engenius.co.th</p>
                     </div>
                   </div>
 
