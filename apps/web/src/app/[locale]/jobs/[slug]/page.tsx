@@ -28,6 +28,152 @@ import {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
+const PROVINCE_EN_MAP: Record<string, string> = {
+  'กรุงเทพมหานคร': 'Bangkok', 'กระบี่': 'Krabi', 'กาญจนบุรี': 'Kanchanaburi',
+  'กาฬสินธุ์': 'Kalasin', 'กำแพงเพชร': 'Kamphaeng Phet', 'ขอนแก่น': 'Khon Kaen',
+  'จันทบุรี': 'Chanthaburi', 'ฉะเชิงเทรา': 'Chachoengsao', 'ชลบุรี': 'Chonburi',
+  'ชัยนาท': 'Chainat', 'ชัยภูมิ': 'Chaiyaphum', 'ชุมพร': 'Chumphon',
+  'เชียงราย': 'Chiang Rai', 'เชียงใหม่': 'Chiang Mai', 'ตรัง': 'Trang',
+  'ตราด': 'Trat', 'ตาก': 'Tak', 'นครนายก': 'Nakhon Nayok',
+  'นครปฐม': 'Nakhon Pathom', 'นครพนม': 'Nakhon Phanom', 'นครราชสีมา': 'Nakhon Ratchasima',
+  'นครศรีธรรมราช': 'Nakhon Si Thammarat', 'นครสวรรค์': 'Nakhon Sawan', 'นนทบุรี': 'Nonthaburi',
+  'นราธิวาส': 'Narathiwat', 'น่าน': 'Nan', 'บึงกาฬ': 'Bueng Kan',
+  'บุรีรัมย์': 'Buri Ram', 'ปทุมธานี': 'Pathum Thani', 'ประจวบคีรีขันธ์': 'Prachuap Khiri Khan',
+  'ปราจีนบุรี': 'Prachin Buri', 'ปัตตานี': 'Pattani', 'พระนครศรีอยุธยา': 'Phra Nakhon Si Ayutthaya',
+  'พะเยา': 'Phayao', 'พังงา': 'Phang Nga', 'พัทลุง': 'Phatthalung',
+  'พิจิตร': 'Phichit', 'พิษณุโลก': 'Phitsanulok', 'เพชรบุรี': 'Phetchaburi',
+  'เพชรบูรณ์': 'Phetchabun', 'แพร่': 'Phrae', 'ภูเก็ต': 'Phuket',
+  'มหาสารคาม': 'Maha Sarakham', 'มุกดาหาร': 'Mukdahan', 'แม่ฮ่องสอน': 'Mae Hong Son',
+  'ยโสธร': 'Yasothon', 'ยะลา': 'Yala', 'ร้อยเอ็ด': 'Roi Et',
+  'ระนอง': 'Ranong', 'ระยอง': 'Rayong', 'ราชบุรี': 'Ratchaburi',
+  'ลพบุรี': 'Lopburi', 'ลำปาง': 'Lampang', 'ลำพูน': 'Lamphun', 'เลย': 'Loei',
+  'ศรีสะเกษ': 'Si Sa Ket', 'สกลนคร': 'Sakon Nakhon', 'สงขลา': 'Songkhla',
+  'สตูล': 'Satun', 'สมุทรปราการ': 'Samut Prakan',
+  'สมุทรสงคราม': 'Samut Songkhram', 'สมุทรสาคร': 'Samut Sakhon', 'สระแก้ว': 'Sa Kaeo',
+  'สระบุรี': 'Saraburi', 'สิงห์บุรี': 'Sing Buri', 'สุโขทัย': 'Sukhothai',
+  'สุพรรณบุรี': 'Suphan Buri', 'สุราษฎร์ธานี': 'Surat Thani', 'สุรินทร์': 'Surin',
+  'หนองคาย': 'Nong Khai', 'หนองบัวลำภู': 'Nong Bua Lamphu', 'อ่างทอง': 'Ang Thong',
+  'อำนาจเจริญ': 'Amnat Charoen', 'อุดรธานี': 'Udon Thani', 'อุตรดิตถ์': 'Uttaradit',
+  'อุทัยธานี': 'Uthai Thani', 'อุบลราชธานี': 'Ubon Ratchathani'
+};
+
+const TRANSLATIONS = {
+  th: {
+    backToJobs: 'กลับไปรายการงาน',
+    savedToast: 'บันทึกงานแล้ว!',
+    unsavedToast: 'ยกเลิกการบันทึกแล้ว',
+    saveJob: 'บันทึกงาน',
+    saved: 'บันทึกแล้ว',
+    unsave: 'ยกเลิกบันทึก',
+    save: 'บันทึกงาน',
+    jobNotFound: 'ไม่พบประกาศงานนี้',
+    jobNotFoundDesc: 'อาจถูกปิดหรือลบไปแล้ว',
+    viewAllJobs: 'ดูงานทั้งหมด',
+    posted: 'โพสต์',
+    jobDescription: 'รายละเอียดงาน',
+    jobRequirements: 'คุณสมบัติที่ต้องการ',
+    requiredSkills: 'ทักษะที่ต้องการ',
+    benefits: 'สวัสดิการ',
+    workplaceAtmosphere: 'ภาพบรรยากาศในที่ทำงาน',
+    companyPhoto: 'รูปบริษัท',
+    viewPhoto: 'ดูรูปภาพ',
+    candidateQualifications: 'คุณสมบัติผู้สมัคร',
+    gender: 'เพศ',
+    age: 'อายุ',
+    ageYears: 'ปี',
+    ageRange: '{min} – {max} ปี',
+    ageMinPlus: '{min}+ ปี',
+    ageMaxUpTo: 'ไม่เกิน {max} ปี',
+    education: 'วุฒิการศึกษา',
+    experience: 'ประสบการณ์',
+    experienceYears: '{y} ปี',
+    additionalQualifications: 'คุณสมบัติเพิ่มเติม',
+    transportation: 'การเดินทาง',
+    mapAndLocation: 'แผนที่และที่ตั้งบริษัท',
+    viewOnGoogleMaps: 'ดูแผนที่บน Google Maps',
+    clickToViewMap: 'คลิกเพื่อเปิดดูตำแหน่งที่ตั้งของบริษัทนี้ผ่านแอปพลิเคชันแผนที่',
+    openMap: 'เปิดแผนที่',
+    applyNow: 'สมัครงานนี้',
+    applying: 'กำลังส่งคำขอ...',
+    appliedSuccess: 'สมัครสำเร็จแล้ว!',
+    alreadyApplied: 'คุณสมัครงานนี้ไปแล้ว',
+    jobseekerOnlyNotice: 'สงวนสิทธิ์การสมัครสำหรับผู้หางานเท่านั้น',
+    applyFailed: 'การสมัครงานล้มเหลว',
+    freeService: 'ฟรี ไม่มีค่าใช้จ่าย',
+    companyInfo: 'ข้อมูลบริษัท',
+    contactInfo: 'ข้อมูลผู้ติดต่อ',
+    jobSummary: 'สรุปข้อมูลงาน',
+    positionsNeeded: 'จำนวนรับ',
+    positionsUnit: 'ตำแหน่ง',
+    workingDays: 'วันทำงาน',
+    workingHours: 'เวลาทำงาน',
+    onlineInterview: 'สัมภาษณ์ออนไลน์',
+    supported: 'รองรับ',
+    similarJobs: 'งานที่ใกล้เคียง',
+    location: 'สถานที่',
+    salary: 'เงินเดือน',
+    positionsCount: 'จำนวนรับสมัคร',
+    positionsRateUnit: 'อัตรา',
+  },
+  en: {
+    backToJobs: 'Back to Jobs',
+    savedToast: 'Job saved!',
+    unsavedToast: 'Job unsaved',
+    saveJob: 'Save Job',
+    saved: 'Saved',
+    unsave: 'Unsave',
+    save: 'Save Job',
+    jobNotFound: 'Job Posting Not Found',
+    jobNotFoundDesc: 'This job may have been closed or removed.',
+    viewAllJobs: 'View All Jobs',
+    posted: 'Posted',
+    jobDescription: 'Job Description',
+    jobRequirements: 'Qualifications',
+    requiredSkills: 'Required Skills',
+    benefits: 'Benefits',
+    workplaceAtmosphere: 'Workplace Environment',
+    companyPhoto: 'Company photo',
+    viewPhoto: 'View image',
+    candidateQualifications: 'Candidate Qualifications',
+    gender: 'Gender',
+    age: 'Age',
+    ageYears: 'years old',
+    ageRange: '{min} – {max} years old',
+    ageMinPlus: '{min}+ years old',
+    ageMaxUpTo: 'Up to {max} years old',
+    education: 'Education',
+    experience: 'Experience',
+    experienceYears: '{y} year(s)',
+    additionalQualifications: 'Additional Qualifications',
+    transportation: 'Transportation',
+    mapAndLocation: 'Map & Location',
+    viewOnGoogleMaps: 'View on Google Maps',
+    clickToViewMap: 'Click to open company location in maps application',
+    openMap: 'Open Map',
+    applyNow: 'Apply for this Job',
+    applying: 'Submitting...',
+    appliedSuccess: 'Applied Successfully!',
+    alreadyApplied: 'You have already applied',
+    jobseekerOnlyNotice: 'Applications are reserved for job seekers only',
+    applyFailed: 'Application failed',
+    freeService: 'Free, no hidden costs',
+    companyInfo: 'Company Information',
+    contactInfo: 'Contact Information',
+    jobSummary: 'Job Summary',
+    positionsNeeded: 'Openings',
+    positionsUnit: 'position(s)',
+    workingDays: 'Working Days',
+    workingHours: 'Working Hours',
+    onlineInterview: 'Online Interview',
+    supported: 'Supported',
+    similarJobs: 'Similar Jobs',
+    location: 'Location',
+    salary: 'Salary',
+    positionsCount: 'Positions',
+    positionsRateUnit: 'positions',
+  },
+};
+
 interface Company {
   id: string;
   name: string;
@@ -81,36 +227,49 @@ interface Job {
   companyImages?: string[];
 }
 
-const JOB_TYPE_LABEL: Record<string, string> = {
-  FULL_TIME: 'งานประจำ',
-  PART_TIME: 'พาร์ทไทม์',
-  CONTRACT: 'สัญญาจ้าง',
-  INTERNSHIP: 'ฝึกงาน',
-  FREELANCE: 'ฟรีแลนซ์',
+const JOB_TYPE_LABEL: Record<string, { th: string; en: string }> = {
+  FULL_TIME: { th: 'งานประจำ', en: 'Full-time' },
+  PART_TIME: { th: 'พาร์ทไทม์', en: 'Part-time' },
+  CONTRACT: { th: 'สัญญาจ้าง', en: 'Contract' },
+  INTERNSHIP: { th: 'ฝึกงาน', en: 'Internship' },
+  FREELANCE: { th: 'ฟรีแลนซ์', en: 'Freelance' },
 };
 
-const WORK_MODEL_LABEL: Record<string, string> = {
-  ONSITE: 'ออฟฟิศ',
-  REMOTE: 'Remote',
-  HYBRID: 'Hybrid',
+const WORK_MODEL_LABEL: Record<string, { th: string; en: string }> = {
+  ONSITE: { th: 'ออฟฟิศ', en: 'On-site' },
+  REMOTE: { th: 'Remote', en: 'Remote' },
+  HYBRID: { th: 'Hybrid', en: 'Hybrid' },
 };
 
-function timeAgo(dateStr: string) {
+function timeAgo(dateStr: string, locale: 'th' | 'en' = 'th') {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'เพิ่งโพสต์';
-  if (mins < 60) return `${mins} นาทีที่แล้ว`;
+  if (mins < 1) return locale === 'en' ? 'Just now' : 'เพิ่งโพสต์';
+  if (mins < 60) return locale === 'en' ? `${mins}m ago` : `${mins} นาทีที่แล้ว`;
   const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs} ชั่วโมงที่แล้ว`;
-  return `${Math.floor(hrs / 24)} วันที่แล้ว`;
+  if (hrs < 24) return locale === 'en' ? `${hrs}h ago` : `${hrs} ชั่วโมงที่แล้ว`;
+  const days = Math.floor(hrs / 24);
+  return locale === 'en' ? `${days}d ago` : `${days} วันที่แล้ว`;
 }
 
-function salaryText(job: Job) {
-  if (!job.salaryVisible || (!job.salaryMin && !job.salaryMax)) return 'ตามโครงสร้างบริษัท';
-  if (job.salaryMin && job.salaryMax)
-    return `${job.salaryMin.toLocaleString()} – ${job.salaryMax.toLocaleString()} บาท`;
-  if (job.salaryMin) return `${job.salaryMin.toLocaleString()}+ บาท`;
-  return `ถึง ${job.salaryMax!.toLocaleString()} บาท`;
+function salaryText(job: Job, locale: 'th' | 'en' = 'th') {
+  const isEn = locale === 'en';
+  if (!job.salaryVisible || (!job.salaryMin && !job.salaryMax)) {
+    return isEn ? 'Negotiable' : 'ตามโครงสร้างบริษัท';
+  }
+  if (job.salaryMin && job.salaryMax) {
+    return isEn
+      ? `THB ${job.salaryMin.toLocaleString()} – ${job.salaryMax.toLocaleString()}`
+      : `${job.salaryMin.toLocaleString()} – ${job.salaryMax.toLocaleString()} บาท`;
+  }
+  if (job.salaryMin) {
+    return isEn
+      ? `THB ${job.salaryMin.toLocaleString()}+`
+      : `${job.salaryMin.toLocaleString()}+ บาท`;
+  }
+  return isEn
+    ? `Up to THB ${job.salaryMax!.toLocaleString()}`
+    : `ถึง ${job.salaryMax!.toLocaleString()} บาท`;
 }
 
 function isVerifiedCompany(company: Company) {
@@ -134,7 +293,9 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 function TextBlock({ text }: { text: string }) {
-  const isHtml = text.trimStart().startsWith('<');
+  const { translatedText } = useTranslator({ text });
+  const content = translatedText || text;
+  const isHtml = content.trimStart().startsWith('<');
 
   if (isHtml) {
     return (
@@ -146,14 +307,14 @@ function TextBlock({ text }: { text: string }) {
           prose-ul:pl-5 prose-ol:pl-5 prose-li:my-0.5
           prose-strong:text-gray-800 prose-em:text-gray-600
           prose-hr:border-gray-200"
-        dangerouslySetInnerHTML={{ __html: text }}
+        dangerouslySetInnerHTML={{ __html: content }}
       />
     );
   }
 
   return (
     <div className="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap break-all overflow-hidden">
-      {text}
+      {content}
     </div>
   );
 }
@@ -190,7 +351,12 @@ export default function JobDetailPage() {
   const params = useParams();
   const router = useRouter();
   const slug = params?.slug as string;
+  const locale = (params?.locale === 'en' ? 'en' : 'th') as 'th' | 'en';
   const { user } = useAuth();
+
+  const t = (key: keyof typeof TRANSLATIONS['th']) => {
+    return TRANSLATIONS[locale]?.[key] || TRANSLATIONS['th'][key] || key;
+  };
 
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
@@ -212,7 +378,7 @@ export default function JobDetailPage() {
     }
     if (user.role !== 'JOBSEEKER') {
       setApplyStatus('error');
-      setApplyMessage('สงวนสิทธิ์การสมัครสำหรับผู้หางานเท่านั้น');
+      setApplyMessage(t('jobseekerOnlyNotice'));
       return;
     }
     if (!job) return;
@@ -237,14 +403,14 @@ export default function JobDetailPage() {
         if (data.message === 'You have already applied for this job') {
           setApplyStatus('already_applied');
         } else {
-          throw new Error(data.message || 'การสมัครงานล้มเหลว');
+          throw new Error(data.message || t('applyFailed'));
         }
       } else {
         setApplyStatus('success');
       }
     } catch (err: unknown) {
       setApplyStatus('error');
-      setApplyMessage(err instanceof Error ? err.message : 'การสมัครงานล้มเหลว');
+      setApplyMessage(err instanceof Error ? err.message : t('applyFailed'));
     } finally {
       setIsApplying(false);
     }
@@ -325,7 +491,7 @@ export default function JobDetailPage() {
               router.push('/jobs');
             }
           }}
-          className="flex items-center gap-1.5 text-sm text-[#000000] hover:text-gray-700 mb-6 transition-colors"
+          className="flex items-center gap-1.5 text-sm text-[#000000] hover:text-gray-700 mb-6 transition-colors cursor-pointer"
         >
           <svg
             className="w-4 h-4"
@@ -340,7 +506,7 @@ export default function JobDetailPage() {
               d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
             />
           </svg>
-          กลับไปรายการงาน
+          {t('backToJobs')}
         </button>
 
         {/* Save toast */}
@@ -352,20 +518,20 @@ export default function JobDetailPage() {
           }`}
         >
           <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-white' : 'fill-none'}`} />
-          {isSaved ? 'บันทึกงานแล้ว!' : 'ยกเลิกการบันทึกแล้ว'}
+          {isSaved ? t('savedToast') : t('unsavedToast')}
         </div>
 
         {/* Not found */}
         {notFound && (
           <div className="text-center py-24">
             <div className="text-5xl mb-4">😕</div>
-            <h1 className="text-xl font-bold text-gray-700 mb-2">ไม่พบประกาศงานนี้</h1>
-            <p className="text-gray-400 text-sm mb-6">อาจถูกปิดหรือลบไปแล้ว</p>
+            <h1 className="text-xl font-bold text-gray-700 mb-2">{t('jobNotFound')}</h1>
+            <p className="text-gray-400 text-sm mb-6">{t('jobNotFoundDesc')}</p>
             <button
               onClick={() => router.push('/jobs')}
               className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors"
             >
-              ดูงานทั้งหมด
+              {t('viewAllJobs')}
             </button>
           </div>
         )}
@@ -396,24 +562,24 @@ export default function JobDetailPage() {
                     {/* Badges */}
                     <div className="flex flex-wrap gap-2 mt-3">
                       <span className="text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100 px-3 py-1 rounded-xl">
-                        {JOB_TYPE_LABEL[job.jobType] || job.jobType}
+                        {JOB_TYPE_LABEL[job.jobType]?.[locale] || job.jobType}
                       </span>
                       <span className="text-xs font-semibold bg-gray-50 text-gray-600 border border-gray-200 px-3 py-1 rounded-xl">
-                        {WORK_MODEL_LABEL[job.workModel] || job.workModel}
+                        {WORK_MODEL_LABEL[job.workModel]?.[locale] || job.workModel}
                       </span>
                       {job.education && (
                         <span className="text-xs font-semibold bg-green-50 text-green-700 border border-green-100 px-3 py-1 rounded-xl">
-                          {job.education}
+                          <Translate text={job.education} />
                         </span>
                       )}
                       {job.category && (
                         <span className="text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-100 px-3 py-1 rounded-xl">
-                          {job.category}
+                          <Translate text={job.category} />
                         </span>
                       )}
                       {job.jobFunction && (
                         <span className="text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-100 px-3 py-1 rounded-xl">
-                          {job.jobFunction}
+                          <Translate text={job.jobFunction} />
                         </span>
                       )}
                     </div>
@@ -432,8 +598,10 @@ export default function JobDetailPage() {
                             clipRule="evenodd"
                           />
                         </svg>
-                        {job.locationProvince}
-                        {job.locationDistrict ? ` · ${job.locationDistrict}` : ''}
+                        {locale === 'en' ? (PROVINCE_EN_MAP[job.locationProvince || ''] || job.locationProvince) : job.locationProvince}
+                        {job.locationDistrict ? (
+                          <> · <Translate text={job.locationDistrict} /></>
+                        ) : ''}
                       </span>
                       <span className="flex items-center gap-1.5">
                         <svg
@@ -449,69 +617,66 @@ export default function JobDetailPage() {
                             d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                           />
                         </svg>
-                        {salaryText(job)}
+                        {salaryText(job, locale)}
                       </span>
                       <div className="flex items-center gap-1.5">
-                      <span className="flex items-center gap-1.5 text-gray-400">
-                        <svg
-                          className="w-4 h-4 shrink-0"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={1.5}
+                        <span className="flex items-center gap-1.5 text-gray-400">
+                          <svg
+                            className="w-4 h-4 shrink-0"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={1.5}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                            />
+                          </svg>
+                          {t('posted')} {timeAgo(job.createdAt, locale)}
+                        </span>
+                        <button
+                          onClick={toggleSave}
+                          title={isSaved ? t('unsave') : t('saveJob')}
+                          className={`ml-2 shrink-0 flex flex-row items-center gap-1 p-2 rounded-xl transition-all cursor-pointer ${
+                            isSaved
+                              ? 'text-[#E00016] bg-red-50 hover:bg-red-100'
+                              : 'text-gray-400 hover:text-[#E00016] hover:bg-red-50'
+                          }`}
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                          <Bookmark
+                            className={`w-5 h-5 transition-all ${
+                              isSaved ? 'fill-[#E00016] stroke-[#E00016]' : 'fill-none stroke-current'
+                            }`}
                           />
-                        </svg>
-                        โพสต์ {timeAgo(job.createdAt)}
-                      </span>
-                      <button
-                    onClick={toggleSave}
-                    title={isSaved ? 'ยกเลิกบันทึก' : 'บันทึกงาน'}
-                    className={`ml-2 shrink-0 flex flex-row items-center gap-1 p-2 rounded-xl transition-all ${
-                      isSaved
-                        ? 'text-[#E00016] bg-red-50 hover:bg-red-100'
-                        : 'text-gray-400 hover:text-[#E00016] hover:bg-red-50'
-                    }`}
-                  >
-                    <Bookmark
-                      className={`w-5 h-5 transition-all ${
-                        isSaved ? 'fill-[#E00016] stroke-[#E00016]' : 'fill-none stroke-current'
-                      }`}
-                    />
-                    <span className="text-[10px] font-semibold leading-none">
-                      {isSaved ? 'บันทึกแล้ว' : 'บันทึกงาน'}
-                    </span>
-                  </button>
-                  </div>
+                          <span className="text-[10px] font-semibold leading-none">
+                            {isSaved ? t('saved') : t('saveJob')}
+                          </span>
+                        </button>
+                      </div>
                     </div>
                   </div>
-                  {/* Save button */}
-                  
-                  
                 </div>
               </div>
 
               {/* Description */}
               {job.description && (
-                <Section title="รายละเอียดงาน">
+                <Section title={t('jobDescription')}>
                   <TextBlock text={job.description} />
                 </Section>
               )}
 
               {/* Requirements */}
               {job.requirements && (
-                <Section title="คุณสมบัติที่ต้องการ">
+                <Section title={t('jobRequirements')}>
                   <TextBlock text={job.requirements} />
                 </Section>
               )}
 
               {/* Skills */}
               {job.requiredSkills.length > 0 && (
-                <Section title="ทักษะที่ต้องการ">
+                <Section title={t('requiredSkills')}>
                   <div className="flex flex-wrap gap-2">
                     {job.requiredSkills.map((s) => (
                       <span
@@ -527,7 +692,7 @@ export default function JobDetailPage() {
 
               {/* Benefits */}
               {job.benefits && (
-                <Section title="สวัสดิการ">
+                <Section title={t('benefits')}>
                   {Array.isArray(job.benefits) ? (
                     <ul className="list-disc list-inside text-[#000000] text-sm leading-relaxed space-y-1">
                       {job.benefits.map((b: string, i: number) => (
@@ -542,7 +707,7 @@ export default function JobDetailPage() {
 
               {/* รูปภาพบริษัท */}
               {job.companyImages && job.companyImages.length > 0 && (
-                <Section title="ภาพบรรยากาศในที่ทำงาน">
+                <Section title={t('workplaceAtmosphere')}>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {job.companyImages.map((url, idx) => (
                       <button
@@ -553,12 +718,12 @@ export default function JobDetailPage() {
                       >
                         <img
                           src={url}
-                          alt={`รูปบริษัท ${idx + 1}`}
+                          alt={`${t('companyPhoto')} ${idx + 1}`}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all flex items-center justify-center">
                           <span className="opacity-0 group-hover:opacity-100 text-white text-xs font-semibold bg-black/40 px-3 py-1 rounded-full transition-opacity">
-                            ดูรูปภาพ
+                            {t('viewPhoto')}
                           </span>
                         </div>
                       </button>
@@ -580,7 +745,7 @@ export default function JobDetailPage() {
                 job.qualificationAgeMin ||
                 job.qualificationAgeMax ||
                 job.qualificationExperience != null) && (
-                <Section title="คุณสมบัติผู้สมัคร">
+                <Section title={t('candidateQualifications')}>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                     {job.qualificationGender && (
                       <div className="flex items-center gap-2.5 text-sm">
@@ -588,8 +753,10 @@ export default function JobDetailPage() {
                           <User className="w-4 h-4 text-blue-500" />
                         </div>
                         <div>
-                          <p className="text-xs text-gray-400">เพศ</p>
-                          <p className="font-medium text-gray-700">{job.qualificationGender}</p>
+                          <p className="text-xs text-gray-400">{t('gender')}</p>
+                          <p className="font-medium text-gray-700">
+                            <Translate text={job.qualificationGender} />
+                          </p>
                         </div>
                       </div>
                     )}
@@ -599,13 +766,13 @@ export default function JobDetailPage() {
                           <Calendar className="w-4 h-4 text-orange-500" />
                         </div>
                         <div>
-                          <p className="text-xs text-gray-400">อายุ</p>
+                          <p className="text-xs text-gray-400">{t('age')}</p>
                           <p className="font-medium text-gray-700">
                             {job.qualificationAgeMin && job.qualificationAgeMax
-                              ? `${job.qualificationAgeMin} – ${job.qualificationAgeMax} ปี`
+                              ? t('ageRange').replace('{min}', String(job.qualificationAgeMin)).replace('{max}', String(job.qualificationAgeMax))
                               : job.qualificationAgeMin
-                                ? `${job.qualificationAgeMin}+ ปี`
-                                : `ไม่เกิน ${job.qualificationAgeMax} ปี`}
+                                ? t('ageMinPlus').replace('{min}', String(job.qualificationAgeMin))
+                                : t('ageMaxUpTo').replace('{max}', String(job.qualificationAgeMax))}
                           </p>
                         </div>
                       </div>
@@ -616,8 +783,10 @@ export default function JobDetailPage() {
                           <GraduationCap className="w-4 h-4 text-green-500" />
                         </div>
                         <div>
-                          <p className="text-xs text-gray-400">วุฒิการศึกษา</p>
-                          <p className="font-medium text-gray-700">{job.education}</p>
+                          <p className="text-xs text-gray-400">{t('education')}</p>
+                          <p className="font-medium text-gray-700">
+                            <Translate text={job.education} />
+                          </p>
                         </div>
                       </div>
                     )}
@@ -627,9 +796,9 @@ export default function JobDetailPage() {
                           <BriefcaseIcon className="w-4 h-4 text-purple-500" />
                         </div>
                         <div>
-                          <p className="text-xs text-gray-400">ประสบการณ์</p>
+                          <p className="text-xs text-gray-400">{t('experience')}</p>
                           <p className="font-medium text-gray-700">
-                            {job.qualificationExperience} ปี
+                            {t('experienceYears').replace('{y}', String(job.qualificationExperience))}
                           </p>
                         </div>
                       </div>
@@ -640,7 +809,7 @@ export default function JobDetailPage() {
 
               {/* คุณสมบัติเพิ่มเติม */}
               {job.additionalQualifications && job.additionalQualifications.length > 0 && (
-                <Section title="คุณสมบัติเพิ่มเติม">
+                <Section title={t('additionalQualifications')}>
                   <div className="flex flex-wrap gap-2">
                     {job.additionalQualifications.map((q, i) => (
                       <span
@@ -656,9 +825,9 @@ export default function JobDetailPage() {
 
               {/* การเดินทาง */}
               {job.transportation && job.transportation.length > 0 && (
-                <Section title="การเดินทาง">
+                <Section title={t('transportation')}>
                   <div className="flex flex-wrap gap-2">
-                    {job.transportation.map((t) => {
+                    {job.transportation.map((tr) => {
                       const iconMap: Record<string, React.ElementType> = {
                         รถเมย์: Bus,
                         BTS: TrainFront,
@@ -666,15 +835,15 @@ export default function JobDetailPage() {
                         ARL: Plane,
                         รถไฟ: Train,
                       };
-                      const presetKey = Object.keys(iconMap).find((key) => t.startsWith(key));
+                      const presetKey = Object.keys(iconMap).find((key) => tr.startsWith(key));
                       const Icon = presetKey ? iconMap[presetKey] : MapPin;
                       return (
                         <span
-                          key={t}
+                          key={tr}
                           className="flex items-center gap-1.5 text-sm text-[#000000] bg-blue-50 border border-[#020263] px-4 py-2 rounded-xl"
                         >
                           <Icon className="w-4 h-4" />
-                          <Translate text={t} />
+                          <Translate text={tr} />
                         </span>
                       );
                     })}
@@ -684,7 +853,7 @@ export default function JobDetailPage() {
 
               {/* Map */}
               {job.mapUrl && (
-                <Section title="แผนที่และที่ตั้งบริษัท">
+                <Section title={t('mapAndLocation')}>
                   {job.mapUrl.includes('<iframe') ? (
                     <div
                       className="w-full h-80 overflow-hidden rounded-xl border border-gray-200"
@@ -710,10 +879,10 @@ export default function JobDetailPage() {
                         </div>
                         <div>
                           <p className="font-semibold text-gray-800 text-base">
-                            ดูแผนที่บน Google Maps
+                            {t('viewOnGoogleMaps')}
                           </p>
                           <p className="text-sm text-gray-500 mt-1 max-w-sm mx-auto">
-                            คลิกเพื่อเปิดดูตำแหน่งที่ตั้งของบริษัทนี้ผ่านแอปพลิเคชันแผนที่
+                            {t('clickToViewMap')}
                           </p>
                         </div>
                         <a
@@ -722,7 +891,7 @@ export default function JobDetailPage() {
                           rel="noreferrer"
                           className="mt-2 inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-all shadow-sm group"
                         >
-                          เปิดแผนที่
+                          {t('openMap')}
                           <svg
                             className="w-4 h-4 group-hover:translate-x-0.5 transition-transform"
                             fill="none"
@@ -753,31 +922,31 @@ export default function JobDetailPage() {
                   disabled={
                     isApplying || applyStatus === 'success' || applyStatus === 'already_applied'
                   }
-                  className={`w-full font-bold text-base py-3.5 rounded-xl transition-colors shadow-sm ${
+                  className={`w-full font-bold text-base py-3.5 rounded-xl transition-colors shadow-sm cursor-pointer ${
                     applyStatus === 'success' || applyStatus === 'already_applied'
                       ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
                       : 'bg-[#E00016] hover:bg-[#A80010] text-white'
                   }`}
                 >
                   {isApplying
-                    ? 'กำลังส่งคำขอ...'
+                    ? t('applying')
                     : applyStatus === 'success'
-                      ? 'สมัครสำเร็จแล้ว!'
+                      ? t('appliedSuccess')
                       : applyStatus === 'already_applied'
-                        ? 'คุณสมัครงานนี้ไปแล้ว'
-                        : 'สมัครงานนี้'}
+                        ? t('alreadyApplied')
+                        : t('applyNow')}
                 </button>
                 {applyStatus === 'error' && (
                   <p className="text-xs text-red-500 mt-3">{applyMessage}</p>
                 )}
-                <p className="text-xs text-gray-400 mt-3">ฟรี ไม่มีค่าใช้จ่าย</p>
+                <p className="text-xs text-gray-400 mt-3">{t('freeService')}</p>
               </div>
 
               {/* Company info card */}
               <div className="bg-white rounded-2xl border border-gray-200 p-6">
                 <h2 className="text-sm font-bold text-[#020263] mb-4 flex items-center gap-2">
                   <span className="w-1 h-4 bg-[#E00016] rounded-full inline-block"></span>
-                  ข้อมูลบริษัท
+                  {t('companyInfo')}
                 </h2>
 
                 <div className="flex items-center gap-3 mb-4">
@@ -819,7 +988,7 @@ export default function JobDetailPage() {
                           d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"
                         />
                       </svg>
-                      <span>{job.company.size}</span>
+                      <span><Translate text={job.company.size} /></span>
                     </div>
                   )}
                   {job.company.website && (
@@ -864,7 +1033,7 @@ export default function JobDetailPage() {
                 <div className="bg-white rounded-2xl border border-gray-200 p-6">
                   <h2 className="text-sm font-bold text-[#020263] mb-4 flex items-center gap-2">
                     <span className="w-1 h-4 bg-[#E00016] rounded-full inline-block"></span>
-                    ข้อมูลผู้ติดต่อ
+                    {t('contactInfo')}
                   </h2>
                   <div className="space-y-3">
                     {job.contactName && (
@@ -884,7 +1053,9 @@ export default function JobDetailPage() {
                     {job.companyAddress && (
                       <div className="flex items-start gap-2.5 text-sm pt-1">
                         <MapPin className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
-                        <span className="text-[#000000] leading-relaxed">{job.companyAddress}</span>
+                        <span className="text-[#000000] leading-relaxed">
+                          <Translate text={job.companyAddress} />
+                        </span>
                       </div>
                     )}
                   </div>
@@ -895,24 +1066,28 @@ export default function JobDetailPage() {
               <div className="bg-white rounded-2xl border border-gray-200 p-6">
                 <h2 className="text-sm font-bold text-[#020263] mb-4 flex items-center gap-2">
                   <span className="w-1 h-4 bg-[#E00016] rounded-full inline-block"></span>
-                  สรุปข้อมูลงาน
+                  {t('jobSummary')}
                 </h2>
                 <div className="space-y-3 text-sm">
                   {job.positions && job.positions > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-gray-400">จำนวนรับ</span>
-                      <span className="text-[#000000] font-medium">{job.positions} ตำแหน่ง</span>
+                      <span className="text-gray-400">{t('positionsNeeded')}</span>
+                      <span className="text-[#000000] font-medium">
+                        {job.positions} {t('positionsUnit')}
+                      </span>
                     </div>
                   )}
                   {job.workingDays && (
                     <div className="flex justify-between">
-                      <span className="text-gray-400">วันทำงาน</span>
-                      <span className="text-[#000000] font-medium">{job.workingDays}</span>
+                      <span className="text-gray-400">{t('workingDays')}</span>
+                      <span className="text-[#000000] font-medium">
+                        <Translate text={job.workingDays} />
+                      </span>
                     </div>
                   )}
                   {job.startTime && job.endTime && (
                     <div className="flex justify-between">
-                      <span className="text-gray-400">เวลาทำงาน</span>
+                      <span className="text-gray-400">{t('workingHours')}</span>
                       <span className="text-gray-700 font-medium">
                         {job.startTime} – {job.endTime}
                       </span>
@@ -920,8 +1095,8 @@ export default function JobDetailPage() {
                   )}
                   {job.canOnlineInterview && (
                     <div className="flex justify-between">
-                      <span className="text-gray-400">สัมภาษณ์ออนไลน์</span>
-                      <span className="text-green-600 font-medium">รองรับ</span>
+                      <span className="text-gray-400">{t('onlineInterview')}</span>
+                      <span className="text-green-600 font-medium">{t('supported')}</span>
                     </div>
                   )}
                 </div>
@@ -935,7 +1110,7 @@ export default function JobDetailPage() {
           <section className="mt-10">
             <div className="flex items-center gap-3 mb-6">
               <span className="w-1.5 h-7 bg-[#E00016] rounded-full"></span>
-              <h2 className="text-xl font-bold text-[#020263]">งานที่ใกล้เคียง</h2>
+              <h2 className="text-xl font-bold text-[#020263]">{t('similarJobs')}</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -960,7 +1135,7 @@ export default function JobDetailPage() {
                     )}
                     <div className="flex-1 min-w-0">
                       <h3 className="text-xl font-bold text-gray-800 leading-tight mb-1 truncate group-hover:text-red-700 transition-colors">
-                        {sJob.title}
+                        <Translate text={sJob.title} />
                       </h3>
                       <div className="flex items-center gap-1.5 min-w-0">
                         {isVerifiedCompany(sJob.company) && (
@@ -984,18 +1159,18 @@ export default function JobDetailPage() {
                           d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
                         />
                       </svg>
-                      {timeAgo(sJob.createdAt)}
+                      {timeAgo(sJob.createdAt, locale)}
                     </div>
                   </div>
 
                   {/* Details: Badges (Job Type, Category) */}
                   <div className="flex w-full flex-wrap items-center gap-2 mb-4">
                     <span className="bg-[#202263] text-white px-2.5 py-1 rounded-full text-xs font-semibold border border-blue-100">
-                      {JOB_TYPE_LABEL[sJob.jobType] || sJob.jobType}
+                      {JOB_TYPE_LABEL[sJob.jobType]?.[locale] || sJob.jobType}
                     </span>
                     {sJob.category && (
                       <span className="bg-[#A80010] text-white px-2.5 py-1 rounded-full text-xs font-semibold border border-purple-100">
-                        {sJob.category}
+                        <Translate text={sJob.category} />
                       </span>
                     )}
                   </div>
@@ -1016,8 +1191,10 @@ export default function JobDetailPage() {
                         />
                       </svg>
                       <span className="text-lg">
-                        สถานที่ : {sJob.locationProvince}
-                        {sJob.locationDistrict ? ` เขต${sJob.locationDistrict}` : ''}
+                        {t('location')} : {locale === 'en' ? (PROVINCE_EN_MAP[sJob.locationProvince || ''] || sJob.locationProvince) : sJob.locationProvince}
+                        {sJob.locationDistrict ? (
+                          locale === 'en' ? ` · ${sJob.locationDistrict}` : ` เขต${sJob.locationDistrict}`
+                        ) : ''}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -1035,7 +1212,7 @@ export default function JobDetailPage() {
                         />
                         <path d="M2.25 18a.75.75 0 000 1.5c5.4 0 10.63.722 15.6 2.075 1.19.324 2.4-.558 2.4-1.82V18.75a.75.75 0 00-.75-.75H2.25z" />
                       </svg>
-                      <span className="text-lg">เงินเดือน : {salaryText(sJob)}</span>
+                      <span className="text-lg">{t('salary')} : {salaryText(sJob, locale)}</span>
                     </div>
                     {sJob.positions && sJob.positions > 0 && (
                       <div className="flex items-center gap-2">
@@ -1047,7 +1224,7 @@ export default function JobDetailPage() {
                         >
                           <path d="M4.5 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM14.25 8.625a3.375 3.375 0 116.75 0 3.375 3.375 0 01-6.75 0zM1.5 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM17.25 19.128l-.001.144a2.25 2.25 0 01-.233.96 10.088 10.088 0 005.06-1.01.75.75 0 00.42-.643 4.875 4.875 0 00-6.957-4.611 8.586 8.586 0 011.71 5.157v.003z" />
                         </svg>
-                        <span className="text-lg"> จำนวนรับสมัคร : {sJob.positions} อัตรา</span>
+                        <span className="text-lg"> {t('positionsCount')} : {sJob.positions} {t('positionsRateUnit')}</span>
                       </div>
                     )}
                   </div>
@@ -1059,9 +1236,9 @@ export default function JobDetailPage() {
             <div className="text-center mt-8">
               <Link
                 href="/jobs"
-                className="inline-flex items-center gap-2 px-8 py-3 bg-[#020263] hover:bg-[#00003D] text-white font-semibold text-sm rounded-xl transition-colors shadow-sm"
+                className="inline-flex items-center gap-2 px-8 py-3 bg-[#020263] hover:bg-[#00003D] text-white font-semibold text-sm rounded-xl transition-colors shadow-sm cursor-pointer"
               >
-                ดูงานทั้งหมด
+                {t('viewAllJobs')}
                 <svg
                   className="w-4 h-4"
                   fill="none"

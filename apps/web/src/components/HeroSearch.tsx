@@ -650,7 +650,7 @@ export function HeroSearch({ onSearch, initialValues }: HeroSearchProps = {}) {
                     <div className="mb-3">
                       <input
                         type="text"
-                        placeholder="ระบุเงินเดือนขั้นต่ำ..."
+                        placeholder={t('salaryPlaceholder')}
                         value={salaryInputText || (selectedSalary > 0 ? selectedSalary.toLocaleString() : '')}
                         onChange={handleSalaryInputChange}
                         onFocus={() => {

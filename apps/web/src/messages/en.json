@@ -113,6 +113,7 @@
     "keywordPlaceholder": "Job Title, Company, or Keywords",
     "provincePlaceholder": "All Provinces",
     "searchProvince": "Search Province...",
+    "salaryPlaceholder": "Specify minimum salary...",
     "minsalary": "Min",
     "provinces": {
       "all": "All Provinces",

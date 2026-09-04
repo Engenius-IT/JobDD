@@ -9,6 +9,8 @@ import { Footer } from '@/components/Footer';
 import { CompanyLogo } from '@/components/CompanyLogo';
 import { HeroSearch, SearchParams } from '@/components/HeroSearch';
 import { useAuth } from '@/context/AuthContext';
+import { useTranslator } from '@/hooks/useTranslator';
+import { Translate } from '@/components/Translate';
 import {
   Bus,
   TrainFront,
@@ -27,6 +29,138 @@ import {
 } from 'lucide-react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+
+const PROVINCE_EN_MAP: Record<string, string> = {
+  'กรุงเทพมหานคร': 'Bangkok', 'กระบี่': 'Krabi', 'กาญจนบุรี': 'Kanchanaburi',
+  'กาฬสินธุ์': 'Kalasin', 'กำแพงเพชร': 'Kamphaeng Phet', 'ขอนแก่น': 'Khon Kaen',
+  'จันทบุรี': 'Chanthaburi', 'ฉะเชิงเทรา': 'Chachoengsao', 'ชลบุรี': 'Chonburi',
+  'ชัยนาท': 'Chainat', 'ชัยภูมิ': 'Chaiyaphum', 'ชุมพร': 'Chumphon',
+  'เชียงราย': 'Chiang Rai', 'เชียงใหม่': 'Chiang Mai', 'ตรัง': 'Trang',
+  'ตราด': 'Trat', 'ตาก': 'Tak', 'นครนายก': 'Nakhon Nayok',
+  'นครปฐม': 'Nakhon Pathom', 'นครพนม': 'Nakhon Phanom', 'นครราชสีมา': 'Nakhon Ratchasima',
+  'นครศรีธรรมราช': 'Nakhon Si Thammarat', 'นครสวรรค์': 'Nakhon Sawan', 'นนทบุรี': 'Nonthaburi',
+  'นราธิวาส': 'Narathiwat', 'น่าน': 'Nan', 'บึงกาฬ': 'Bueng Kan',
+  'บุรีรัมย์': 'Buri Ram', 'ปทุมธานี': 'Pathum Thani', 'ประจวบคีรีขันธ์': 'Prachuap Khiri Khan',
+  'ปราจีนบุรี': 'Prachin Buri', 'ปัตตานี': 'Pattani', 'พระนครศรีอยุธยา': 'Phra Nakhon Si Ayutthaya',
+  'พะเยา': 'Phayao', 'พังงา': 'Phang Nga', 'พัทลุง': 'Phatthalung',
+  'พิจิตร': 'Phichit', 'พิษณุโลก': 'Phitsanulok', 'เพชรบุรี': 'Phetchaburi',
+  'เพชรบูรณ์': 'Phetchabun', 'แพร่': 'Phrae', 'ภูเก็ต': 'Phuket',
+  'มหาสารคาม': 'Maha Sarakham', 'มุกดาหาร': 'Mukdahan', 'แม่ฮ่องสอน': 'Mae Hong Son',
+  'ยโสธร': 'Yasothon', 'ยะลา': 'Yala', 'ร้อยเอ็ด': 'Roi Et',
+  'ระนอง': 'Ranong', 'ระยอง': 'Rayong', 'ราชบุรี': 'Ratchaburi',
+  'ลพบุรี': 'Lopburi', 'ลำปาง': 'Lampang', 'ลำพูน': 'Lamphun', 'เลย': 'Loei',
+  'ศรีสะเกษ': 'Si Sa Ket', 'สกลนคร': 'Sakon Nakhon', 'สงขลา': 'Songkhla',
+  'สตูล': 'Satun', 'สมุทรปราการ': 'Samut Prakan',
+  'สมุทรสงคราม': 'Samut Songkhram', 'สมุทรสาคร': 'Samut Sakhon', 'สระแก้ว': 'Sa Kaeo',
+  'สระบุรี': 'Saraburi', 'สิงห์บุรี': 'Sing Buri', 'สุโขทัย': 'Sukhothai',
+  'สุพรรณบุรี': 'Suphan Buri', 'สุราษฎร์ธานี': 'Surat Thani', 'สุรินทร์': 'Surin',
+  'หนองคาย': 'Nong Khai', 'หนองบัวลำภู': 'Nong Bua Lamphu', 'อ่างทอง': 'Ang Thong',
+  'อำนาจเจริญ': 'Amnat Charoen', 'อุดรธานี': 'Udon Thani', 'อุตรดิตถ์': 'Uttaradit',
+  'อุทัยธานี': 'Uthai Thani', 'อุบลราชธานี': 'Ubon Ratchathani'
+};
+
+const TRANSLATIONS = {
+  th: {
+    urgent: 'รับด่วน',
+    company: 'บริษัท :',
+    workLocation: 'สถานที่ปฏิบัติงาน :',
+    locationNotSpecified: 'ไม่ระบุสถานที่',
+    salary: 'เงินเดือน :',
+    experienceYears: 'ประสบการณ์ {y} ปี',
+    welcomeRecentGrads: '🎓 รับจบใหม่',
+    posted: 'โพสต์',
+    save: 'บันทึกงาน',
+    saved: 'บันทึกแล้ว',
+    unsave: 'ยกเลิกบันทึก',
+    viewDetails: 'ดูรายละเอียด',
+    close: 'ปิด',
+    submitting: 'กำลังส่ง...',
+    appliedSuccess: '✓ สมัครสำเร็จ!',
+    alreadyApplied: 'สมัครไปแล้ว',
+    applyJob: 'สมัครงานนี้',
+    viewFullPage: 'ดูเต็มหน้า',
+    jobDescription: 'รายละเอียดงาน',
+    jobRequirements: 'คุณสมบัติที่ต้องการ',
+    requiredSkills: 'ทักษะที่ต้องการ',
+    benefits: 'สวัสดิการ',
+    candidateQualifications: 'คุณสมบัติผู้สมัคร',
+    gender: 'เพศ',
+    age: 'อายุ',
+    ageYears: 'ปี',
+    education: 'วุฒิการศึกษา',
+    experience: 'ประสบการณ์',
+    workingInfo: 'ข้อมูลการทำงาน',
+    positionsNeeded: 'จำนวนรับ',
+    positionsUnit: 'ตำแหน่ง',
+    workingDays: 'วันทำงาน',
+    workingHours: 'เวลาทำงาน',
+    onlineInterview: 'สัมภาษณ์ออนไลน์',
+    supported: 'รองรับ',
+    contactInfo: 'ข้อมูลผู้ติดต่อ',
+    transportation: 'การเดินทาง',
+    workplaceAtmosphere: 'ภาพบรรยากาศในที่ทำงาน',
+    companyPhoto: 'รูปบริษัท',
+    viewPhoto: 'ดูรูปภาพ',
+    loading: 'กำลังโหลด...',
+    foundJobs: 'พบ {total} ตำแหน่งงาน',
+    clearFilter: 'ล้างตัวกรอง',
+    noJobsFound: 'ไม่พบประกาศงาน',
+    tryChangingFilters: 'ลองเปลี่ยนคำค้นหาหรือล้างตัวกรอง',
+    viewAllJobs: 'ดูงานทั้งหมด',
+    prevPage: '← ก่อนหน้า',
+    nextPage: 'ถัดไป →',
+  },
+  en: {
+    urgent: 'URGENT',
+    company: 'Company:',
+    workLocation: 'Work Location:',
+    locationNotSpecified: 'Location not specified',
+    salary: 'Salary:',
+    experienceYears: '{y} yrs exp',
+    welcomeRecentGrads: '🎓 New Grads Welcome',
+    posted: 'Posted',
+    save: 'Save Job',
+    saved: 'Saved',
+    unsave: 'Unsave',
+    viewDetails: 'View Details',
+    close: 'Close',
+    submitting: 'Submitting...',
+    appliedSuccess: '✓ Applied!',
+    alreadyApplied: 'Already Applied',
+    applyJob: 'Apply for this Job',
+    viewFullPage: 'View Full Page',
+    jobDescription: 'Job Description',
+    jobRequirements: 'Qualifications',
+    requiredSkills: 'Required Skills',
+    benefits: 'Benefits',
+    candidateQualifications: 'Candidate Qualifications',
+    gender: 'Gender',
+    age: 'Age',
+    ageYears: 'years old',
+    education: 'Education',
+    experience: 'Experience',
+    workingInfo: 'Job Summary',
+    positionsNeeded: 'Openings',
+    positionsUnit: 'position(s)',
+    workingDays: 'Working Days',
+    workingHours: 'Working Hours',
+    onlineInterview: 'Online Interview',
+    supported: 'Supported',
+    contactInfo: 'Contact Information',
+    transportation: 'Transportation',
+    workplaceAtmosphere: 'Workplace Environment',
+    companyPhoto: 'Company photo',
+    viewPhoto: 'View image',
+    loading: 'Loading...',
+    foundJobs: 'Found {total} job(s)',
+    clearFilter: 'Clear Filters',
+    noJobsFound: 'No Jobs Found',
+    tryChangingFilters: 'Try adjusting your search keywords or clearing filters',
+    viewAllJobs: 'View All Jobs',
+    prevPage: '← Previous',
+    nextPage: 'Next →',
+  },
+};
 
 interface Job {
   id: string;
@@ -87,43 +221,54 @@ interface CompanyGroup {
   jobs: Job[];
 }
 
-const JOB_TYPE_LABEL: Record<string, string> = {
-  FULL_TIME: 'งานประจำ',
-  PART_TIME: 'พาร์ทไทม์',
-  CONTRACT: 'สัญญาจ้าง',
-  INTERNSHIP: 'ฝึกงาน',
-  FREELANCE: 'ฟรีแลนซ์',
+const JOB_TYPE_LABEL: Record<string, { th: string; en: string }> = {
+  FULL_TIME: { th: 'งานประจำ', en: 'Full-time' },
+  PART_TIME: { th: 'พาร์ทไทม์', en: 'Part-time' },
+  CONTRACT: { th: 'สัญญาจ้าง', en: 'Contract' },
+  INTERNSHIP: { th: 'ฝึกงาน', en: 'Internship' },
+  FREELANCE: { th: 'ฟรีแลนซ์', en: 'Freelance' },
 };
 
-const WORK_MODEL_LABEL: Record<string, string> = {
-  ONSITE: 'ออฟฟิศ',
-  REMOTE: 'Remote',
-  HYBRID: 'Hybrid',
+const WORK_MODEL_LABEL: Record<string, { th: string; en: string }> = {
+  ONSITE: { th: 'ออฟฟิศ', en: 'On-site' },
+  REMOTE: { th: 'Remote', en: 'Remote' },
+  HYBRID: { th: 'Hybrid', en: 'Hybrid' },
 };
 
-function timeAgo(dateStr: string) {
+function timeAgo(dateStr: string, locale: 'th' | 'en' = 'th') {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'เพิ่งโพสต์';
-  if (mins < 60) return `${mins} นาทีที่แล้ว`;
+  if (mins < 1) return locale === 'en' ? 'Just now' : 'เพิ่งโพสต์';
+  if (mins < 60) return locale === 'en' ? `${mins}m ago` : `${mins} นาทีที่แล้ว`;
   const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs} ชั่วโมงที่แล้ว`;
-  return `${Math.floor(hrs / 24)} วันที่แล้ว`;
+  if (hrs < 24) return locale === 'en' ? `${hrs}h ago` : `${hrs} ชั่วโมงที่แล้ว`;
+  const days = Math.floor(hrs / 24);
+  return locale === 'en' ? `${days}d ago` : `${days} วันที่แล้ว`;
 }
 
-function salaryText(job: Job) {
-  if (!job.salaryVisible || (!job.salaryMin && !job.salaryMax)) return 'ตามโครงสร้างบริษัท';
-  if (job.salaryMin && job.salaryMax)
-    return `${job.salaryMin.toLocaleString()} – ${job.salaryMax.toLocaleString()} บาท`;
-  if (job.salaryMin) return `${job.salaryMin.toLocaleString()}+ บาท`;
-  return `ถึง ${job.salaryMax!.toLocaleString()} บาท`;
+function salaryText(job: Job, locale: 'th' | 'en' = 'th') {
+  const isEn = locale === 'en';
+  if (!job.salaryVisible || (!job.salaryMin && !job.salaryMax)) {
+    return isEn ? 'Negotiable' : 'ตามโครงสร้างบริษัท';
+  }
+  if (job.salaryMin && job.salaryMax) {
+    return isEn
+      ? `THB ${job.salaryMin.toLocaleString()} – ${job.salaryMax.toLocaleString()}`
+      : `${job.salaryMin.toLocaleString()} – ${job.salaryMax.toLocaleString()} บาท`;
+  }
+  if (job.salaryMin) {
+    return isEn
+      ? `THB ${job.salaryMin.toLocaleString()}+`
+      : `${job.salaryMin.toLocaleString()}+ บาท`;
+  }
+  return isEn
+    ? `Up to THB ${job.salaryMax!.toLocaleString()}`
+    : `ถึง ${job.salaryMax!.toLocaleString()} บาท`;
 }
 
 function isVerifiedCompany(company: Job['company']) {
   return company.isVerified || company.verificationStatus === 'VERIFIED';
 }
-
-// We will import CompanyLogo at the top of the file.
 
 function JobCard({
   job,
@@ -140,7 +285,9 @@ function JobCard({
   onSelect: (job: Job) => void;
   onToggleSave: () => void;
 }) {
-  const locale = useLocale();
+  const rawLocale = useLocale();
+  const locale = (rawLocale === 'en' ? 'en' : 'th') as 'th' | 'en';
+  const t = (key: keyof typeof TRANSLATIONS['th']) => TRANSLATIONS[locale]?.[key] || TRANSLATIONS['th'][key] || key;
   const isNew = job.isQuickApply === true;
 
   return (
@@ -155,12 +302,12 @@ function JobCard({
       {/* Urgent Badge - Corner Ribbon Style */}
       {isNew && (
         <div className="absolute -top-[2px] -right-[2px] w-[96px] h-[96px] overflow-hidden pointer-events-none z-30">
-          <div 
+          <div
             className="absolute top-[20px] right-[-30px] w-[140px] bg-[#E00016] text-white text-[13px] sm:text-[14px] font-black py-2 text-center rotate-45 shadow-md leading-none"
             style={{ textShadow: '1px 1px 2px rgba(0, 0, 0, 0.4)' }}
           >
             <span className={locale === 'en' ? 'tracking-widest' : 'tracking-wider'}>
-              {locale === 'en' ? 'URGENT' : 'รับด่วน'}
+              {t('urgent')}
             </span>
           </div>
         </div>
@@ -176,14 +323,14 @@ function JobCard({
         <div className="flex-1 min-w-0 flex flex-col justify-between gap-3">
           {/* Title */}
           <h3 className="font-semibold text-[#020263] text-[17px] leading-snug group-hover:text-blue-600 transition-colors line-clamp-2">
-            {job.title}
+            <Translate text={job.title} />
           </h3>
 
           {/* Labeled info rows */}
           <div className="flex flex-col gap-1 text-sm">
             <div className="flex items-center gap-1.5 text-gray-700">
-              <span className="text-[#000000] font-bold shrink-0 w-[60px] whitespace-nowrap text-[15px]   ">
-                บริษัท :
+              <span className="text-[#000000] font-bold shrink-0 w-[60px] whitespace-nowrap text-[15px]">
+                {t('company')}
               </span>
               <div className="flex items-center gap-1.5 min-w-0">
                 {isVerifiedCompany(job.company) && (
@@ -192,52 +339,62 @@ function JobCard({
                 <span className="font-bold text-[#020263] truncate text-[15px]">{job.company.name}</span>
               </div>
             </div>
-            <div className="flex items-start gap-1.5 text-[#020263] ">
+            <div className="flex items-start gap-1.5 text-[#020263]">
               <span className="text-[#000000] font-bold shrink-0 w-[120px] whitespace-nowrap">
-                สถานที่ปฏิบัติงาน :
+                {t('workLocation')}
               </span>
               <span className="text-[#000000] text-[15px] line-clamp-2">
-                {job.companyAddress
-                  ? job.companyAddress.length > 60
-                    ? job.companyAddress.slice(0, 60) + '...'
-                    : job.companyAddress
-                  : job.locationProvince
-                    ? job.locationProvince +
-                    (job.locationDistrict ? ` ${job.locationDistrict}` : '')
-                    : 'ไม่ระบุสถานที่'}
+                {job.companyAddress ? (
+                  <Translate
+                    text={
+                      job.companyAddress.length > 60
+                        ? job.companyAddress.slice(0, 60) + '...'
+                        : job.companyAddress
+                    }
+                  />
+                ) : job.locationProvince ? (
+                  <>
+                    {locale === 'en'
+                      ? PROVINCE_EN_MAP[job.locationProvince] || job.locationProvince
+                      : job.locationProvince}
+                    {job.locationDistrict ? ` ${job.locationDistrict}` : ''}
+                  </>
+                ) : (
+                  t('locationNotSpecified')
+                )}
               </span>
             </div>
             <div className="flex items-center gap-1.5 text-gray-700">
               <span className="text-[#000000] font-bold shrink-0 w-[60px] whitespace-nowrap text-[15px]">
-                เงินเดือน :
+                {t('salary')}
               </span>
-              <span className="text-[#000000]">{salaryText(job)}</span>
+              <span className="text-[#000000]">{salaryText(job, locale)}</span>
             </div>
           </div>
 
           {/* Tags */}
           <div className="flex flex-wrap gap-1.5">
             <span className="text-xs text-gray-500 border border-gray-200 bg-gray-50 px-3 py-1 rounded-full">
-              {JOB_TYPE_LABEL[job.jobType] || job.jobType}
+              {JOB_TYPE_LABEL[job.jobType]?.[locale] || job.jobType}
             </span>
             <span className="text-xs text-gray-500 border border-gray-200 bg-gray-50 px-3 py-1 rounded-full">
-              {WORK_MODEL_LABEL[job.workModel] || job.workModel}
+              {WORK_MODEL_LABEL[job.workModel]?.[locale] || job.workModel}
             </span>
             {job.education && (
               <span className="text-xs text-green-600 border border-green-200 bg-green-50 px-3 py-1 rounded-full flex items-center gap-1">
                 <GraduationCap className="w-3 h-3" />
-                {job.education}
+                <Translate text={job.education} />
               </span>
             )}
             {job.qualificationExperience != null && job.qualificationExperience > 0 && (
               <span className="text-xs text-purple-600 border border-purple-200 bg-purple-50 px-3 py-1 rounded-full flex items-center gap-1">
                 <BriefcaseIcon className="w-3 h-3" />
-                ประสบการณ์ {job.qualificationExperience} ปี
+                {t('experienceYears').replace('{y}', String(job.qualificationExperience))}
               </span>
             )}
             {job.welcomeRecentGrads && (
               <span className="text-xs text-blue-600 border border-blue-200 bg-blue-50 px-3 py-1 rounded-full">
-                🎓 รับจบใหม่
+                {t('welcomeRecentGrads')}
               </span>
             )}
             {job.requiredSkills.slice(0, 3).map((s) => (
@@ -245,7 +402,7 @@ function JobCard({
                 key={s}
                 className="text-xs text-gray-500 border border-gray-200 bg-gray-50 px-3 py-1 rounded-full"
               >
-                {s}
+                <Translate text={s} />
               </span>
             ))}
             {job.requiredSkills.length > 3 && (
@@ -256,7 +413,7 @@ function JobCard({
           {/* Transportation */}
           {job.transportation && job.transportation.length > 0 && (
             <div className="flex flex-wrap items-center gap-1.5 mt-2">
-              {job.transportation.map((t) => {
+              {job.transportation.map((tr) => {
                 const iconMap: Record<string, React.ElementType> = {
                   รถเมล์: Bus,
                   BTS: TrainFront,
@@ -264,17 +421,16 @@ function JobCard({
                   ARL: Plane,
                   รถไฟ: Train,
                 };
-                // Find icon by checking if the text starts with the preset value
-                const presetKey = Object.keys(iconMap).find((key) => t.startsWith(key));
+                const presetKey = Object.keys(iconMap).find((key) => tr.startsWith(key));
                 const Icon = presetKey ? iconMap[presetKey] : MapPin;
 
                 return (
                   <span
-                    key={t}
+                    key={tr}
                     className="text-xs text-[#000000] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-full flex items-center gap-1"
                   >
                     <Icon className="w-3 h-3" />
-                    {t}
+                    <Translate text={tr} />
                   </span>
                 );
               })}
@@ -300,7 +456,7 @@ function JobCard({
                   d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
                 />
               </svg>
-              {timeAgo(job.createdAt)}
+              {timeAgo(job.createdAt, locale)}
             </span>
             {/* Bookmark */}
             <button
@@ -308,8 +464,8 @@ function JobCard({
                 e.stopPropagation();
                 onToggleSave();
               }}
-              title={isSaved ? 'ยกเลิกบันทึก' : 'บันทึกงาน'}
-              className={`shrink-0 flex items-center gap-1 text-xs font-medium whitespace-nowrap transition-colors ${isSaved ? 'text-[#E00016] hover:text-[#E00016]/80' : 'text-gray-400 hover:text-[#E00016]/80'
+              title={isSaved ? t('unsave') : t('save')}
+              className={`shrink-0 flex items-center gap-1 text-xs font-medium whitespace-nowrap transition-colors cursor-pointer ${isSaved ? 'text-[#E00016] hover:text-[#E00016]/80' : 'text-gray-400 hover:text-[#E00016]/80'
                 }`}
             >
               <svg
@@ -331,7 +487,7 @@ function JobCard({
 
           {/* Bottom: view detail indicator */}
           <div className="flex items-center gap-1 text-xs text-[#020263] font-semibold opacity-70">
-            <span>ดูรายละเอียด</span>
+            <span>{t('viewDetails')}</span>
             <svg
               className="w-3.5 h-3.5"
               fill="none"
@@ -349,7 +505,9 @@ function JobCard({
 }
 
 function TextBlock({ text }: { text: string }) {
-  const isHtml = text.trimStart().startsWith('<');
+  const { translatedText } = useTranslator({ text });
+  const content = translatedText || text;
+  const isHtml = content.trimStart().startsWith('<');
   if (isHtml) {
     return (
       <div
@@ -360,11 +518,11 @@ function TextBlock({ text }: { text: string }) {
     prose-ul:pl-5 prose-ol:pl-5 prose-li:my-0.5
     prose-strong:text-gray-800 prose-em:text-gray-600
     prose-hr:border-gray-200"
-        dangerouslySetInnerHTML={{ __html: text }}
+        dangerouslySetInnerHTML={{ __html: content }}
       />
     );
   }
-  return <div className="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap break-words overflow-hidden">{text}</div>;
+  return <div className="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap break-words overflow-hidden">{content}</div>;
 }
 
 function DetailSection({ title, children }: { title: string; children: React.ReactNode }) {
@@ -396,6 +554,9 @@ function JobDetailPanel({
   isApplying: boolean;
   applyStatus: 'idle' | 'success' | 'error' | 'already_applied';
 }) {
+  const rawLocale = useLocale();
+  const locale = (rawLocale === 'en' ? 'en' : 'th') as 'th' | 'en';
+  const t = (key: keyof typeof TRANSLATIONS['th']) => TRANSLATIONS[locale]?.[key] || TRANSLATIONS['th'][key] || key;
   const merged = detailJob ?? job;
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -412,7 +573,7 @@ function JobDetailPanel({
         <CompanyLogo company={merged.company} size="md" />
         <div className="flex-1 min-w-0">
           <h2 className="font-bold text-[#020263] text-base leading-snug line-clamp-2">
-            {merged.title}
+            <Translate text={merged.title} />
           </h2>
           <div className="flex items-center gap-1 mt-0.5">
             {isVerifiedCompany(merged.company) && (
@@ -422,17 +583,17 @@ function JobDetailPanel({
           </div>
           <div className="flex flex-wrap gap-1.5 mt-2">
             <span className="text-xs bg-blue-50 text-blue-700 border border-blue-100 px-2.5 py-0.5 rounded-full font-medium">
-              {JOB_TYPE_LABEL[merged.jobType] || merged.jobType}
+              {JOB_TYPE_LABEL[merged.jobType]?.[locale] || merged.jobType}
             </span>
             <span className="text-xs bg-gray-50 text-gray-600 border border-gray-200 px-2.5 py-0.5 rounded-full font-medium">
-              {WORK_MODEL_LABEL[merged.workModel] || merged.workModel}
+              {WORK_MODEL_LABEL[merged.workModel]?.[locale] || merged.workModel}
             </span>
           </div>
         </div>
         <button
           onClick={onClose}
-          className="shrink-0 w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
-          title="ปิด"
+          className="shrink-0 w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+          title={t('close')}
         >
           <X className="w-4 h-4" />
         </button>
@@ -445,7 +606,9 @@ function JobDetailPanel({
           {(merged.locationProvince || merged.locationDistrict) && (
             <span className="flex items-center gap-1.5">
               <MapPin className="w-4 h-4 text-red-400 shrink-0" />
-              {merged.locationProvince}
+              {locale === 'en'
+                ? PROVINCE_EN_MAP[merged.locationProvince || ''] || merged.locationProvince
+                : merged.locationProvince}
               {merged.locationDistrict ? ` · ${merged.locationDistrict}` : ''}
             </span>
           )}
@@ -463,7 +626,7 @@ function JobDetailPanel({
                 d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            {salaryText(merged)}
+            {salaryText(merged, locale)}
           </span>
           <span className="flex items-center gap-1 text-gray-400 text-xs">
             <svg
@@ -479,7 +642,7 @@ function JobDetailPanel({
                 d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
               />
             </svg>
-            โพสต์ {timeAgo(merged.createdAt)}
+            {t('posted')} {timeAgo(merged.createdAt, locale)}
           </span>
         </div>
 
@@ -488,26 +651,26 @@ function JobDetailPanel({
           <button
             onClick={() => onApply(merged.id)}
             disabled={isApplying || applyStatus === 'success' || applyStatus === 'already_applied'}
-            className={`w-full sm:w-auto flex-1 py-2.5 rounded-xl text-sm font-bold transition-colors shadow-sm ${applyStatus === 'success' || applyStatus === 'already_applied'
+            className={`w-full sm:w-auto flex-1 py-2.5 rounded-xl text-sm font-bold transition-colors shadow-sm cursor-pointer ${applyStatus === 'success' || applyStatus === 'already_applied'
               ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
               : 'bg-[#E00016] hover:bg-[#A80010] text-white'
               }`}
           >
             {isApplying
-              ? 'กำลังส่ง...'
+              ? t('submitting')
               : applyStatus === 'success'
-                ? '✓ สมัครสำเร็จ!'
+                ? t('appliedSuccess')
                 : applyStatus === 'already_applied'
-                  ? 'สมัครไปแล้ว'
-                  : 'สมัครงานนี้'}
+                  ? t('alreadyApplied')
+                  : t('applyJob')}
           </button>
           <Link
             href={`/jobs/${merged.slug}`}
             target="_blank"
-            className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border-2 border-[#020263] text-[#020263] text-sm font-bold hover:bg-[#020263] hover:text-white transition-colors whitespace-nowrap"
+            className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border-2 border-[#020263] text-[#020263] text-sm font-bold hover:bg-[#020263] hover:text-white transition-colors whitespace-nowrap cursor-pointer"
           >
             <ExternalLink className="w-3.5 h-3.5" />
-            ดูเต็มหน้า
+            {t('viewFullPage')}
           </Link>
         </div>
 
@@ -528,28 +691,28 @@ function JobDetailPanel({
           <>
             {/* Description */}
             {merged.description && (
-              <DetailSection title="รายละเอียดงาน">
+              <DetailSection title={t('jobDescription')}>
                 <TextBlock text={merged.description} />
               </DetailSection>
             )}
 
             {/* Requirements */}
             {merged.requirements && (
-              <DetailSection title="คุณสมบัติที่ต้องการ">
+              <DetailSection title={t('jobRequirements')}>
                 <TextBlock text={merged.requirements} />
               </DetailSection>
             )}
 
             {/* Skills */}
             {merged.requiredSkills.length > 0 && (
-              <DetailSection title="ทักษะที่ต้องการ">
+              <DetailSection title={t('requiredSkills')}>
                 <div className="flex flex-wrap gap-1.5">
                   {merged.requiredSkills.map((s) => (
                     <span
                       key={s}
                       className="text-xs text-gray-600 bg-gray-50 border border-gray-200 px-3 py-1 rounded-full"
                     >
-                      {s}
+                      <Translate text={s} />
                     </span>
                   ))}
                 </div>
@@ -558,11 +721,11 @@ function JobDetailPanel({
 
             {/* Benefits */}
             {merged.benefits && (
-              <DetailSection title="สวัสดิการ">
+              <DetailSection title={t('benefits')}>
                 {Array.isArray(merged.benefits) ? (
                   <ul className="list-disc list-inside text-gray-600 text-sm leading-relaxed space-y-1">
                     {merged.benefits.map((b: string, i: number) => (
-                      <li key={i}>{b}</li>
+                      <li key={i}><Translate text={b} /></li>
                     ))}
                   </ul>
                 ) : (
@@ -577,7 +740,7 @@ function JobDetailPanel({
               merged.qualificationAgeMin ||
               merged.qualificationAgeMax ||
               merged.qualificationExperience != null) && (
-                <DetailSection title="คุณสมบัติผู้สมัคร">
+                <DetailSection title={t('candidateQualifications')}>
                   <div className="grid grid-cols-2 gap-3">
                     {merged.qualificationGender && (
                       <div className="flex items-center gap-2 text-sm">
@@ -585,9 +748,9 @@ function JobDetailPanel({
                           <User className="w-3.5 h-3.5 text-blue-500" />
                         </div>
                         <div>
-                          <p className="text-xs text-gray-400">เพศ</p>
+                          <p className="text-xs text-gray-400">{t('gender')}</p>
                           <p className="font-medium text-gray-700 text-xs">
-                            {merged.qualificationGender}
+                            <Translate text={merged.qualificationGender} />
                           </p>
                         </div>
                       </div>
@@ -598,13 +761,13 @@ function JobDetailPanel({
                           <Calendar className="w-3.5 h-3.5 text-orange-500" />
                         </div>
                         <div>
-                          <p className="text-xs text-gray-400">อายุ</p>
+                          <p className="text-xs text-gray-400">{t('age')}</p>
                           <p className="font-medium text-gray-700 text-xs">
                             {merged.qualificationAgeMin && merged.qualificationAgeMax
-                              ? `${merged.qualificationAgeMin}–${merged.qualificationAgeMax} ปี`
+                              ? `${merged.qualificationAgeMin}–${merged.qualificationAgeMax} ${t('ageYears')}`
                               : merged.qualificationAgeMin
-                                ? `${merged.qualificationAgeMin}+ ปี`
-                                : `≤${merged.qualificationAgeMax} ปี`}
+                                ? `${merged.qualificationAgeMin}+ ${t('ageYears')}`
+                                : `≤${merged.qualificationAgeMax} ${t('ageYears')}`}
                           </p>
                         </div>
                       </div>
@@ -615,8 +778,10 @@ function JobDetailPanel({
                           <GraduationCap className="w-3.5 h-3.5 text-green-500" />
                         </div>
                         <div>
-                          <p className="text-xs text-gray-400">วุฒิการศึกษา</p>
-                          <p className="font-medium text-gray-700 text-xs">{merged.education}</p>
+                          <p className="text-xs text-gray-400">{t('education')}</p>
+                          <p className="font-medium text-gray-700 text-xs">
+                            <Translate text={merged.education} />
+                          </p>
                         </div>
                       </div>
                     )}
@@ -626,9 +791,9 @@ function JobDetailPanel({
                           <BriefcaseIcon className="w-3.5 h-3.5 text-purple-500" />
                         </div>
                         <div>
-                          <p className="text-xs text-gray-400">ประสบการณ์</p>
+                          <p className="text-xs text-gray-400">{t('experience')}</p>
                           <p className="font-medium text-gray-700 text-xs">
-                            {merged.qualificationExperience} ปี
+                            {merged.qualificationExperience} {t('ageYears')}
                           </p>
                         </div>
                       </div>
@@ -642,23 +807,27 @@ function JobDetailPanel({
               merged.workingDays ||
               merged.startTime ||
               merged.canOnlineInterview) && (
-                <DetailSection title="ข้อมูลการทำงาน">
+                <DetailSection title={t('workingInfo')}>
                   <div className="space-y-1.5 text-sm">
                     {merged.positions && merged.positions > 0 && (
                       <div className="flex justify-between">
-                        <span className="text-gray-400">จำนวนรับ</span>
-                        <span className="text-gray-700 font-medium">{merged.positions} ตำแหน่ง</span>
+                        <span className="text-gray-400">{t('positionsNeeded')}</span>
+                        <span className="text-gray-700 font-medium">
+                          {merged.positions} {t('positionsUnit')}
+                        </span>
                       </div>
                     )}
                     {merged.workingDays && (
                       <div className="flex justify-between">
-                        <span className="text-gray-400">วันทำงาน</span>
-                        <span className="text-gray-700 font-medium">{merged.workingDays}</span>
+                        <span className="text-gray-400">{t('workingDays')}</span>
+                        <span className="text-gray-700 font-medium">
+                          <Translate text={merged.workingDays} />
+                        </span>
                       </div>
                     )}
                     {merged.startTime && merged.endTime && (
                       <div className="flex justify-between">
-                        <span className="text-gray-400">เวลาทำงาน</span>
+                        <span className="text-gray-400">{t('workingHours')}</span>
                         <span className="text-gray-700 font-medium">
                           {merged.startTime} – {merged.endTime}
                         </span>
@@ -666,8 +835,8 @@ function JobDetailPanel({
                     )}
                     {merged.canOnlineInterview && (
                       <div className="flex justify-between">
-                        <span className="text-gray-400">สัมภาษณ์ออนไลน์</span>
-                        <span className="text-green-600 font-medium">รองรับ</span>
+                        <span className="text-gray-400">{t('onlineInterview')}</span>
+                        <span className="text-green-600 font-medium">{t('supported')}</span>
                       </div>
                     )}
                   </div>
@@ -676,7 +845,7 @@ function JobDetailPanel({
 
             {/* Contact info */}
             {(merged.contactName || merged.contactPhone || merged.companyAddress) && (
-              <DetailSection title="ข้อมูลผู้ติดต่อ">
+              <DetailSection title={t('contactInfo')}>
                 <div className="space-y-2 text-sm">
                   {merged.contactName && (
                     <div className="flex items-center gap-2">
@@ -698,7 +867,9 @@ function JobDetailPanel({
                   {merged.companyAddress && (
                     <div className="flex items-start gap-2">
                       <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0 mt-0.5" />
-                      <span className="text-gray-700 leading-relaxed">{merged.companyAddress}</span>
+                      <span className="text-gray-700 leading-relaxed">
+                        <Translate text={merged.companyAddress} />
+                      </span>
                     </div>
                   )}
                 </div>
@@ -707,9 +878,9 @@ function JobDetailPanel({
 
             {/* Transportation */}
             {merged.transportation && merged.transportation.length > 0 && (
-              <DetailSection title="การเดินทาง">
+              <DetailSection title={t('transportation')}>
                 <div className="flex flex-wrap gap-1.5">
-                  {merged.transportation.map((t) => {
+                  {merged.transportation.map((tr) => {
                     const iconMap: Record<string, React.ElementType> = {
                       รถเมล์: Bus,
                       BTS: TrainFront,
@@ -717,15 +888,15 @@ function JobDetailPanel({
                       ARL: Plane,
                       รถไฟ: Train,
                     };
-                    const presetKey = Object.keys(iconMap).find((key) => t.startsWith(key));
+                    const presetKey = Object.keys(iconMap).find((key) => tr.startsWith(key));
                     const Icon = presetKey ? iconMap[presetKey] : MapPin;
                     return (
                       <span
-                        key={t}
+                        key={tr}
                         className="flex items-center gap-1.5 text-xs text-[#020263] bg-blue-50 border border-[#020263]/30 px-3 py-1.5 rounded-xl"
                       >
                         <Icon className="w-3 h-3" />
-                        {t}
+                        <Translate text={tr} />
                       </span>
                     );
                   })}
@@ -735,7 +906,7 @@ function JobDetailPanel({
 
             {/* Company Images */}
             {merged.companyImages && merged.companyImages.length > 0 && (
-              <DetailSection title="ภาพบรรยากาศในที่ทำงาน">
+              <DetailSection title={t('workplaceAtmosphere')}>
                 <div className="grid grid-cols-2 gap-2">
                   {merged.companyImages.map((url, idx) => (
                     <a
@@ -743,16 +914,16 @@ function JobDetailPanel({
                       href={url}
                       target="_blank"
                       rel="noreferrer"
-                      className="group relative aspect-video rounded-xl overflow-hidden border border-gray-200 hover:border-[#020263] transition-all block"
+                      className="group relative aspect-video rounded-xl overflow-hidden border border-gray-200 hover:border-[#020263] transition-all block cursor-pointer"
                     >
                       <img
                         src={url}
-                        alt={`รูปบริษัท ${idx + 1}`}
+                        alt={`${t('companyPhoto')} ${idx + 1}`}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center">
                         <span className="opacity-0 group-hover:opacity-100 text-white text-xs font-semibold bg-black/50 px-2.5 py-1 rounded-full transition-opacity">
-                          ดูรูปภาพ
+                          {t('viewPhoto')}
                         </span>
                       </div>
                     </a>
@@ -795,6 +966,9 @@ function SkeletonSection() {
 
 function JobsContent() {
   const searchParams = useSearchParams();
+  const rawLocale = useLocale();
+  const locale = (rawLocale === 'en' ? 'en' : 'th') as 'th' | 'en';
+  const t = (key: keyof typeof TRANSLATIONS['th']) => TRANSLATIONS[locale]?.[key] || TRANSLATIONS['th'][key] || key;
   const router = useRouter();
   const { user } = useAuth();
 
@@ -1020,11 +1194,17 @@ function JobsContent() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-xl font-bold text-gray-800">
-              {loading ? 'กำลังโหลด...' : `พบ ${total} ตำแหน่งงาน`}
+              {loading
+                ? t('loading')
+                : t('foundJobs').replace('{total}', String(total))}
             </h1>
             {hasFilters && !loading && (
               <p className="text-sm text-gray-400 mt-0.5">
-                {[keyword && `"${keyword}"`, province, jobType && JOB_TYPE_LABEL[jobType]]
+                {[
+                  keyword && `"${keyword}"`,
+                  province && (locale === 'en' ? (PROVINCE_EN_MAP[province] || province) : province),
+                  jobType && (JOB_TYPE_LABEL[jobType]?.[locale] || jobType),
+                ]
                   .filter(Boolean)
                   .join(' · ')}
               </p>
@@ -1033,9 +1213,9 @@ function JobsContent() {
           {hasFilters && (
             <button
               onClick={() => router.push('/jobs')}
-              className="text-sm text-blue-600 hover:underline"
+              className="text-sm text-blue-600 hover:underline cursor-pointer"
             >
-              ล้างตัวกรอง
+              {t('clearFilter')}
             </button>
           )}
         </div>
@@ -1043,9 +1223,7 @@ function JobsContent() {
         {/* Split-panel layout */}
         <div className="flex gap-5 items-start min-h-screen pb-10">
           {/* Left: Job list */}
-          <div
-            className="flex flex-col gap-4 transition-all duration-300 w-full"
-          >
+          <div className="flex flex-col gap-4 transition-all duration-300 w-full">
             {/* Loading */}
             {loading && (
               <div className="space-y-6">
@@ -1059,13 +1237,13 @@ function JobsContent() {
             {!loading && allJobs.length === 0 && (
               <div className="text-center py-24">
                 <div className="text-5xl mb-4">🔍</div>
-                <div className="text-gray-600 font-semibold text-lg mb-2">ไม่พบประกาศงาน</div>
-                <p className="text-gray-400 text-sm mb-6">ลองเปลี่ยนคำค้นหาหรือล้างตัวกรอง</p>
+                <div className="text-gray-600 font-semibold text-lg mb-2">{t('noJobsFound')}</div>
+                <p className="text-gray-400 text-sm mb-6">{t('tryChangingFilters')}</p>
                 <button
                   onClick={() => router.push('/jobs')}
-                  className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors"
+                  className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors cursor-pointer"
                 >
-                  ดูงานทั้งหมด
+                  {t('viewAllJobs')}
                 </button>
               </div>
             )}
@@ -1114,9 +1292,9 @@ function JobsContent() {
                     <button
                       disabled={page <= 1}
                       onClick={() => fetchJobs(page - 1)}
-                      className="px-4 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      className="px-4 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
                     >
-                      ← ก่อนหน้า
+                      {t('prevPage')}
                     </button>
                     {pages.map((p, idx) =>
                       typeof p === 'string' ? (
@@ -1127,7 +1305,7 @@ function JobsContent() {
                         <button
                           key={p}
                           onClick={() => fetchJobs(p)}
-                          className={`w-10 h-10 rounded-xl text-sm font-medium transition-colors ${p === page
+                          className={`w-10 h-10 rounded-xl text-sm font-medium transition-colors cursor-pointer ${p === page
                             ? 'bg-[#020263] text-white shadow-md'
                             : 'border border-gray-200 text-gray-600 hover:bg-gray-50'
                             }`}
@@ -1139,9 +1317,9 @@ function JobsContent() {
                     <button
                       disabled={page >= totalPages}
                       onClick={() => fetchJobs(page + 1)}
-                      className="px-4 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      className="px-4 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
                     >
-                      ถัดไป →
+                      {t('nextPage')}
                     </button>
                   </div>
                 );

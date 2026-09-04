@@ -112,6 +112,7 @@
   "HeroSearch": {
     "keywordPlaceholder": "ชื่องาน บริษัท หรือคำค้นหา",
     "provincePlaceholder": "ทุกจังหวัด",
+    "salaryPlaceholder": "ระบุเงินเดือนขั้นต่ำ...",
     "minsalary": "ขั้นต่ำ",
     "provinces": {
       "all": "ทุกจังหวัด",
