@@ -44,7 +44,9 @@ export function SearchableSelect({
     }
   }[locale || 'th'];
 
-  const currentOption = options.find((o) => o.value === value);
+  const currentOption = options.find(
+    (o) => o.value === value || (Boolean(value) && o.label.toLowerCase() === value.toLowerCase())
+  );
 
   const displayInputValue = isTyping ? typedSearch : (currentOption?.label || value);
 

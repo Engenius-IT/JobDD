@@ -121,10 +121,15 @@ export default function ProfilePage() {
       'ผ่านการเกณฑ์ทหารแล้ว': 'ผ่านการเกณฑ์ทหารแล้ว',
       'ยังไม่ผ่านการเกณฑ์ทหาร': 'ยังไม่ผ่านการเกณฑ์ทหาร',
       'จังหวัดที่สนใจทำงาน (เลือกได้หลายที่)': 'จังหวัดที่สนใจทำงาน (เลือกได้หลายที่)',
-      'จังหวัด': 'Province',
-      'อำเภอ / เขต': 'District',
-      'ตำบล / แขวง': 'Sub-district',
-      'รหัสไปรษณีย์': 'Postal Code',
+      'จังหวัด': 'จังหวัด',
+      'อำเภอ / เขต': 'อำเภอ / เขต',
+      'ตำบล / แขวง': 'ตำบล / แขวง',
+      'รหัสไปรษณีย์': 'รหัสไปรษณีย์',
+      'ชื่อจริง': 'ชื่อจริง',
+      'นามสกุล': 'นามสกุล',
+      'บันทึก': 'บันทึก',
+      'ยกเลิก': 'ยกเลิก',
+      'แก้ไขชื่อ': 'แก้ไขชื่อ',
       'อัพโหลดรูปภาพโปรไฟล์สำเร็จ ✓': 'อัพโหลดรูปภาพโปรไฟล์สำเร็จ ✓',
       'บันทึกข้อมูลเรียบร้อยแล้ว ✓': 'บันทึกข้อมูลเรียบร้อยแล้ว ✓',
       'มกราคม': 'มกราคม',
@@ -164,6 +169,11 @@ export default function ProfilePage() {
       'ใบประกาศนียบัตร': 'Certificates',
       'เปลี่ยนรูป': 'Change Photo',
       'เพิ่มชื่อของคุณ': 'Add your name',
+      'ชื่อจริง': 'First name',
+      'นามสกุล': 'Last name',
+      'บันทึก': 'Save',
+      'ยกเลิก': 'Cancel',
+      'แก้ไขชื่อ': 'Edit name',
       'วัน/เดือน/ปีที่เกิด': 'Date of Birth',
       'วัน': 'Day',
       'เดือน': 'Month',
@@ -193,6 +203,10 @@ export default function ProfilePage() {
       'ผ่านการเกณฑ์ทหารแล้ว': 'Completed',
       'ยังไม่ผ่านการเกณฑ์ทหาร': 'Not yet completed',
       'จังหวัดที่สนใจทำงาน (เลือกได้หลายที่)': 'Preferred Work Locations (Multiple choices)',
+      'จังหวัด': 'Province',
+      'อำเภอ / เขต': 'District',
+      'ตำบล / แขวง': 'Sub-district',
+      'รหัสไปรษณีย์': 'Postal Code',
       'อัพโหลดรูปภาพโปรไฟล์สำเร็จ ✓': 'Profile picture uploaded successfully ✓',
       'บันทึกข้อมูลเรียบร้อยแล้ว ✓': 'Data saved successfully ✓',
       'พุทธ': 'Buddhism',
@@ -624,7 +638,7 @@ export default function ProfilePage() {
           <div className="flex items-center gap-3 mb-8">
             <div className="w-1 h-6 rounded-full bg-linear-to-b from-blue-400 to-cyan-400" />
             <h2 className="text-white text-2xl md:text-3xl lg:text-4xl font-semibold tracking-wide">
-              ความสมบูรณ์ของโปรไฟล์
+              {t('ความสมบูรณ์ของโปรไฟล์')}
             </h2>
           </div>
 
@@ -654,7 +668,7 @@ export default function ProfilePage() {
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
                     <span className="text-3xl md:text-4xl font-bold text-white">{completionPercent}%</span>
-                    <span className="text-[10px] text-blue-300/80 mt-0.5">สำเร็จ</span>
+                    <span className="text-[10px] text-blue-300/80 mt-0.5">{t('สำเร็จ')}</span>
                   </div>
                 </div>
               </div>
@@ -716,7 +730,7 @@ export default function ProfilePage() {
               )}
               {/* Hover overlay */}
               <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="text-white text-xs font-semibold">เปลี่ยนรูป</span>
+                <span className="text-white text-xs font-semibold">{t('เปลี่ยนรูป')}</span>
               </div>
             </div>
             <button className="absolute -bottom-2 -right-2 w-8 h-8 bg-black text-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-800 transition-colors z-10">
@@ -740,14 +754,14 @@ export default function ProfilePage() {
                   type="text"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  placeholder="ชื่อจริง"
+                  placeholder={t('ชื่อจริง')}
                   className="bg-white border border-gray-300 text-gray-700 py-1.5 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm w-[45%] min-w-[120px] md:w-auto"
                 />
                 <input
                   type="text"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  placeholder="นามสกุล"
+                  placeholder={t('นามสกุล')}
                   className="bg-white border border-gray-300 text-gray-700 py-1.5 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm w-[45%] min-w-[120px] md:w-auto"
                 />
                 <div className="flex gap-2 w-full justify-center md:w-auto md:justify-start mt-1 md:mt-0">
@@ -755,7 +769,7 @@ export default function ProfilePage() {
                     onClick={handleSaveName}
                     className="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer"
                   >
-                    บันทึก
+                    {t('บันทึก')}
                   </button>
                   <button
                     onClick={() => {
@@ -765,7 +779,7 @@ export default function ProfilePage() {
                     }}
                     className="bg-gray-400 hover:bg-gray-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer"
                   >
-                    ยกเลิก
+                    {t('ยกเลิก')}
                   </button>
                 </div>
               </div>
@@ -773,13 +787,13 @@ export default function ProfilePage() {
               /* 👀 โหมดแสดงผลปกติ */
               <div className="flex items-center justify-center gap-2 w-full md:w-auto">
                 <span className="text-lg font-medium">
-                  {user?.firstName || user?.lastName ? `${firstName} ${lastName}` : 'เพิ่มชื่อของคุณ'}
+                  {user?.firstName || user?.lastName ? `${firstName} ${lastName}` : t('เพิ่มชื่อของคุณ')}
                 </span>
                 {/* ปุ่มดินสอ: เพิ่ม onClick ตรงนี้เพื่อให้กดเปิดโหมดแก้ไขได้จริง */}
                 <button
                   onClick={() => setIsEditingName(true)}
                   className="text-gray-400 hover:text-gray-600 p-1 rounded-sm hover:bg-gray-100 cursor-pointer"
-                  title="แก้ไขชื่อ"
+                  title={t('แก้ไขชื่อ')}
                 >
                   <Pencil className="w-4 h-4" />
                 </button>
@@ -836,7 +850,7 @@ export default function ProfilePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-start md:items-end">
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-2">Height (cm.)</label>
+                <label className="block text-xs font-bold text-gray-700 mb-2">{t('ส่วนสูง (ซม.)')}</label>
                 <input
                   type="number"
                   name="height"
@@ -847,7 +861,7 @@ export default function ProfilePage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-2">Weight (kg.)</label>
+                <label className="block text-xs font-bold text-gray-700 mb-2">{t('น้ำหนัก (กก.)')}</label>
                 <input
                   type="number"
                   name="weight"

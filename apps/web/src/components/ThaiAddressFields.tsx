@@ -1,13 +1,29 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { SearchableSelect } from './SearchableSelect';
 
-interface ThaiAddress {
-  district: string; // ตำบล
-  amphoe: string;   // อำเภอ
-  province: string; // จังหวัด
-  zipcode: number;
+export interface SubDistrictItem {
+  id: number;
+  zip_code: number;
+  name_th: string;
+  name_en: string;
+  district_id: number;
+}
+
+export interface DistrictItem {
+  id: number;
+  name_th: string;
+  name_en: string;
+  province_id: number;
+  sub_districts: SubDistrictItem[];
+}
+
+export interface ProvinceItem {
+  id: number;
+  name_th: string;
+  name_en: string;
+  districts: DistrictItem[];
 }
 
 interface ThaiAddressFieldsProps {
@@ -25,210 +41,290 @@ interface ThaiAddressFieldsProps {
 }
 
 const DATA_URL =
-  'https://cdn.jsdelivr.net/gh/earthchie/jquery.Thailand.js@master/jquery.Thailand.js/database/raw_database/raw_database.json';
+  'https://cdn.jsdelivr.net/gh/kongvut/thai-province-data@master/api/latest/province_with_district_and_sub_district.json';
 
-// 1. ดิกชันนารีแปลชื่อจังหวัด (77 จังหวัด แบบทางการ)
+// In-memory cache across component mounts so the data is only fetched once per session
+let cachedData: ProvinceItem[] | null = null;
+let fetchPromise: Promise<ProvinceItem[]> | null = null;
+
+// 1. ดิกชันนารีแปลชื่อจังหวัด 77 จังหวัด สำหรับการแสดงผลทันทีระหว่างรอโหลด
 const PROVINCE_EN_MAP: Record<string, string> = {
-  'กรุงเทพมหานคร': 'Bangkok', 'กระบี่': 'Krabi', 'กาญจนบุรี': 'Kanchanaburi', 
-  'กาฬสินธุ์': 'Kalasin', 'กำแพงเพชร': 'Kamphaeng Phet', 'ขอนแก่น': 'Khon Kaen', 
-  'จันทบุรี': 'Chanthaburi', 'ฉะเชิงเทรา': 'Chachoengsao', 'ชลบุรี': 'Chonburi', 
-  'ชัยนาท': 'Chainat', 'ชัยภูมิ': 'Chaiyaphum', 'ชุมพร': 'Chumphon', 
-  'เชียงราย': 'Chiang Rai', 'เชียงใหม่': 'Chiang Mai', 'ตรัง': 'Trang', 
-  'ตราด': 'Trat', 'ตาก': 'Tak', 'นครนายก': 'Nakhon Nayok', 
-  'นครปฐม': 'Nakhon Pathom', 'นครพนม': 'Nakhon Phanom', 'นครราชสีมา': 'Nakhon Ratchasima', 
-  'นครศรีธรรมราช': 'Nakhon Si Thammarat', 'นครสวรรค์': 'Nakhon Sawan', 'นนทบุรี': 'Nonthaburi', 
-  'นราธิวาส': 'Narathiwat', 'น่าน': 'Nan', 'บึงกาฬ': 'Bueng Kan', 
-  'บุรีรัมย์': 'Buri Ram', 'ปทุมธานี': 'Pathum Thani', 'ประจวบคีรีขันธ์': 'Prachuap Khiri Khan', 
-  'ปราจีนบุรี': 'Prachin Buri', 'ปัตตานี': 'Pattani', 'พระนครศรีอยุธยา': 'Phra Nakhon Si Ayutthaya', 
-  'พะเยา': 'Phayao', 'พังงา': 'Phang Nga', 'พัทลุง': 'Phatthalung', 
-  'พิจิตร': 'Phichit', 'พิษณุโลก': 'Phitsanulok', 'เพชรบุรี': 'Phetchaburi', 
-  'เพชรบูรณ์': 'Phetchabun', 'แพร่': 'Phrae', 'ภูเก็ต': 'Phuket', 
-  'มหาสารคาม': 'Maha Sarakham', 'มุกดาหาร': 'Mukdahan', 'แม่ฮ่องสอน': 'Mae Hong Son', 
-  'ยโสธร': 'Yasothon', 'ยะลา': 'Yala', 'ร้อยเอ็ด': 'Roi Et', 
-  'ระนอง': 'Ranong', 'ระยอง': 'Rayong', 'ราชบุรี': 'Ratchaburi', 
-  'ลพบุรี': 'Lopburi', 'ลำปาง': 'Lampang', 'ลำพูน': 'Lamphun', 'เลย': 'Loei', 
-  'ศรีสะเกษ': 'Si Sa Ket', 'สกลนคร': 'Sakon Nakhon', 'สงขลา': 'Songkhla', 
-  'สตูล': 'Satun', 'สมุทรปราการ': 'Samut Prakan', 
-  'สมุทรสงคราม': 'Samut Songkhram', 'สมุทรสาคร': 'Samut Sakhon', 'สระแก้ว': 'Sa Kaeo', 
-  'สระบุรี': 'Saraburi', 'สิงห์บุรี': 'Sing Buri', 'สุโขทัย': 'Sukhothai', 
-  'สุพรรณบุรี': 'Suphan Buri', 'สุราษฎร์ธานี': 'Surat Thani', 'สุรินทร์': 'Surin', 
-  'หนองคาย': 'Nong Khai', 'หนองบัวลำภู': 'Nong Bua Lamphu', 'อ่างทอง': 'Ang Thong', 
-  'อำนาจเจริญ': 'Amnat Charoen', 'อุดรธานี': 'Udon Thani', 'อุตรดิตถ์': 'Uttaradit', 
+  'กรุงเทพมหานคร': 'Bangkok', 'กระบี่': 'Krabi', 'กาญจนบุรี': 'Kanchanaburi',
+  'กาฬสินธุ์': 'Kalasin', 'กำแพงเพชร': 'Kamphaeng Phet', 'ขอนแก่น': 'Khon Kaen',
+  'จันทบุรี': 'Chanthaburi', 'ฉะเชิงเทรา': 'Chachoengsao', 'ชลบุรี': 'Chonburi',
+  'ชัยนาท': 'Chainat', 'ชัยภูมิ': 'Chaiyaphum', 'ชุมพร': 'Chumphon',
+  'เชียงราย': 'Chiang Rai', 'เชียงใหม่': 'Chiang Mai', 'ตรัง': 'Trang',
+  'ตราด': 'Trat', 'ตาก': 'Tak', 'นครนายก': 'Nakhon Nayok',
+  'นครปฐม': 'Nakhon Pathom', 'นครพนม': 'Nakhon Phanom', 'นครราชสีมา': 'Nakhon Ratchasima',
+  'นครศรีธรรมราช': 'Nakhon Si Thammarat', 'นครสวรรค์': 'Nakhon Sawan', 'นนทบุรี': 'Nonthaburi',
+  'นราธิวาส': 'Narathiwat', 'น่าน': 'Nan', 'บึงกาฬ': 'Bueng Kan',
+  'บุรีรัมย์': 'Buri Ram', 'ปทุมธานี': 'Pathum Thani', 'ประจวบคีรีขันธ์': 'Prachuap Khiri Khan',
+  'ปราจีนบุรี': 'Prachin Buri', 'ปัตตานี': 'Pattani', 'พระนครศรีอยุธยา': 'Phra Nakhon Si Ayutthaya',
+  'พะเยา': 'Phayao', 'พังงา': 'Phang Nga', 'พัทลุง': 'Phatthalung',
+  'พิจิตร': 'Phichit', 'พิษณุโลก': 'Phitsanulok', 'เพชรบุรี': 'Phetchaburi',
+  'เพชรบูรณ์': 'Phetchabun', 'แพร่': 'Phrae', 'ภูเก็ต': 'Phuket',
+  'มหาสารคาม': 'Maha Sarakham', 'มุกดาหาร': 'Mukdahan', 'แม่ฮ่องสอน': 'Mae Hong Son',
+  'ยโสธร': 'Yasothon', 'ยะลา': 'Yala', 'ร้อยเอ็ด': 'Roi Et',
+  'ระนอง': 'Ranong', 'ระยอง': 'Rayong', 'ราชบุรี': 'Ratchaburi',
+  'ลพบุรี': 'Lopburi', 'ลำปาง': 'Lampang', 'ลำพูน': 'Lamphun', 'เลย': 'Loei',
+  'ศรีสะเกษ': 'Si Sa Ket', 'สกลนคร': 'Sakon Nakhon', 'สงขลา': 'Songkhla',
+  'สตูล': 'Satun', 'สมุทรปราการ': 'Samut Prakan',
+  'สมุทรสงคราม': 'Samut Songkhram', 'สมุทรสาคร': 'Samut Sakhon', 'สระแก้ว': 'Sa Kaeo',
+  'สระบุรี': 'Saraburi', 'สิงห์บุรี': 'Sing Buri', 'สุโขทัย': 'Sukhothai',
+  'สุพรรณบุรี': 'Suphan Buri', 'สุราษฎร์ธานี': 'Surat Thani', 'สุรินทร์': 'Surin',
+  'หนองคาย': 'Nong Khai', 'หนองบัวลำภู': 'Nong Bua Lamphu', 'อ่างทอง': 'Ang Thong',
+  'อำนาจเจริญ': 'Amnat Charoen', 'อุดรธานี': 'Udon Thani', 'อุตรดิตถ์': 'Uttaradit',
   'อุทัยธานี': 'Uthai Thani', 'อุบลราชธานี': 'Ubon Ratchathani'
 };
 
-// ฟังก์ชันถอดเสียงคาราโอเกะแบบเบาและแม่นยำ (ไม่หน่วงเว็บ)
-const phoneticTranslate = (text: string): string => {
-  if (!text) return '';
-  
-  // ดิกชันนารีคำศัพท์เฉพาะที่พบบ่อย
-  const commonWords: Record<string, string> = {
-    'เมือง': 'Mueang', 'อำเภอ': 'District', 'เขต': 'District',
-    'ตำบล': 'Sub-district', 'แขวง': 'Sub-district'
-  };
-
-  // แปลงคำศัพท์เฉพาะก่อน
-  if (commonWords[text]) return commonWords[text];
-
-  // ตารางเทียบพยัญชนะและสระเบื้องต้น
-  const charMap: Record<string, string> = {
-    'ก': 'k', 'ข': 'kh', 'ค': 'kh', 'ง': 'ng', 'จ': 'ch',
-    'ฉ': 'ch', 'ช': 'ch', 'ซ': 's', 'ญ': 'y', 'ด': 'd',
-    'ต': 't', 'ถ': 'th', 'ท': 'th', 'น': 'n', 'บ': 'b',
-    'ป': 'p', 'ผ': 'ph', 'ฝ': 'f', 'พ': 'ph', 'ฟ': 'f',
-    'ภ': 'ph', 'ม': 'm', 'ย': 'y', 'ร': 'r', 'ล': 'l',
-    'ว': 'w', 'ศ': 's', 'ส': 's', 'ห': 'h', 'อ': '',
-    'เ': 'e', 'แ': 'ae', 'า': 'a', 'ิ': 'i', 'ี': 'i',
-    'ุ': 'u', 'ู': 'u', 'โ': 'o', 'ใ': 'ai', 'ไ': 'ai'
-  };
-
-  let result = '';
-  for (let i = 0; i < text.length; i++) {
-    const char = text[i];
-    
-    // ตัดวรรณยุกต์และการันต์ออก
-    if (['่', '้', '๊', '๋', '์', '็'].includes(char)) continue;
-
-    // ตรวจสอบว่าเป็นอักขระภาษาไทยหรือไม่ (รหัสยูนิโค้ด 0E00-0E7F)
-    const isThai = char.charCodeAt(0) >= 0x0E00 && char.charCodeAt(0) <= 0x0E7F;
-
-    if (charMap[char] !== undefined) {
-      result += charMap[char];
-    } else if (isThai) {
-      // ถ้าเป็นตัวอักษรไทยแต่ไม่มีใน map ให้ข้ามทิ้งไปเลย (ป้องกันสระ/อักษรลอยติดมา)
-      continue;
-    } else {
-      // อักขระอื่นๆ (เช่น ช่องว่าง, วงเล็บ) ให้คงไว้ตามเดิม
-      result += char;
-    }
-  }
-
-  // ปรับตัวอักษรตัวแรกให้เป็นพิมพ์ใหญ่
-  return result.charAt(0).toUpperCase() + result.slice(1).toLowerCase();
+// Helper ฟังก์ชันสำหรับลบคำนำหน้า (อำเภอ, เขต, khet, amphoe) เพื่อให้ค้นหาตรงกันได้อย่างแม่นยำ
+const cleanDistrictName = (s: string) => {
+  if (!s) return '';
+  return s
+    .replace(/^(อำเภอ|เขต|khet\s+|amphoe\s+|district\s+)/i, '')
+    .trim()
+    .toLowerCase();
 };
 
-function unique(arr: string[]): string[] {
-  return [...new Set(arr)].sort((a, b) => a.localeCompare(b, 'th'));
-}
+// Helper ฟังก์ชันสำหรับลบคำนำหน้า (ตำบล, แขวง, tambon, khwaeng)
+const cleanSubDistrictName = (s: string) => {
+  if (!s) return '';
+  return s
+    .replace(/^(ตำบล|แขวง|tambon\s+|khwaeng\s+|sub-district\s+)/i, '')
+    .trim()
+    .toLowerCase();
+};
 
 export function ThaiAddressFields({
   locale,
   province,
-  district,   
-  subDistrict, 
+  district,
+  subDistrict,
   postalCode,
   onChange,
 }: ThaiAddressFieldsProps) {
-  const [data, setData] = useState<ThaiAddress[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<ProvinceItem[]>(() => cachedData || []);
+  const [loading, setLoading] = useState<boolean>(!cachedData);
 
   useEffect(() => {
-    fetch(DATA_URL)
-      .then((r) => r.json())
-      .then((json) => {
-        setData(json);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error('Failed to load address database:', err);
-        setLoading(false);
-      });
+    if (cachedData) {
+      setData(cachedData);
+      setLoading(false);
+      return;
+    }
+
+    if (!fetchPromise) {
+      fetchPromise = fetch(DATA_URL)
+        .then((r) => {
+          if (!r.ok) throw new Error(`HTTP error! status: ${r.status}`);
+          return r.json();
+        })
+        .then((json: ProvinceItem[]) => {
+          cachedData = json;
+          return json;
+        })
+        .catch((err) => {
+          console.error('Failed to load official Thai address data:', err);
+          fetchPromise = null;
+          return [];
+        });
+    }
+
+    fetchPromise.then((json) => {
+      setData(json);
+      setLoading(false);
+    });
   }, []);
 
-  const provinces = unique(data.map((item) => item.province));
+  // 1. ค้นหาจังหวัดที่ถูกเลือก
+  const selectedProvince = useMemo(() => {
+    if (!province) return null;
+    const provLower = province.trim().toLowerCase();
+    return (
+      data.find(
+        (p) =>
+          p.name_th === province ||
+          p.name_en.toLowerCase() === provLower ||
+          PROVINCE_EN_MAP[p.name_th]?.toLowerCase() === provLower
+      ) || null
+    );
+  }, [data, province]);
 
-  const amphoes = unique(
-    data.filter((item) => item.province === province).map((item) => item.amphoe)
-  );
+  // 2. ค้นหาอำเภอ / เขตที่ถูกเลือก
+  const selectedDistrict = useMemo(() => {
+    if (!district || !selectedProvince) return null;
+    const distLower = district.trim().toLowerCase();
+    const cleanD = cleanDistrictName(district);
 
-  const subDistricts = unique(
-    data
-      .filter((item) => item.province === province && item.amphoe === district)
-      .map((item) => item.district) 
-  );
+    return (
+      selectedProvince.districts.find(
+        (d) =>
+          d.name_th === district ||
+          d.name_en.toLowerCase() === distLower ||
+          cleanDistrictName(d.name_th) === cleanD ||
+          cleanDistrictName(d.name_en) === cleanD
+      ) || null
+    );
+  }, [selectedProvince, district]);
 
-  const getProvinceLabel = (val: string) => {
-    if (!val) return '';
-    return locale === 'en' ? PROVINCE_EN_MAP[val] || val : val;
-  };
+  // 3. ค้นหาตำบล / แขวงที่ถูกเลือก
+  const selectedSubDistrict = useMemo(() => {
+    if (!subDistrict || !selectedDistrict) return null;
+    const subLower = subDistrict.trim().toLowerCase();
+    const cleanS = cleanSubDistrictName(subDistrict);
 
-  const getLabel = (val: string) => {
-    if (!val) return '';
-    return locale === 'en' ? phoneticTranslate(val) : val;
-  };
+    return (
+      selectedDistrict.sub_districts.find(
+        (s) =>
+          s.name_th === subDistrict ||
+          s.name_en.toLowerCase() === subLower ||
+          cleanSubDistrictName(s.name_th) === cleanS ||
+          cleanSubDistrictName(s.name_en) === cleanS
+      ) || null
+    );
+  }, [selectedDistrict, subDistrict]);
+
+  // ตัวเลือกจังหวัด (เรียงลำดับ ก-ฮ ภาษาไทยคงที่ทั้งโหมดไทยและอังกฤษ เพื่อไม่ให้ลำดับกระโดด)
+  const provinceOptions = useMemo(() => {
+    return data
+      .map((p) => ({
+        value: p.name_th,
+        label: locale === 'en' ? (p.name_en || PROVINCE_EN_MAP[p.name_th] || p.name_th) : p.name_th,
+      }))
+      .sort((a, b) => a.value.localeCompare(b.value, 'th'));
+  }, [data, locale]);
+
+  // ตัวเลือกอำเภอ / เขต (เรียงลำดับ ก-ฮ ภาษาไทยคงที่ทั้งโหมดไทยและอังกฤษ)
+  const districtOptions = useMemo(() => {
+    if (!selectedProvince) return [];
+    return selectedProvince.districts
+      .map((d) => ({
+        value: d.name_th,
+        label: locale === 'en' ? d.name_en : d.name_th,
+      }))
+      .sort((a, b) => a.value.localeCompare(b.value, 'th'));
+  }, [selectedProvince, locale]);
+
+  // ตัวเลือกตำบล / แขวง (เรียงลำดับ ก-ฮ ภาษาไทยคงที่ทั้งโหมดไทยและอังกฤษ)
+  const subDistrictOptions = useMemo(() => {
+    if (!selectedDistrict) return [];
+    return selectedDistrict.sub_districts
+      .map((s) => ({
+        value: s.name_th,
+        label: locale === 'en' ? s.name_en : s.name_th,
+      }))
+      .sort((a, b) => a.value.localeCompare(b.value, 'th'));
+  }, [selectedDistrict, locale]);
+
+  const isBangkok =
+    selectedProvince?.name_th === 'กรุงเทพมหานคร' ||
+    province === 'กรุงเทพมหานคร' ||
+    province.toLowerCase() === 'bangkok';
 
   const t = {
     province: locale === 'en' ? 'Province' : 'จังหวัด',
-    district: locale === 'en' ? 'District' : 'เขต / อำเภอ',
-    subDistrict: locale === 'en' ? 'Sub-district' : 'แขวง / ตำบล',
+    district: locale === 'en' ? 'District' : isBangkok ? 'เขต' : 'อำเภอ',
+    subDistrict: locale === 'en' ? 'Sub-district' : isBangkok ? 'แขวง' : 'ตำบล',
     postalCode: locale === 'en' ? 'Postal Code' : 'รหัสไปรษณีย์',
     load: locale === 'en' ? 'Loading...' : 'กำลังโหลด...',
     searchProvince: locale === 'en' ? 'Select Province' : 'เลือกจังหวัด',
-    searchDistrict: locale === 'en' ? 'Select District' : 'เลือกเขต / อำเภอ',
-    searchSubDistrict: locale === 'en' ? 'Select Sub-district' : 'เลือกแขวง / ตำบล',
+    searchDistrict: locale === 'en' ? 'Select District' : isBangkok ? 'เลือกเขต' : 'เลือกอำเภอ',
+    searchSubDistrict: locale === 'en' ? 'Select Sub-district' : isBangkok ? 'เลือกแขวง' : 'เลือกตำบล',
     selectProvinceFirst: locale === 'en' ? 'Please select province first' : 'กรุณาเลือกจังหวัดก่อน',
-    selectDistrictFirst: locale === 'en' ? 'Please select district first' : 'กรุณาเลือกเขต / อำเภอก่อน',
+    selectDistrictFirst:
+      locale === 'en'
+        ? 'Please select district first'
+        : isBangkok
+        ? 'กรุณาเลือกเขตก่อน'
+        : 'กรุณาเลือกอำเภอก่อน',
   };
 
   const handleProvince = (val: string) => {
-    onChange({ province: val, district: '', subDistrict: '', postalCode: '' });
+    const matched = data.find(
+      (p) =>
+        p.name_th === val ||
+        p.name_en.toLowerCase() === val.trim().toLowerCase()
+    );
+    const provNameTh = matched ? matched.name_th : val;
+    onChange({
+      province: provNameTh,
+      district: '',
+      subDistrict: '',
+      postalCode: '',
+    });
   };
 
-  const handleAmphoe = (val: string) => {
-    onChange({ province, district: val, subDistrict: '', postalCode: '' });
+  const handleDistrict = (val: string) => {
+    const matched = selectedProvince?.districts.find(
+      (d) =>
+        d.name_th === val ||
+        d.name_en.toLowerCase() === val.trim().toLowerCase() ||
+        cleanDistrictName(d.name_th) === cleanDistrictName(val)
+    );
+    const distNameTh = matched ? matched.name_th : val;
+    onChange({
+      province: selectedProvince ? selectedProvince.name_th : province,
+      district: distNameTh,
+      subDistrict: '',
+      postalCode: '',
+    });
   };
 
   const handleSubDistrict = (val: string) => {
-    const selectedZip = data.find(
-      (item) =>
-        item.province === province &&
-        item.amphoe === district &&
-        item.district === val
-    )?.zipcode;
-
+    const matched = selectedDistrict?.sub_districts.find(
+      (s) =>
+        s.name_th === val ||
+        s.name_en.toLowerCase() === val.trim().toLowerCase() ||
+        cleanSubDistrictName(s.name_th) === cleanSubDistrictName(val)
+    );
+    const subNameTh = matched ? matched.name_th : val;
     onChange({
-      province,
-      district,
-      subDistrict: val,
-      postalCode: selectedZip ? String(selectedZip) : '',
+      province: selectedProvince ? selectedProvince.name_th : province,
+      district: selectedDistrict ? selectedDistrict.name_th : district,
+      subDistrict: subNameTh,
+      postalCode: matched?.zip_code ? String(matched.zip_code) : postalCode,
     });
   };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      {/* จังหวัด (Province) */}
       <div>
         <label className="block text-sm font-bold text-gray-700 mb-2">{t.province}</label>
         <SearchableSelect
           locale={locale}
           placeholder={loading ? t.load : t.searchProvince}
-          value={getProvinceLabel(province)} 
+          value={selectedProvince ? selectedProvince.name_th : province}
           onChange={handleProvince}
-          options={provinces.map((p) => ({ value: p, label: getProvinceLabel(p) }))}
+          options={provinceOptions}
         />
       </div>
 
+      {/* อำเภอ / เขต (District) */}
       <div>
         <label className="block text-sm font-bold text-gray-700 mb-2">{t.district}</label>
         <SearchableSelect
           locale={locale}
           placeholder={!province ? t.selectProvinceFirst : t.searchDistrict}
-          value={getLabel(district)}
-          onChange={handleAmphoe}
-          options={amphoes.map((a) => ({ value: a, label: getLabel(a) }))}
+          value={selectedDistrict ? selectedDistrict.name_th : district}
+          onChange={handleDistrict}
+          options={districtOptions}
         />
       </div>
 
+      {/* ตำบล / แขวง (Sub-district) */}
       <div>
         <label className="block text-sm font-bold text-gray-700 mb-2">{t.subDistrict}</label>
         <SearchableSelect
           locale={locale}
           placeholder={!district ? t.selectDistrictFirst : t.searchSubDistrict}
-          value={getLabel(subDistrict)}
+          value={selectedSubDistrict ? selectedSubDistrict.name_th : subDistrict}
           onChange={handleSubDistrict}
-          options={subDistricts.map((s) => ({ value: s, label: getLabel(s) }))}
+          options={subDistrictOptions}
         />
       </div>
 
+      {/* รหัสไปรษณีย์ (Postal Code) */}
       <div>
         <label className="block text-sm font-bold text-gray-700 mb-2">{t.postalCode}</label>
         <input
